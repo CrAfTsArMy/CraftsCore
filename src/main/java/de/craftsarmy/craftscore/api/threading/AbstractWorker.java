@@ -1,15 +1,10 @@
 package de.craftsarmy.craftscore.api.threading;
 
-import de.craftsarmy.craftscore.buildin.Worker;
+import de.craftsarmy.craftscore.Core;
+import de.craftsarmy.craftscore.buildin.threading.Worker;
 import de.craftsarmy.craftscore.utils.Touch;
 
 public abstract class AbstractWorker {
-
-    private boolean debug = false;
-
-    public AbstractWorker(boolean debug) {
-        this.debug = debug;
-    }
 
     public abstract void shutdown();
     public abstract void submit(Class<? extends Worker.Task> clazz);
@@ -17,16 +12,8 @@ public abstract class AbstractWorker {
     public abstract void pause(Class<? extends Worker.Task> clazz);
 
     public void callback(Class<?> clazz) {
-        if (debug)
-            System.out.println("[Worker]: Running Task: " + clazz.getName());
-    }
-
-    public final void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    public final boolean isDebug() {
-        return debug;
+        if (Core.isDebug())
+            System.out.println("[" + Thread.currentThread().getName() + "]: Running Task: " + clazz.getName());
     }
 
     public abstract static class Task extends Touch.TouchAble {

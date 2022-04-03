@@ -1,5 +1,6 @@
-package de.craftsarmy.craftscore.buildin;
+package de.craftsarmy.craftscore.buildin.moduls;
 
+import de.craftsarmy.craftscore.Core;
 import de.craftsarmy.craftscore.api.moduls.AbstractModul;
 import de.craftsarmy.craftscore.api.moduls.AbstractModulManager;
 import de.craftsarmy.craftscore.utils.Touch;
@@ -44,7 +45,8 @@ public final class ModulManager extends AbstractModulManager {
     }
 
     public void callback(Class<?> clazz) {
-
+        if (Core.isDebug())
+            System.out.println("[" + Thread.currentThread().getName() + "]: Touch Callback from: " + clazz.getName());
     }
 
 }

@@ -1,4 +1,4 @@
-package de.craftsarmy.craftscore.buildin;
+package de.craftsarmy.craftscore.buildin.config;
 
 import com.google.gson.*;
 import de.craftsarmy.craftscore.api.config.AbstractConfig;

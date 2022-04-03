@@ -1,4 +1,4 @@
-package de.craftsarmy.craftscore.buildin;
+package de.craftsarmy.craftscore.buildin.threading;
 
 import de.craftsarmy.craftscore.api.threading.AbstractWorker;
 import de.craftsarmy.craftscore.utils.Touch;
@@ -15,8 +15,7 @@ public final class Worker extends AbstractWorker {
     private final ConcurrentLinkedQueue<Class<? extends Task>> tasks = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<Class<? extends Task>> repeatingTasks = new ConcurrentLinkedQueue<>();
 
-    public Worker(boolean debug) {
-        super(debug);
+    public Worker() {
         touch = new Touch<>(this.getClass());
         thread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {

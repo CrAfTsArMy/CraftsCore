@@ -33,7 +33,7 @@ repositories {
 ```
 ```gradle
 dependencies {
-  implementation 'com.github.CrAfTsArMy:CraftsCore:2.6-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:2.7-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'
   implementation 'com.google.code.gson:gson:2.9.0'

@@ -18,7 +18,6 @@ public abstract class AbstractConfig {
     public abstract double getDouble(String path);
 
     public abstract void set(String path, Object data);
-    public abstract void setString(String path, String data);
     public abstract void setInt(String path, int data);
     public abstract void setLong(String path, long data);
     public abstract void setBoolean(String path, boolean data);

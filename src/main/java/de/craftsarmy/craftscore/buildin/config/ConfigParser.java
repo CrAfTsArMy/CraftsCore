@@ -14,21 +14,21 @@ import java.io.InputStreamReader;
 public final class ConfigParser extends AbstractConfigParser {
 
     @Override
-    @Nullable
     public AbstractConfig parse(File f) {
         try {
             if (!f.getParentFile().exists())
                 f.getParentFile().mkdirs();
             f.createNewFile();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-            if (Validator.isJsonValid(bufferedReader))
-                return new Config(JsonParser.parseReader(bufferedReader).getAsJsonObject());
+            String json = bufferedReader.readLine();
+            if (json != null && Validator.isJsonValid(json))
+                return new Config(JsonParser.parseString(json).getAsJsonObject());
             else
                 return new Config(JsonParser.parseString("{}").getAsJsonObject());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new Config(JsonParser.parseString("{}").getAsJsonObject());
+        return null;
     }
 
 }

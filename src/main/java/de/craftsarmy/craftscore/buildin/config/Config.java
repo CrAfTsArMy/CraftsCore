@@ -87,25 +87,13 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
                 temp = temp.getAsJsonObject(s);
             } else {
                 temp.addProperty(object, data.toString());
-            }
-        }
-    }
-
-    @Override
-    public void setString(String path, String data) {
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1];
-        JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data);
             }
         }
     }
@@ -119,6 +107,10 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
                 temp = temp.getAsJsonObject(s);
             } else {
                 temp.addProperty(object, data);
@@ -135,6 +127,10 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
                 temp = temp.getAsJsonObject(s);
             } else {
                 temp.addProperty(object, data);
@@ -151,6 +147,10 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
                 temp = temp.getAsJsonObject(s);
             } else {
                 temp.addProperty(object, data);
@@ -167,6 +167,10 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
                 temp = temp.getAsJsonObject(s);
             } else {
                 temp.addProperty(object, data);
@@ -177,7 +181,7 @@ public final class Config extends AbstractConfig {
     @Override
     public void save(File f) {
         try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().create();
             String json = gson.toJson(getObject());
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(f));
             bufferedWriter.write(json);

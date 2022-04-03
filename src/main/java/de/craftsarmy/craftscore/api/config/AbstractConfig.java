@@ -11,6 +11,8 @@ public abstract class AbstractConfig {
         this.object = object;
     }
 
+    public abstract boolean contains(String path);
+
     public abstract String getString(String path);
     public abstract int getInt(String path);
     public abstract long getLong(String path);

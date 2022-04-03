@@ -27,8 +27,7 @@ public final class Touch<E extends Touch.TouchAble> {
                     }
                 if (callback)
                     from.getMethod("callback").invoke(from.getDeclaredConstructor(Class.class).newInstance(this.getClass()));
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ignored) {
             }
         }
 

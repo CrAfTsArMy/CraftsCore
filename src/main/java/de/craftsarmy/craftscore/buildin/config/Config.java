@@ -14,6 +14,21 @@ public final class Config extends AbstractConfig {
     }
 
     @Override
+    public boolean contains(String path) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args)
+            if (s.equals(object) && temp.has(object))
+                return true;
+            else if (temp.has(s))
+                temp = temp.getAsJsonObject(s);
+            else
+                return false;
+        return false;
+    }
+
+    @Override
     public String getString(String path) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];

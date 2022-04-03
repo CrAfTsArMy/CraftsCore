@@ -16,10 +16,10 @@
 ```
 ```xml
 <dependency>
-	    <groupId>com.github.CrAfTsArMy</groupId>
-	    <artifactId>CraftsCore</artifactId>
-	    <version>2.4-SNAPSHOT</version>
-	</dependency>
+  <groupId>com.github.CrAfTsArMy</groupId>
+  <artifactId>CraftsCore</artifactId>
+  <version>2.4-SNAPSHOT</version>
+</dependency>
 ```
 
 ### Gradle
@@ -36,4 +36,4 @@ dependencies {
 ```
 
 ## Issues
-If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/HypeAPI/issues)
+If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/CraftsCore/issues)

@@ -1,16 +1,11 @@
-# HypeAPI - The most useful api you have ever seen
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/CrAfTsArMy/HypeAPI)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrAfTsArMy/HypeAPI)
-![GitHub](https://img.shields.io/github/license/CrAfTsArMy/HypeAPI)
-![GitHub all releases](https://img.shields.io/github/downloads/CrAfTsArMy/HypeAPI/total)
-![GitHub issues](https://img.shields.io/github/issues-raw/CrAfTsArMy/HypeAPI)
+# CraftsCore
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/CrAfTsArMy/CraftsCore)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrAfTsArMy/CraftsCore)
+![GitHub](https://img.shields.io/github/license/CrAfTsArMy/CraftsCore)
+![GitHub all releases](https://img.shields.io/github/downloads/CrAfTsArMy/CraftsCore/total)
+![GitHub issues](https://img.shields.io/github/issues-raw/CrAfTsArMy/CraftsCore)
 ![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCtBJZHmZqOvWJ0t8hjhWSAA?label=CraftsCodesArmy&style=flat)
 ![Twitch Status](https://img.shields.io/twitch/status/crafts__army?label=CrAfTs__ArMy)
-
-
-## How to use?
-You can find basic functions, classes and everything from [wiki](https://github.com/CrAfTsArMy/HypeAPI/wiki).
-
 
 ### Maven
 ```xml
@@ -21,24 +16,22 @@ You can find basic functions, classes and everything from [wiki](https://github.
 ```
 ```xml
 <dependency>
-  <groupId>com.github.CrAfTsArMy</groupId>
-  <artifactId>HypeAPI</artifactId>
-  <version>2.6</version>
-</dependency>
+	    <groupId>com.github.CrAfTsArMy</groupId>
+	    <artifactId>CraftsCore</artifactId>
+	    <version>2.4-SNAPSHOT</version>
+	</dependency>
 ```
 
 ### Gradle
 ```gradle
-allprojects {
-  repositories {
-    ...
-    maven { url 'https://jitpack.io' }
-  }
+repositories {
+  ...
+  maven { url 'https://jitpack.io' }
 }
 ```
 ```gradle
 dependencies {
-  implementation 'com.github.CrAfTsArMy:HypeAPI:2.6'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:2.4-SNAPSHOT'
 }
 ```
 

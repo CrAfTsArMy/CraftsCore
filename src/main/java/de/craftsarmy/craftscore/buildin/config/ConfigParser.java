@@ -28,7 +28,7 @@ public final class ConfigParser extends AbstractConfigParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return new Config(JsonParser.parseString("{}").getAsJsonObject());
     }
 
 }

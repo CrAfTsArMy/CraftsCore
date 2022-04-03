@@ -36,38 +36,30 @@ public final class Core {
         return this;
     }
 
-    public AbstractConfigParser getParser() {
+    public AbstractConfigParser getConfigParser() {
         return parser;
     }
-
-    public void setParser(AbstractConfigParser parser) {
+    public void setConfigParser(AbstractConfigParser parser) {
         this.parser = parser;
     }
-
     public AbstractModulManager getModulManager() {
         return modulManager;
     }
-
     public void setModulManager(AbstractModulManager modulManager) {
         this.modulManager = modulManager;
     }
-
     public AbstractWorker getWorker() {
         return worker;
     }
-
     public void setWorker(AbstractWorker worker) {
         this.worker = worker;
     }
-
     public AbstractNetworker getNetworker() {
         return networker;
     }
-
     public void enableNetworking(String endpoint) {
         this.networker = new Networker(endpoint);
     }
-
     public void setNetworker(AbstractNetworker networker) {
         this.networker = networker;
     }
@@ -93,31 +85,24 @@ public final class Core {
     public void setDiscordRPC(AbstractDiscordRPC discordRPC) {
         this.discordRPC = discordRPC;
     }
-
     public AbstractDiscordRPCCache getDiscordRPCCache() {
         return discordRPCCache;
     }
-
     public void setDiscordRPCCache(AbstractDiscordRPCCache discordRPCCache) {
         this.discordRPCCache = discordRPCCache;
     }
-
     public AbstractDiscordRPCParty getDiscordRPCParty() {
         return discordRPCParty;
     }
-
     public void setDiscordRPCParty(AbstractDiscordRPCParty discordRPCParty) {
         this.discordRPCParty = discordRPCParty;
     }
-
     public static boolean isInitialized() {
         return initialized;
     }
-
     public static void setDebug(boolean debug) {
         Core.debug = debug;
     }
-
     public static boolean isDebug() {
         return debug;
     }

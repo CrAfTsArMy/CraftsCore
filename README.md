@@ -18,7 +18,7 @@
 <dependency>
   <groupId>com.github.CrAfTsArMy</groupId>
   <artifactId>CraftsCore</artifactId>
-  <version>2.4-SNAPSHOT</version>
+  <version>2.7-SNAPSHOT</version>
 </dependency>
 ```
 

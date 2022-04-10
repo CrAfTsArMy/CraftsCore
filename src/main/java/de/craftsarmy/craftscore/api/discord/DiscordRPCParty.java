@@ -4,7 +4,7 @@ import de.craftsarmy.craftscore.Core;
 
 import java.util.UUID;
 
-public abstract class AbstractDiscordRPCParty {
+public class DiscordRPCParty {
 
     private final String id;
     private final String joinsecret;
@@ -12,7 +12,7 @@ public abstract class AbstractDiscordRPCParty {
     private int max;
 
 
-    public AbstractDiscordRPCParty(int max) {
+    public DiscordRPCParty(int max) {
         this.id = UUID.randomUUID().toString();
         this.joinsecret = UUID.randomUUID().toString().substring(0, 28).replace("-", "").toUpperCase();
         this.size = 1;

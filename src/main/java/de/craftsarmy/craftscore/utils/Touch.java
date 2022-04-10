@@ -11,7 +11,12 @@ public final class Touch<E extends Touch.TouchAble> {
     }
 
     public E touch(Class<? extends E> clazz) throws Exception {
-        return clazz.getDeclaredConstructor(Class.class).newInstance(instance);
+        try {
+            return clazz.getDeclaredConstructor(Class.class).newInstance(instance);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static abstract class TouchAble {
@@ -27,6 +32,7 @@ public final class Touch<E extends Touch.TouchAble> {
                     }
                 if (callback)
                     from.getMethod("callback").invoke(from.getDeclaredConstructor(Class.class).newInstance(this.getClass()));
+                System.out.println(from.getName());
             } catch (Exception ignored) {
             }
         }

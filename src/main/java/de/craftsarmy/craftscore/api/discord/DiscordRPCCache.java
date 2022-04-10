@@ -1,13 +1,13 @@
 package de.craftsarmy.craftscore.api.discord;
 
-public abstract class AbstractDiscordRPCCache {
+public class DiscordRPCCache {
 
     private final String state;
     private final String details;
     private final String smallKey;
     private final String smallText;
 
-    public AbstractDiscordRPCCache(String state, String details, String smallKey, String smallText) {
+    public DiscordRPCCache(String state, String details, String smallKey, String smallText) {
         this.state = state;
         this.details = details;
         this.smallKey = smallKey;

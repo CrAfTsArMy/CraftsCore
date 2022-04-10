@@ -3,6 +3,7 @@ package de.craftsarmy.craftscore.buildin.threading;
 import de.craftsarmy.craftscore.api.threading.AbstractWorker;
 import de.craftsarmy.craftscore.utils.Touch;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class Worker extends AbstractWorker {
@@ -22,7 +23,7 @@ public final class Worker extends AbstractWorker {
                 // Only run tasks once
                 for (Class<? extends Task> task : tasks)
                     try {
-                        touch.touch(task).run();
+                        Objects.requireNonNull(touch.touch(task)).run();
                         tasks.remove(task);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -32,7 +33,7 @@ public final class Worker extends AbstractWorker {
                 // Perform repeating tasks
                 for (Class<? extends Task> task : repeatingTasks)
                     try {
-                        touch.touch(task).run();
+                        Objects.requireNonNull(touch.touch(task)).run();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

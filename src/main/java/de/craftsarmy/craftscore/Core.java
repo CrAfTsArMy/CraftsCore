@@ -1,9 +1,9 @@
 package de.craftsarmy.craftscore;
 
 import de.craftsarmy.craftscore.api.config.AbstractConfigParser;
-import de.craftsarmy.craftscore.api.discord.AbstractDiscordRPC;
-import de.craftsarmy.craftscore.api.discord.AbstractDiscordRPCCache;
-import de.craftsarmy.craftscore.api.discord.AbstractDiscordRPCParty;
+import de.craftsarmy.craftscore.api.discord.DiscordRPC;
+import de.craftsarmy.craftscore.api.discord.DiscordRPCCache;
+import de.craftsarmy.craftscore.api.discord.DiscordRPCParty;
 import de.craftsarmy.craftscore.api.moduls.AbstractModulManager;
 import de.craftsarmy.craftscore.api.network.AbstractNetworker;
 import de.craftsarmy.craftscore.api.threading.AbstractWorker;
@@ -19,9 +19,9 @@ public final class Core {
     private AbstractWorker worker;
     private AbstractNetworker networker;
 
-    private AbstractDiscordRPC discordRPC;
-    private AbstractDiscordRPCCache discordRPCCache;
-    private AbstractDiscordRPCParty discordRPCParty;
+    private DiscordRPC discordRPC;
+    private DiscordRPCCache discordRPCCache;
+    private DiscordRPCParty discordRPCParty;
 
     private static boolean initialized = false;
     private static boolean debug = false;
@@ -63,16 +63,14 @@ public final class Core {
     public void setNetworker(AbstractNetworker networker) {
         this.networker = networker;
     }
-
-    public AbstractDiscordRPC getDiscordRPC() {
+    public DiscordRPC getDiscordRPC() {
         return discordRPC;
     }
 
-    public AbstractDiscordRPC enableDiscordRPC(String applicationID, String largeImageKey, String largeImageText) {
+    public DiscordRPC enableDiscordRPC(String applicationID, String largeImageKey, String largeImageText) {
         if (!initialized)
             init();
-        setDiscordRPC(new AbstractDiscordRPC(largeImageKey, largeImageText) {
-        });
+        setDiscordRPC(new DiscordRPC(largeImageKey, largeImageText));
         return getDiscordRPC().create(applicationID);
     }
 
@@ -82,19 +80,19 @@ public final class Core {
         return this;
     }
 
-    public void setDiscordRPC(AbstractDiscordRPC discordRPC) {
+    public void setDiscordRPC(DiscordRPC discordRPC) {
         this.discordRPC = discordRPC;
     }
-    public AbstractDiscordRPCCache getDiscordRPCCache() {
+    public DiscordRPCCache getDiscordRPCCache() {
         return discordRPCCache;
     }
-    public void setDiscordRPCCache(AbstractDiscordRPCCache discordRPCCache) {
+    public void setDiscordRPCCache(DiscordRPCCache discordRPCCache) {
         this.discordRPCCache = discordRPCCache;
     }
-    public AbstractDiscordRPCParty getDiscordRPCParty() {
+    public DiscordRPCParty getDiscordRPCParty() {
         return discordRPCParty;
     }
-    public void setDiscordRPCParty(AbstractDiscordRPCParty discordRPCParty) {
+    public void setDiscordRPCParty(DiscordRPCParty discordRPCParty) {
         this.discordRPCParty = discordRPCParty;
     }
     public static boolean isInitialized() {
@@ -108,7 +106,6 @@ public final class Core {
     }
 
     private static Core instance;
-
     public static Core instance() {
         if (instance == null)
             instance = new Core().init();

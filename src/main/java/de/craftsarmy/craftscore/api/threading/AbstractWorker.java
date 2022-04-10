@@ -7,9 +7,9 @@ import de.craftsarmy.craftscore.utils.Touch;
 public abstract class AbstractWorker {
 
     public abstract void shutdown();
-    public abstract void submit(Class<? extends Worker.Task> clazz);
-    public abstract void repeat(Class<? extends Worker.Task> clazz);
-    public abstract void pause(Class<? extends Worker.Task> clazz);
+    public abstract void submit(Class<? extends AbstractWorker.Task> clazz);
+    public abstract void repeat(Class<? extends AbstractWorker.Task> clazz);
+    public abstract void pause(Class<? extends AbstractWorker.Task> clazz);
 
     public void callback(Class<?> clazz) {
         if (Core.isDebug())
@@ -21,7 +21,6 @@ public abstract class AbstractWorker {
         public Task(Class<?> from) {
             super(from);
         }
-
         public abstract void run();
 
     }

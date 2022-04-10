@@ -28,7 +28,7 @@ public class DiscordRPC {
     public DiscordRPC create(String applicationId) {
         if(!created) {
             DiscordEventHandlers handlers = new DiscordEventHandlers();
-            handlers.ready = (user) -> System.out.println("Ready!");
+            handlers.ready = (user) -> System.out.println("Ready! Welcome -> " + user.username + "#" + user.discriminator);
             lib.Discord_Initialize(applicationId, handlers, true, "");
             Core.instance().getWorker().repeat(DiscordCallbackHandler.class);
             created = true;

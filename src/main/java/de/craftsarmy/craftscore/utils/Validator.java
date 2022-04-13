@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-public class Validator {
+public final class Validator {
 
     public static boolean isJsonValid(final String json) throws IOException {
         return isJsonValid(new StringReader(json));

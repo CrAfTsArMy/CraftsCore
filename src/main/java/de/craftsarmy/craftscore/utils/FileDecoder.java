@@ -1,13 +1,16 @@
 package de.craftsarmy.craftscore.utils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 
-public class FileDecoder {
+public final class FileDecoder {
 
     public static File decode(File in, File out) throws IOException {
         FileInputStream inputStream = new FileInputStream(in);
-        return decode(inputStream.readAllBytes(), out);
+        return decode(Utils.readAllBytes(inputStream), out);
     }
 
     public static File decode(byte[] bytes, File out) throws IOException {

@@ -18,7 +18,7 @@
 <dependency>
   <groupId>com.github.CrAfTsArMy</groupId>
   <artifactId>CraftsCore</artifactId>
-  <version>2.9-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -33,7 +33,7 @@ repositories {
 ```
 ```gradle
 dependencies {
-  implementation 'com.github.CrAfTsArMy:CraftsCore:2.9-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:3.0-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'
   implementation 'com.google.code.gson:gson:2.9.0'

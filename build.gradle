@@ -2,8 +2,8 @@ plugins {
     id 'java'
 }
 
-group 'de.craftsarmy'
-version '2.7-SNAPSHOT'
+group 'de.craftsarmy.craftscore'
+version '3.0-SNAPSHOT'
 
 repositories {
     mavenCentral()

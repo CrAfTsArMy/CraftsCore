@@ -9,17 +9,43 @@
 
 ### Maven
 ```xml
-<repository>
-  <id>jitpack.io</id>
-  <url>https://jitpack.io</url>
-</repository>
+</repositories>
+  ...
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+  <repository> 
+    <id>jcenter</id>
+    <url>https://jcenter.bintray.com</url>
+    <name>jcenter-bintray</name>
+  </repository>
+</repositories>
 ```
 ```xml
-<dependency>
-  <groupId>com.github.CrAfTsArMy</groupId>
-  <artifactId>CraftsCore</artifactId>
-  <version>3.0-SNAPSHOT</version>
-</dependency>
+<dependencies>
+  ...
+  <dependency>
+    <groupId>com.github.CrAfTsArMy</groupId>
+    <artifactId>CraftsCore</artifactId>
+    <version>3.0-SNAPSHOT</version>
+  </dependency>
+  <dependency>
+    <groupId>com.squareup.okhttp</groupId>
+    <artifactId>okhttp</artifactId>
+    <version>2.7.5</version>
+  </dependency>
+  <dependency>
+    <groupId>com.squareup.okhttp3</groupId>
+    <artifactId>okhttp</artifactId>
+    <version>5.0.0-alpha.6</version>
+  </dependency>
+  <dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.9.0</version>
+  </dependency>
+</dependencies>
 ```
 
 ### Gradle
@@ -33,6 +59,7 @@ repositories {
 ```
 ```gradle
 dependencies {
+  ...
   implementation 'com.github.CrAfTsArMy:CraftsCore:3.0-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'

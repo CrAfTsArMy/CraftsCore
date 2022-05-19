@@ -1,5 +1,6 @@
 package de.craftsarmy.craftscore;
 
+import de.craftsarmy.craftscore.api.animate.AbstractAnimator;
 import de.craftsarmy.craftscore.api.config.AbstractConfigParser;
 import de.craftsarmy.craftscore.api.discord.DiscordRPC;
 import de.craftsarmy.craftscore.api.discord.DiscordRPCCache;
@@ -7,10 +8,13 @@ import de.craftsarmy.craftscore.api.discord.DiscordRPCParty;
 import de.craftsarmy.craftscore.api.moduls.AbstractModulManager;
 import de.craftsarmy.craftscore.api.network.AbstractNetworker;
 import de.craftsarmy.craftscore.api.threading.AbstractWorker;
+import de.craftsarmy.craftscore.buildin.animate.Animator;
 import de.craftsarmy.craftscore.buildin.config.ConfigParser;
 import de.craftsarmy.craftscore.buildin.moduls.ModulManager;
 import de.craftsarmy.craftscore.buildin.network.Networker;
 import de.craftsarmy.craftscore.buildin.threading.Worker;
+
+import java.util.List;
 
 public final class Core {
 
@@ -18,6 +22,8 @@ public final class Core {
     private AbstractModulManager modulManager;
     private AbstractWorker worker;
     private AbstractNetworker networker;
+
+    private Class<? extends AbstractAnimator<?>> clazz$animator;
 
     private DiscordRPC discordRPC;
     private DiscordRPCCache discordRPCCache;
@@ -34,6 +40,10 @@ public final class Core {
             initialized = true;
         }
         return this;
+    }
+
+    public <T> AbstractAnimator<T> createAnimator(List<T> items) {
+
     }
 
     public AbstractConfigParser getConfigParser() {

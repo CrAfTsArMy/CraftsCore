@@ -26,6 +26,7 @@ public abstract class AbstractConfig {
     public abstract void setDouble(String path, double data);
 
     public abstract void save(File f);
+    public abstract String asString();
 
     public final JsonObject getObject() {
         return object;

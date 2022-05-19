@@ -207,4 +207,15 @@ public final class Config extends AbstractConfig {
         }
     }
 
+    @Override
+    public String asString() {
+        try {
+            Gson gson = new GsonBuilder().create();
+            return gson.toJson(getObject());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "{\"code\":500,\"message\":\"CraftsCore failed to build a string from the config data!\"}";
+    }
+
 }

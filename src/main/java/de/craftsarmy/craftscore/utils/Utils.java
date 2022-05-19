@@ -3,6 +3,10 @@ package de.craftsarmy.craftscore.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Utils {
 
@@ -30,6 +34,19 @@ public final class Utils {
                 exception.addSuppressed(e);
             }
         }
+    }
+
+    public static List<Method> getMethodeByAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
+        final List<Method> methods = new ArrayList<>();
+        Class<?> clazz = type;
+        while (clazz != Object.class) {
+            for (final Method method : clazz.getDeclaredMethods())
+                if (method.isAnnotationPresent(annotation)) {
+                    methods.add(method);
+                }
+            clazz = clazz.getSuperclass();
+        }
+        return methods;
     }
 
 }

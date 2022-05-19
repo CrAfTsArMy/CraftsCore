@@ -9,7 +9,7 @@
 
 ### Maven
 ```xml
-</repositories>
+<repositories>
   ...
   <repository>
     <id>jitpack.io</id>
@@ -34,11 +34,6 @@
     <groupId>com.squareup.okhttp</groupId>
     <artifactId>okhttp</artifactId>
     <version>2.7.5</version>
-  </dependency>
-  <dependency>
-    <groupId>com.squareup.okhttp3</groupId>
-    <artifactId>okhttp</artifactId>
-    <version>5.0.0-alpha.6</version>
   </dependency>
   <dependency>
     <groupId>com.google.code.gson</groupId>
@@ -69,3 +64,21 @@ dependencies {
 
 ## Issues
 If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/CraftsCore/issues)
+
+##CraftsBlock
+**Who or what is CraftsBlock?**
+> CraftsBlock is a fairly new community server, which deals with the topic of programming. On our server you can ask questions about programming. But of course you can also just chill with the community.
+>
+> Also we are currently building our own small company, where you can ask certain questions for free, for your own app and or other programs.
+>
+> But we also offer you a free cloud where you get a storage limit of **momentarily** 500MB for free. (Later it will be 2.5GB!).
+
+**Is everything really free?**
+> CraftsBlock stands for implementing everything for free! That means you can get **all** services from CraftsBlock for free. However, we are currently working on a system where you can earn points by being active. With these points you can later buy more things, like the VIP rank.
+
+**How do you find us?**
+> We have a website where you can read more about it! https://craftsblock.de
+>
+> Of course you can also come to our Discord Server! https://discord.gg/xgWQQuagmV
+>
+> We are looking forward to you!

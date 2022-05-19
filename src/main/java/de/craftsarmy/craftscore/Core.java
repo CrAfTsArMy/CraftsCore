@@ -8,7 +8,6 @@ import de.craftsarmy.craftscore.api.discord.DiscordRPCParty;
 import de.craftsarmy.craftscore.api.moduls.AbstractModulManager;
 import de.craftsarmy.craftscore.api.network.AbstractNetworker;
 import de.craftsarmy.craftscore.api.threading.AbstractWorker;
-import de.craftsarmy.craftscore.buildin.animate.Animator;
 import de.craftsarmy.craftscore.buildin.config.ConfigParser;
 import de.craftsarmy.craftscore.buildin.moduls.ModulManager;
 import de.craftsarmy.craftscore.buildin.network.Networker;
@@ -40,10 +39,6 @@ public final class Core {
             initialized = true;
         }
         return this;
-    }
-
-    public <T> AbstractAnimator<T> createAnimator(List<T> items) {
-
     }
 
     public AbstractConfigParser getConfigParser() {

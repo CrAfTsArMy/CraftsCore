@@ -28,7 +28,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.1-SNAPSHOT</version>
+    <version>v3.2-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp</groupId>
@@ -39,6 +39,11 @@
     <groupId>com.google.code.gson</groupId>
     <artifactId>gson</artifactId>
     <version>2.9.0</version>
+  </dependency>
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.29</version>
   </dependency>
 </dependencies>
 ```
@@ -55,10 +60,11 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.1-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.2-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'
   implementation 'com.google.code.gson:gson:2.9.0'
+  implementation 'mysql:mysql-connector-java:8.0.29'
 }
 ```
 
@@ -79,6 +85,6 @@ If you find any issues from the plugin or documentation please [open up issue](h
 **How do you find us?**
 > We have a website where you can read more about it! https://craftsblock.de
 >
-> Of course you can also come to our Discord Server! https://discord.gg/xgWQQuagmV
+> Of course you can also come to our Discord Server! https://discord.gg/craftsblock
 >
 > We are looking forward to you!

@@ -1,4 +1,6 @@
-package de.craftsarmy.craftscore.utils;
+package de.craftsarmy.craftscore.utils.files;
+
+import de.craftsarmy.craftscore.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;

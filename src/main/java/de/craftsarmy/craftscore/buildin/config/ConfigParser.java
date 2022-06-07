@@ -6,10 +6,7 @@ import de.craftsarmy.craftscore.api.config.AbstractConfigParser;
 import de.craftsarmy.craftscore.utils.Validator;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public final class ConfigParser extends AbstractConfigParser {
 
@@ -26,6 +23,17 @@ public final class ConfigParser extends AbstractConfigParser {
             else
                 return new Config(JsonParser.parseString("{}").getAsJsonObject());
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public AbstractConfig parse(String json) {
+        try {
+            if (json != null && Validator.isJsonValid(json))
+                return new Config(JsonParser.parseString(json).getAsJsonObject());
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

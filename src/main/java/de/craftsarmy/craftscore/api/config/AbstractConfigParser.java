@@ -5,5 +5,6 @@ import java.io.File;
 public abstract class AbstractConfigParser {
 
     public abstract AbstractConfig parse(File f);
+    public abstract AbstractConfig parse(String s);
 
 }

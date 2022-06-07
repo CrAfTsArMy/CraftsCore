@@ -1,11 +1,16 @@
 package de.craftsarmy.craftscore.buildin.config;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.craftsarmy.craftscore.api.config.AbstractConfig;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class Config extends AbstractConfig {
 
@@ -29,7 +34,7 @@ public final class Config extends AbstractConfig {
     }
 
     @Override
-    public String getString(String path) {
+    public String get(String path) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -91,6 +96,106 @@ public final class Config extends AbstractConfig {
             else
                 temp = temp.getAsJsonObject(s);
         return -1;
+    }
+
+    @Override
+    public Collection<?> getList(String path) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args)
+            if (s.equals(object))
+                if (!temp.get(object).isJsonArray()) {
+                    ConcurrentLinkedQueue<String> list = new ConcurrentLinkedQueue<>();
+                    for (JsonElement element : temp.get(object).getAsJsonArray())
+                        list.add(element.getAsString());
+                    return list;
+                } else {
+                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
+                }
+            else
+                temp = temp.getAsJsonObject(s);
+        return new ConcurrentLinkedQueue<>();
+    }
+
+    @Override
+    public Collection<Integer> getIntList(String path) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args)
+            if (s.equals(object))
+                if (!temp.get(object).isJsonArray()) {
+                    ConcurrentLinkedQueue<Integer> list = new ConcurrentLinkedQueue<>();
+                    for (JsonElement element : temp.get(object).getAsJsonArray())
+                        list.add(element.getAsInt());
+                    return list;
+                } else {
+                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
+                }
+            else
+                temp = temp.getAsJsonObject(s);
+        return new ConcurrentLinkedQueue<>();
+    }
+
+    @Override
+    public Collection<Long> getLongList(String path) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args)
+            if (s.equals(object))
+                if (!temp.get(object).isJsonArray()) {
+                    ConcurrentLinkedQueue<Long> list = new ConcurrentLinkedQueue<>();
+                    for (JsonElement element : temp.get(object).getAsJsonArray())
+                        list.add(element.getAsLong());
+                    return list;
+                } else {
+                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
+                }
+            else
+                temp = temp.getAsJsonObject(s);
+        return new ConcurrentLinkedQueue<>();
+    }
+
+    @Override
+    public Collection<Boolean> getBoolList(String path) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args)
+            if (s.equals(object))
+                if (!temp.get(object).isJsonArray()) {
+                    ConcurrentLinkedQueue<Boolean> list = new ConcurrentLinkedQueue<>();
+                    for (JsonElement element : temp.get(object).getAsJsonArray())
+                        list.add(element.getAsBoolean());
+                    return list;
+                } else {
+                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
+                }
+            else
+                temp = temp.getAsJsonObject(s);
+        return new ConcurrentLinkedQueue<>();
+    }
+
+    @Override
+    public Collection<Double> getDoubleList(String path) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args)
+            if (s.equals(object))
+                if (!temp.get(object).isJsonArray()) {
+                    ConcurrentLinkedQueue<Double> list = new ConcurrentLinkedQueue<>();
+                    for (JsonElement element : temp.get(object).getAsJsonArray())
+                        list.add(element.getAsDouble());
+                    return list;
+                } else {
+                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
+                }
+            else
+                temp = temp.getAsJsonObject(s);
+        return new ConcurrentLinkedQueue<>();
     }
 
     @Override
@@ -190,6 +295,106 @@ public final class Config extends AbstractConfig {
             } else {
                 temp.addProperty(object, data);
             }
+        }
+    }
+
+    @Override
+    public void setList(String path, Collection<?> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonArray()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else
+                for (Object o : collection)
+                    temp.getAsJsonArray(object).add(o.toString());
+        }
+    }
+
+    @Override
+    public void setIntList(String path, Collection<Integer> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonArray()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else
+                for (Integer o : collection)
+                    temp.getAsJsonArray(object).add(o);
+        }
+    }
+
+    @Override
+    public void setLongList(String path, Collection<Long> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonArray()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else
+                for (Long o : collection)
+                    temp.getAsJsonArray(object).add(o);
+        }
+    }
+
+    @Override
+    public void setBoolList(String path, Collection<Boolean> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonArray()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else
+                for (Boolean o : collection)
+                    temp.getAsJsonArray(object).add(o);
+        }
+    }
+
+    @Override
+    public void setDoubleList(String path, Collection<Double> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonArray()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else
+                for (Double o : collection)
+                    temp.getAsJsonArray(object).add(o);
         }
     }
 

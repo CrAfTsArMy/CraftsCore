@@ -31,9 +31,9 @@
     <version>v3.2.3-SNAPSHOT</version>
   </dependency>
   <dependency>
-    <groupId>com.squareup.okhttp</groupId>
+    <groupId>com.squareup.okhttp3</groupId>
     <artifactId>okhttp</artifactId>
-    <version>2.7.5</version>
+    <version>5.0.0-alpha.6</version>
   </dependency>
   <dependency>
     <groupId>com.google.code.gson</groupId>

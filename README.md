@@ -85,6 +85,6 @@ If you find any issues from the plugin or documentation please [open up issue](h
 **How do you find us?**
 > We have a website where you can read more about it! https://craftsblock.de
 >
-> Of course you can also come to our Discord Server! https://discord.gg/xgWQQuagmV
+> Of course you can also come to our Discord Server! https://discord.gg/craftsblock
 >
 > We are looking forward to you!

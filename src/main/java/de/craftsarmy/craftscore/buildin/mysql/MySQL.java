@@ -33,7 +33,7 @@ public final class MySQL extends AbstractMySQL {
             throw new IllegalStateException("You have to bind your MySQL Connection! (Use \"bind(String, String)\" before connecting.)");
         if (!isConnected()) {
             try {
-                DriverManager.getConnection(
+                connection = DriverManager.getConnection(
                         "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true",
                         user,
                         password
@@ -63,7 +63,7 @@ public final class MySQL extends AbstractMySQL {
     @Override
     public boolean isConnected() {
         try {
-            return connection == null || connection.isClosed();
+            return connection != null && !connection.isClosed();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -74,7 +74,7 @@ public final class MySQL extends AbstractMySQL {
     public AbstractMySQL update(String sql) {
         if (isConnected()) {
             try {
-                connection.createStatement().executeUpdate(sql);
+                connection.createStatement().executeLargeUpdate(sql);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

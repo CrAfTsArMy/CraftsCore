@@ -74,7 +74,7 @@ public final class MySQL extends AbstractMySQL {
     public AbstractMySQL update(String sql) {
         if (isConnected()) {
             try {
-                connection.createStatement().executeLargeUpdate(sql);
+                connection.createStatement().executeUpdate(sql);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

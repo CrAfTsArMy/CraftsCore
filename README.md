@@ -40,6 +40,11 @@
     <artifactId>gson</artifactId>
     <version>2.9.0</version>
   </dependency>
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.29</version>
+  </dependency>
 </dependencies>
 ```
 
@@ -59,6 +64,7 @@ dependencies {
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'
   implementation 'com.google.code.gson:gson:2.9.0'
+  implementation 'mysql:mysql-connector-java:8.0.29'
 }
 ```
 

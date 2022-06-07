@@ -71,6 +71,16 @@ public final class MySQL extends AbstractMySQL {
     }
 
     @Override
+    public PreparedStatement prepareStatement(String sql) {
+        try {
+            return connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public AbstractMySQL update(String sql) {
         if (isConnected()) {
             try {
@@ -81,6 +91,17 @@ public final class MySQL extends AbstractMySQL {
         } else {
             throw new IllegalStateException("You have to connect to a Database before requesting!");
         }
+        return this;
+    }
+
+    @Override
+    public AbstractMySQL update(PreparedStatement statement) {
+        if (isConnected())
+            try {
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         return this;
     }
 
@@ -96,4 +117,16 @@ public final class MySQL extends AbstractMySQL {
         } else
             throw new IllegalStateException("You have to connect to a Database before requesting!");
     }
+
+    @Override
+    public ResultSet query(PreparedStatement statement) {
+        if (isConnected())
+            try {
+                return statement.executeQuery();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        return null;
+    }
+
 }

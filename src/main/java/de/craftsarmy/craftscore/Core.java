@@ -27,8 +27,6 @@ public final class Core {
     private AbstractWorker worker;
     private AbstractNetworker networker;
 
-    private Class<? extends AbstractAnimator<?>> clazz$animator;
-
     private DiscordRPC discordRPC;
     private DiscordRPCCache discordRPCCache;
     private DiscordRPCParty discordRPCParty;

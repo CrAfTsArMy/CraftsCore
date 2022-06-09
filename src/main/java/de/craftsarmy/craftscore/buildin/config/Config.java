@@ -1,9 +1,6 @@
 package de.craftsarmy.craftscore.buildin.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import de.craftsarmy.craftscore.api.config.AbstractConfig;
 
 import java.io.BufferedWriter;
@@ -105,7 +102,7 @@ public final class Config extends AbstractConfig {
         JsonObject temp = getObject();
         for (String s : args)
             if (s.equals(object))
-                if (!temp.get(object).isJsonArray()) {
+                if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<String> list = new ConcurrentLinkedQueue<>();
                     for (JsonElement element : temp.get(object).getAsJsonArray())
                         list.add(element.getAsString());
@@ -125,7 +122,7 @@ public final class Config extends AbstractConfig {
         JsonObject temp = getObject();
         for (String s : args)
             if (s.equals(object))
-                if (!temp.get(object).isJsonArray()) {
+                if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Integer> list = new ConcurrentLinkedQueue<>();
                     for (JsonElement element : temp.get(object).getAsJsonArray())
                         list.add(element.getAsInt());
@@ -145,7 +142,7 @@ public final class Config extends AbstractConfig {
         JsonObject temp = getObject();
         for (String s : args)
             if (s.equals(object))
-                if (!temp.get(object).isJsonArray()) {
+                if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Long> list = new ConcurrentLinkedQueue<>();
                     for (JsonElement element : temp.get(object).getAsJsonArray())
                         list.add(element.getAsLong());
@@ -165,7 +162,7 @@ public final class Config extends AbstractConfig {
         JsonObject temp = getObject();
         for (String s : args)
             if (s.equals(object))
-                if (!temp.get(object).isJsonArray()) {
+                if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Boolean> list = new ConcurrentLinkedQueue<>();
                     for (JsonElement element : temp.get(object).getAsJsonArray())
                         list.add(element.getAsBoolean());
@@ -185,7 +182,7 @@ public final class Config extends AbstractConfig {
         JsonObject temp = getObject();
         for (String s : args)
             if (s.equals(object))
-                if (!temp.get(object).isJsonArray()) {
+                if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Double> list = new ConcurrentLinkedQueue<>();
                     for (JsonElement element : temp.get(object).getAsJsonArray())
                         list.add(element.getAsDouble());
@@ -307,14 +304,18 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonArray()) {
+                if (!temp.get(s).isJsonObject()) {
                     temp.remove(s);
                     temp.add(s, new JsonObject());
                 }
                 temp = temp.getAsJsonObject(s);
-            } else
+            } else {
+                if (temp.has(object))
+                    temp.remove(object);
+                temp.add(object, new JsonArray());
                 for (Object o : collection)
                     temp.getAsJsonArray(object).add(o.toString());
+            }
         }
     }
 
@@ -327,14 +328,18 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonArray()) {
+                if (!temp.get(s).isJsonObject()) {
                     temp.remove(s);
                     temp.add(s, new JsonObject());
                 }
                 temp = temp.getAsJsonObject(s);
-            } else
+            } else {
+                if (temp.has(object))
+                    temp.remove(object);
+                temp.add(object, new JsonArray());
                 for (Integer o : collection)
                     temp.getAsJsonArray(object).add(o);
+            }
         }
     }
 
@@ -347,14 +352,18 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonArray()) {
+                if (!temp.get(s).isJsonObject()) {
                     temp.remove(s);
                     temp.add(s, new JsonObject());
                 }
                 temp = temp.getAsJsonObject(s);
-            } else
+            } else {
+                if (temp.has(object))
+                    temp.remove(object);
+                temp.add(object, new JsonArray());
                 for (Long o : collection)
                     temp.getAsJsonArray(object).add(o);
+            }
         }
     }
 
@@ -367,14 +376,18 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonArray()) {
+                if (!temp.get(s).isJsonObject()) {
                     temp.remove(s);
                     temp.add(s, new JsonObject());
                 }
                 temp = temp.getAsJsonObject(s);
-            } else
+            } else {
+                if (temp.has(object))
+                    temp.remove(object);
+                temp.add(object, new JsonArray());
                 for (Boolean o : collection)
                     temp.getAsJsonArray(object).add(o);
+            }
         }
     }
 
@@ -387,14 +400,18 @@ public final class Config extends AbstractConfig {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonArray()) {
+                if (!temp.get(s).isJsonObject()) {
                     temp.remove(s);
                     temp.add(s, new JsonObject());
                 }
                 temp = temp.getAsJsonObject(s);
-            } else
+            } else {
+                if (temp.has(object))
+                    temp.remove(object);
+                temp.add(object, new JsonArray());
                 for (Double o : collection)
                     temp.getAsJsonArray(object).add(o);
+            }
         }
     }
 

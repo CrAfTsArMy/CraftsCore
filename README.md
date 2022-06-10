@@ -4,8 +4,6 @@
 ![GitHub](https://img.shields.io/github/license/CrAfTsArMy/CraftsCore)
 ![GitHub all releases](https://img.shields.io/github/downloads/CrAfTsArMy/CraftsCore/total)
 ![GitHub issues](https://img.shields.io/github/issues-raw/CrAfTsArMy/CraftsCore)
-![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCtBJZHmZqOvWJ0t8hjhWSAA?label=CraftsCodesArmy&style=flat)
-![Twitch Status](https://img.shields.io/twitch/status/crafts__army?label=CrAfTs__ArMy)
 
 ### Maven
 ```xml
@@ -28,7 +26,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.2.5-SNAPSHOT</version>
+    <version>v3.2.6-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -60,7 +58,7 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.2.5-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.2.6-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:4.9.3'
   implementation 'com.google.code.gson:gson:2.9.0'

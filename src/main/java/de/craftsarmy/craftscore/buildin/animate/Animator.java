@@ -3,12 +3,12 @@ package de.craftsarmy.craftscore.buildin.animate;
 import de.craftsarmy.craftscore.api.animate.AbstractAnimator;
 
 import java.rmi.UnexpectedException;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class Animator<E> extends AbstractAnimator<E> {
 
-    public Animator(List<E> items) {
+    public Animator(Collection<E> items) {
         super(items);
     }
 

@@ -4,7 +4,6 @@ import com.google.gson.JsonParser;
 import de.craftsarmy.craftscore.api.config.AbstractConfig;
 import de.craftsarmy.craftscore.api.config.AbstractConfigParser;
 import de.craftsarmy.craftscore.utils.Validator;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 

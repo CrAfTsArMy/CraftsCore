@@ -3,10 +3,12 @@ package de.craftsarmy.craftscore.buildin.config;
 import com.google.gson.*;
 import de.craftsarmy.craftscore.api.config.AbstractConfig;
 
+import javax.activation.UnsupportedDataTypeException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class Config extends AbstractConfig {
@@ -31,7 +33,7 @@ public final class Config extends AbstractConfig {
     }
 
     @Override
-    public String get(String path) {
+    public String getString(String path) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -96,7 +98,9 @@ public final class Config extends AbstractConfig {
     }
 
     @Override
-    public Collection<?> getList(String path) {
+    public Collection<String> getStringList(String path) {
+        if (!contains(path))
+            return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -117,6 +121,8 @@ public final class Config extends AbstractConfig {
 
     @Override
     public Collection<Integer> getIntList(String path) {
+        if (!contains(path))
+            return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -137,6 +143,8 @@ public final class Config extends AbstractConfig {
 
     @Override
     public Collection<Long> getLongList(String path) {
+        if (!contains(path))
+            return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -157,6 +165,8 @@ public final class Config extends AbstractConfig {
 
     @Override
     public Collection<Boolean> getBoolList(String path) {
+        if (!contains(path))
+            return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -177,6 +187,8 @@ public final class Config extends AbstractConfig {
 
     @Override
     public Collection<Double> getDoubleList(String path) {
+        if (!contains(path))
+            return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -197,46 +209,24 @@ public final class Config extends AbstractConfig {
 
     @Override
     public void set(String path, Object data) {
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1];
-        JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data.toString());
-            }
-        }
+        if (data instanceof String)
+            setString(path, (String) data);
+        else if (data instanceof Integer)
+            setInt(path, (int) data);
+        else if (data instanceof Long)
+            setLong(path, (long) data);
+        else if (data instanceof Boolean)
+            setBoolean(path, (boolean) data);
+        else if (data instanceof Double)
+            setDouble(path, (double) data);
+        else if (data instanceof Collection<?>)
+            setList(path, (Collection<?>) data);
+        else
+            throw new UnsupportedDataTypeException();
+
     }
 
-    @Override
-    public void setInt(String path, int data) {
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1];
-        JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data);
-            }
-        }
-    }
-
-    @Override
-    public void setLong(String path, long data) {
+    private void setString(String path, String data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -255,8 +245,7 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setBoolean(String path, boolean data) {
+    private void setInt(String path, int data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -275,8 +264,7 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setDouble(String path, double data) {
+    private void setLong(String path, long data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -295,8 +283,63 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setList(String path, Collection<?> collection) {
+    private void setBoolean(String path, boolean data) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else {
+                temp.addProperty(object, data);
+            }
+        }
+    }
+
+    private void setDouble(String path, double data) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else {
+                temp.addProperty(object, data);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setList(String path, Collection<?> collection) {
+        assert collection != null;
+        if (collection.isEmpty())
+            setEmptyList(path, Collections.emptyList());
+        for (Object o : collection)
+            if (o instanceof String)
+                setStringList(path, (Collection<String>) collection);
+            else if (o instanceof Integer)
+                setIntList(path, (Collection<Integer>) collection);
+            else if (o instanceof Long)
+                setLongList(path, (Collection<Long>) collection);
+            else if (o instanceof Boolean)
+                setBoolList(path, (Collection<Boolean>) collection);
+            else if (o instanceof Double)
+                setDoubleList(path, (Collection<Double>) collection);
+    }
+
+    private void setEmptyList(String path, Collection<?> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -319,8 +362,30 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setIntList(String path, Collection<Integer> collection) {
+    private void setStringList(String path, Collection<String> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1];
+        JsonObject temp = getObject();
+        for (String s : args) {
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else {
+                if (temp.has(object))
+                    temp.remove(object);
+                temp.add(object, new JsonArray());
+                for (Object o : collection)
+                    temp.getAsJsonArray(object).add(o.toString());
+            }
+        }
+    }
+
+    private void setIntList(String path, Collection<Integer> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -343,8 +408,7 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setLongList(String path, Collection<Long> collection) {
+    private void setLongList(String path, Collection<Long> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -367,8 +431,7 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setBoolList(String path, Collection<Boolean> collection) {
+    private void setBoolList(String path, Collection<Boolean> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();
@@ -391,8 +454,7 @@ public final class Config extends AbstractConfig {
         }
     }
 
-    @Override
-    public void setDoubleList(String path, Collection<Double> collection) {
+    private void setDoubleList(String path, Collection<Double> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1];
         JsonObject temp = getObject();

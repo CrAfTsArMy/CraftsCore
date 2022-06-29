@@ -70,6 +70,7 @@ dependencies {
 If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/CraftsCore/issues)
 
 ##CraftsBlock
+
 **Who or what is CraftsBlock?**
 > CraftsBlock is a fairly new community server, which deals with the topic of programming. On our server you can ask questions about programming. But of course you can also just chill with the community.
 >

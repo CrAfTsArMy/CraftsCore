@@ -26,7 +26,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.3-SNAPSHOT</version>
+    <version>v3.4-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>

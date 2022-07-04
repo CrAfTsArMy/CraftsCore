@@ -48,10 +48,12 @@
     <version>8.0.29</version>
   </dependency>
   
+  <!--
   // Replace "%VERSION%" below with your version of Minecraft.
   // Currently all versions from 1.13 are supported!
   // If you do not want to use the core for a Minecraft plugin,
   // please replace "%VERSION%" with "1.13".
+  -->
   <dependency>
     <groupId>org.spigotmc</groupId>
     <artifactId>spigot-api</artifactId>

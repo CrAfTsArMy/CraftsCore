@@ -26,7 +26,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.2.6-SNAPSHOT</version>
+    <version>v3.3-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -58,7 +58,7 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.2.6-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.3-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:4.9.3'
   implementation 'com.google.code.gson:gson:2.9.0'
@@ -69,7 +69,7 @@ dependencies {
 ## Issues
 If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/CraftsCore/issues)
 
-##CraftsBlock
+## CraftsBlock
 **Who or what is CraftsBlock?**
 > CraftsBlock is a fairly new community server, which deals with the topic of programming. On our server you can ask questions about programming. But of course you can also just chill with the community.
 >

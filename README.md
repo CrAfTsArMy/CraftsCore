@@ -18,10 +18,16 @@
     <url>https://jcenter.bintray.com</url>
     <name>jcenter-bintray</name>
   </repository>
+  
+  <!--
+  // If you have specified a Minecraft Jar as a library, then you can omit
+  // this repository!
+  -->
   <repository>
     <id>spigot-repo</id>
     <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
   </repository>
+  
 </repositories>
 ```
 ```xml
@@ -52,7 +58,9 @@
   // Replace "%VERSION%" below with your version of Minecraft.
   // Currently all versions from 1.13 are supported!
   // If you do not want to use the core for a Minecraft plugin,
-  // please replace "%VERSION%" with "1.13".
+  // please replace "%VERSION%" with "1.13". You can also add 
+  // the corresponding Minecraft Server Jar, then you can omit 
+  // this dependency.
   -->
   <dependency>
     <groupId>org.spigotmc</groupId>
@@ -70,14 +78,18 @@ repositories {
   maven { url 'https://jitpack.io' }
   mavenCentral()
   jcenter()
+  
+  // If you have specified a Minecraft Jar as library, then you can omit
+  // the following two repository!
   maven {
-        name = 'spigotmc-repo'
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-    }
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
+    name = 'spigotmc-repo'
+    url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+  }
+  maven {
+    name = 'sonatype'
+    url = 'https://oss.sonatype.org/content/groups/public/'
+  }
+    
 }
 ```
 ```gradle
@@ -92,7 +104,9 @@ dependencies {
   // Replace "%VERSION%" below with your version of Minecraft.
   // Currently all versions from 1.13 are supported!
   // If you do not want to use the core for a Minecraft plugin,
-  // please replace "%VERSION%" with "1.13".
+  // please replace "%VERSION%" with "1.13". You can also add 
+  // the corresponding Minecraft Server Jar, then you can omit 
+  // this implementation.
   implementation 'org.spigotmc:spigot-api:%VERSION%-R0.1-SNAPSHOT'
 }
 ```

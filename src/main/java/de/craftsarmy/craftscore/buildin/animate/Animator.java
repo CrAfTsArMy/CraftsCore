@@ -25,7 +25,7 @@ public final class Animator<E> extends AbstractAnimator<E> {
 
     @Override
     public void remove(int index) throws UnexpectedException {
-        if (items.size() == index$total && index >= 0 && index < items.size()) {
+        if ((items.size() - 1) == index$total && index >= 0 && index < items.size()) {
             ConcurrentHashMap<Integer, E> items$temp = new ConcurrentHashMap<>();
             items.remove(index);
             int index$temp = 0;

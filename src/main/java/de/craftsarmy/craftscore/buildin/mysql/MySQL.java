@@ -3,8 +3,11 @@ package de.craftsarmy.craftscore.buildin.mysql;
 import de.craftsarmy.craftscore.api.mysql.AbstractMySQL;
 
 import java.sql.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class MySQL extends AbstractMySQL {
+
+    private static final ConcurrentHashMap<String, Connection> cache = new ConcurrentHashMap<>();
 
     private boolean bind = false;
     private String host, database;
@@ -32,14 +35,15 @@ public final class MySQL extends AbstractMySQL {
         if (!bind)
             throw new IllegalStateException("You have to bind your MySQL Connection! (Use \"bind(String, String)\" before connecting.)");
         if (!isConnected()) {
+            if (cache.containsKey(host + ":" + port + ":" + database)) {
+                connection = cache.get(host + ":" + port + ":" + database);
+                if (getCallback() != null) getCallback().connect(this);
+                return this;
+            }
             try {
-                connection = DriverManager.getConnection(
-                        "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true",
-                        user,
-                        password
-                );
-                if (getCallback() != null)
-                    getCallback().connect(this);
+                connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true", user, password);
+                cache.put(host + ":" + port + ":" + database, connection);
+                if (getCallback() != null) getCallback().connect(this);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

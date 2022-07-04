@@ -1,6 +1,6 @@
 package de.craftsarmy.craftscore.api.discord;
 
-import de.craftsarmy.craftscore.Core;
+import de.craftsarmy.craftscore.core.Core;
 
 import java.util.UUID;
 

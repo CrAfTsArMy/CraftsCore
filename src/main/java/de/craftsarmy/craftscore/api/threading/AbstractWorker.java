@@ -1,7 +1,6 @@
 package de.craftsarmy.craftscore.api.threading;
 
-import de.craftsarmy.craftscore.Core;
-import de.craftsarmy.craftscore.buildin.threading.Worker;
+import de.craftsarmy.craftscore.core.Core;
 import de.craftsarmy.craftscore.utils.Touch;
 
 public abstract class AbstractWorker {

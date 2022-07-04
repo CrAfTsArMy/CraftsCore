@@ -2,7 +2,7 @@ package de.craftsarmy.craftscore.api.discord;
 
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import de.craftsarmy.craftscore.Core;
+import de.craftsarmy.craftscore.core.Core;
 
 public class DiscordRPC {
 

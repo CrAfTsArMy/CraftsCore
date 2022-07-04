@@ -1,6 +1,6 @@
 package de.craftsarmy.craftscore.buildin.moduls;
 
-import de.craftsarmy.craftscore.Core;
+import de.craftsarmy.craftscore.core.Core;
 import de.craftsarmy.craftscore.api.moduls.AbstractModul;
 import de.craftsarmy.craftscore.api.moduls.AbstractModulManager;
 import de.craftsarmy.craftscore.utils.Touch;

@@ -1,8 +1,6 @@
-package de.craftsarmy.craftscore;
+package de.craftsarmy.craftscore.core;
 
 import com.mysql.cj.jdbc.Driver;
-import de.craftsarmy.craftscore.api.animate.AbstractAnimator;
-import de.craftsarmy.craftscore.api.config.AbstractConfig;
 import de.craftsarmy.craftscore.api.config.AbstractConfigParser;
 import de.craftsarmy.craftscore.api.discord.DiscordRPC;
 import de.craftsarmy.craftscore.api.discord.DiscordRPCCache;
@@ -11,14 +9,13 @@ import de.craftsarmy.craftscore.api.moduls.AbstractModulManager;
 import de.craftsarmy.craftscore.api.mysql.AbstractMySQL;
 import de.craftsarmy.craftscore.api.network.AbstractNetworker;
 import de.craftsarmy.craftscore.api.threading.AbstractWorker;
-import de.craftsarmy.craftscore.buildin.config.Config;
 import de.craftsarmy.craftscore.buildin.config.ConfigParser;
 import de.craftsarmy.craftscore.buildin.moduls.ModulManager;
 import de.craftsarmy.craftscore.buildin.mysql.MySQL;
 import de.craftsarmy.craftscore.buildin.network.Networker;
 import de.craftsarmy.craftscore.buildin.threading.Worker;
+import de.craftsarmy.craftscore.minecraft.commands.AbstractCommand;
 
-import java.io.File;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -40,7 +37,6 @@ public final class Core {
             parser = new ConfigParser();
             modulManager = new ModulManager();
             sql = new MySQL();
-            worker = new Worker();
             try {
                 Driver driver = new Driver();
                 DriverManager.registerDriver(driver);
@@ -73,6 +69,9 @@ public final class Core {
     }
     public AbstractWorker getWorker() {
         return worker;
+    }
+    public void enableWorker() {
+        worker = new Worker();
     }
     public void setWorker(AbstractWorker worker) {
         this.worker = worker;

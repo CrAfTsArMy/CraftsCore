@@ -18,6 +18,10 @@
     <url>https://jcenter.bintray.com</url>
     <name>jcenter-bintray</name>
   </repository>
+  <repository>
+    <id>spigot-repo</id>
+    <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+  </repository>
 </repositories>
 ```
 ```xml
@@ -31,7 +35,7 @@
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
     <artifactId>okhttp</artifactId>
-    <version>4.9.3</version>
+    <version>4.10.0</version>
   </dependency>
   <dependency>
     <groupId>com.google.code.gson</groupId>
@@ -43,6 +47,17 @@
     <artifactId>mysql-connector-java</artifactId>
     <version>8.0.29</version>
   </dependency>
+  
+  // Replace "%VERSION%" below with your version of Minecraft.
+  // Currently all versions from 1.13 are supported!
+  // If you do not want to use the core for a Minecraft plugin,
+  // please replace "%VERSION%" with "1.13".
+  <dependency>
+    <groupId>org.spigotmc</groupId>
+    <artifactId>spigot-api</artifactId>
+    <version>%VERSION%-R0.1-SNAPSHOT</version>
+    <scope>provided</scope>
+  </dependency>
 </dependencies>
 ```
 
@@ -53,6 +68,14 @@ repositories {
   maven { url 'https://jitpack.io' }
   mavenCentral()
   jcenter()
+  maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
 }
 ```
 ```gradle
@@ -60,9 +83,15 @@ dependencies {
   ...
   implementation 'com.github.CrAfTsArMy:CraftsCore:v3.3-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
-  implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+  implementation 'com.squareup.okhttp3:okhttp:4.10.0'
   implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'mysql:mysql-connector-java:8.0.29'
+  
+  // Replace "%VERSION%" below with your version of Minecraft.
+  // Currently all versions from 1.13 are supported!
+  // If you do not want to use the core for a Minecraft plugin,
+  // please replace "%VERSION%" with "1.13".
+  implementation 'org.spigotmc:spigot-api:%VERSION%-R0.1-SNAPSHOT'
 }
 ```
 

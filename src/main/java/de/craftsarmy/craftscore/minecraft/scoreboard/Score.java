@@ -12,7 +12,7 @@ public class Score {
 
     private final boolean animated;
     private Team animationTarget;
-    private String identifier = "";
+    private StringBuilder identifier = new StringBuilder();
 
     public Score(String content) {
         this.content = content;
@@ -24,7 +24,7 @@ public class Score {
         this.animated = true;
         String[] tiles = UUID.randomUUID().toString().split("");
         for (String tile : tiles)
-            this.identifier += "§" + tile;
+            this.identifier.append("§").append(tile);
     }
 
     public String content() {
@@ -58,7 +58,7 @@ public class Score {
     public String identifier() {
         if (!animated)
             throw new IllegalStateException("Score is not animate able!");
-        return identifier.replace("null", "");
+        return identifier.toString();
     }
 
 }

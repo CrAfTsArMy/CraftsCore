@@ -36,7 +36,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.4.2-SNAPSHOT</version>
+    <version>v3.4.4-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -56,9 +56,9 @@
   
   <!--
   // Replace "%VERSION%" below with your version of Minecraft.
-  // Currently all versions from 1.13 are supported!
+  // Currently all versions from 1.16.5 are supported!
   // If you do not want to use the core for a Minecraft plugin,
-  // please replace "%VERSION%" with "1.13". You can also add 
+  // please replace "%VERSION%" with "1.16.5". You can also add 
   // the corresponding Minecraft Server Jar, then you can omit 
   // this dependency.
   -->
@@ -95,16 +95,16 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.4.2-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.4.4-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:4.10.0'
   implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'mysql:mysql-connector-java:8.0.29'
   
   // Replace "%VERSION%" below with your version of Minecraft.
-  // Currently all versions from 1.13 are supported!
+  // Currently all versions from 1.16.5 are supported!
   // If you do not want to use the core for a Minecraft plugin,
-  // please replace "%VERSION%" with "1.13". You can also add 
+  // please replace "%VERSION%" with "1.16.5". You can also add 
   // the corresponding Minecraft Server Jar, then you can omit 
   // this implementation.
   implementation 'org.spigotmc:spigot-api:%VERSION%-R0.1-SNAPSHOT'

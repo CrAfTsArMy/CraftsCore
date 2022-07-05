@@ -58,7 +58,7 @@ public class Score {
     public String identifier() {
         if (!animated)
             throw new IllegalStateException("Score is not animate able!");
-        return identifier;
+        return identifier.replace("null", "");
     }
 
 }

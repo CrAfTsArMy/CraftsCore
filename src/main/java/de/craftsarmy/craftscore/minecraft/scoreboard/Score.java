@@ -3,6 +3,8 @@ package de.craftsarmy.craftscore.minecraft.scoreboard;
 import de.craftsarmy.craftscore.buildin.animate.Animator;
 import org.bukkit.scoreboard.Team;
 
+import java.util.UUID;
+
 public class Score {
 
     private String content;
@@ -20,6 +22,9 @@ public class Score {
     public Score(Animator<String> stringAnimator) {
         this.animator = stringAnimator;
         this.animated = true;
+        String[] tiles = UUID.randomUUID().toString().split("");
+        for (String tile : tiles)
+            this.identifier += "§" + tile;
     }
 
     public String content() {

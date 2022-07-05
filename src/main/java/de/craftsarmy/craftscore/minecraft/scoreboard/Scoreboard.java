@@ -9,6 +9,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,7 +65,7 @@ public class Scoreboard {
     }
 
     public Scoreboard build(String display$name, DisplaySlot slot) {
-        org.bukkit.scoreboard.Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        org.bukkit.scoreboard.Scoreboard board = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
         Objective obj = board.registerNewObjective(UUID.randomUUID().toString(), "dummy", display$name);
         obj.setDisplaySlot(slot);
 

@@ -4,6 +4,7 @@ import de.craftsarmy.craftscore.minecraft.Minecraft;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
 
@@ -59,8 +60,13 @@ public class Scoreboard {
     }
 
     public Scoreboard build(String display$name) {
+        return build(display$name, DisplaySlot.SIDEBAR);
+    }
+
+    public Scoreboard build(String display$name, DisplaySlot slot) {
         org.bukkit.scoreboard.Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = board.registerNewObjective(UUID.randomUUID().toString(), "dummy", display$name);
+        obj.setDisplaySlot(slot);
 
         for (int key : scores.keySet())
             if (scores.get(key).animated()) {

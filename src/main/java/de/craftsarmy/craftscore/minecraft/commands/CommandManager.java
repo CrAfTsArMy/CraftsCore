@@ -16,6 +16,7 @@ public class CommandManager {
             final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
             commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+            commands = new ConcurrentHashMap<>();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }

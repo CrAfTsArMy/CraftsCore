@@ -12,7 +12,7 @@ public class Score {
 
     private final boolean animated;
     private Team animationTarget;
-    private String identifier;
+    private String identifier = "";
 
     public Score(String content) {
         this.content = content;

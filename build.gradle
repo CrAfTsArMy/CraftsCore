@@ -8,14 +8,6 @@ version '3.4.6-SNAPSHOT'
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        name = 'spigotmc-repo'
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-    }
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
 }
 
 dependencies {
@@ -23,6 +15,4 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'mysql:mysql-connector-java:8.0.29'
-
-    implementation 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
 }

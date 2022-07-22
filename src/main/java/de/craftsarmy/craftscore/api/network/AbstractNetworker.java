@@ -33,7 +33,7 @@ public abstract class AbstractNetworker {
 
     public final RequestBody prepareData(String data) throws IOException {
         if (Validator.isJsonValid(data))
-            return RequestBody.create(MediaType.parse("application/json"), data);
+            return RequestBody.create(data, MediaType.parse("application/json"));
         throw new IOException("You could only post valid json data.");
     }
 

@@ -18,16 +18,6 @@
     <url>https://jcenter.bintray.com</url>
     <name>jcenter-bintray</name>
   </repository>
-  
-  <!--
-  // If you have specified a Minecraft Jar as a library, then you can omit
-  // this repository!
-  -->
-  <repository>
-    <id>spigot-repo</id>
-    <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-  </repository>
-  
 </repositories>
 ```
 ```xml
@@ -36,7 +26,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.4.6-SNAPSHOT</version>
+    <version>v3.4.7-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -53,21 +43,6 @@
     <artifactId>mysql-connector-java</artifactId>
     <version>8.0.29</version>
   </dependency>
-  
-  <!--
-  // Replace "%VERSION%" below with your version of Minecraft.
-  // Currently all versions from 1.16.5 are supported!
-  // If you do not want to use the core for a Minecraft plugin,
-  // please replace "%VERSION%" with "1.16.5". You can also add 
-  // the corresponding Minecraft Server Jar, then you can omit 
-  // this dependency.
-  -->
-  <dependency>
-    <groupId>org.spigotmc</groupId>
-    <artifactId>spigot-api</artifactId>
-    <version>%VERSION%-R0.1-SNAPSHOT</version>
-    <scope>provided</scope>
-  </dependency>
 </dependencies>
 ```
 
@@ -78,36 +53,16 @@ repositories {
   maven { url 'https://jitpack.io' }
   mavenCentral()
   jcenter()
-  
-  // If you have specified a Minecraft Jar as library, then you can omit
-  // the following two repository!
-  maven {
-    name = 'spigotmc-repo'
-    url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-  }
-  maven {
-    name = 'sonatype'
-    url = 'https://oss.sonatype.org/content/groups/public/'
-  }
-    
 }
 ```
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.4.6-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.4.7-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:4.10.0'
   implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'mysql:mysql-connector-java:8.0.29'
-  
-  // Replace "%VERSION%" below with your version of Minecraft.
-  // Currently all versions from 1.16.5 are supported!
-  // If you do not want to use the core for a Minecraft plugin,
-  // please replace "%VERSION%" with "1.16.5". You can also add 
-  // the corresponding Minecraft Server Jar, then you can omit 
-  // this implementation.
-  implementation 'org.spigotmc:spigot-api:%VERSION%-R0.1-SNAPSHOT'
 }
 ```
 

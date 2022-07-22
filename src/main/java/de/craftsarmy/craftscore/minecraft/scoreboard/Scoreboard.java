@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Scoreboard {
 
     private final ConcurrentHashMap<Integer, Score> scores = new ConcurrentHashMap<>();
+    private final Player owner;
 
     private org.bukkit.scoreboard.Scoreboard scoreboard;
     private boolean build = false;
@@ -25,11 +26,15 @@ public class Scoreboard {
     private BukkitTask animation;
     private final Runnable animation$runnable;
 
-    public Scoreboard() {
+    public Scoreboard(Player player) {
+        this.owner = player;
         animation$runnable = () -> {
             for (Map.Entry<Integer, Score> e : scores.entrySet()) {
                 Score obj = e.getValue();
-                obj.target().setPrefix(obj.animator().cycleGet());
+                ScoreChangeEvent event = new ScoreChangeEvent(owner, obj.animator().cycleGet());
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled())
+                    obj.target().setPrefix(event.getContent());
             }
         };
     }
@@ -43,20 +48,17 @@ public class Scoreboard {
         return this;
     }
 
-    public Scoreboard showToAll() {
+    public Scoreboard show() {
         if (!build)
             throw new IllegalStateException("The Scoreboard must be built first by using \"build(String)\"");
-        return showTo(null, Bukkit.getOnlinePlayers().toArray(new Player[]{}));
+        owner.setScoreboard(scoreboard);
+        return this;
     }
 
-    public Scoreboard showTo(Player player, Player... players) {
+    public Scoreboard hide() {
         if (!build)
             throw new IllegalStateException("The Scoreboard must be built first by using \"build(String)\"");
-        if (player != null)
-            player.setScoreboard(scoreboard);
-        for (Player obj : players)
-            if (obj != null)
-                obj.setScoreboard(scoreboard);
+        owner.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard());
         return this;
     }
 
@@ -105,8 +107,12 @@ public class Scoreboard {
             this.animation$interval = animation$interval;
     }
 
-    public static Scoreboard create() {
-        return new Scoreboard();
+    public Player getOwner() {
+        return owner;
+    }
+
+    public static Scoreboard create(Player owner) {
+        return new Scoreboard(owner);
     }
 
 }

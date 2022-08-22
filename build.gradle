@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
-group 'de.craftsarmy.craftscore'
-version '3.4.8-SNAPSHOT'
+group 'de.craftsblock.craftscore'
+version '3.5.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -16,3 +17,4 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'mysql:mysql-connector-java:8.0.29'
 }
+

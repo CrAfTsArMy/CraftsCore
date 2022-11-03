@@ -41,7 +41,7 @@ public final class MySQL extends AbstractMySQL {
                 return this;
             }
             try {
-                connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true", user, password);
+                connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
                 cache.put(host + ":" + port + ":" + database, connection);
                 if (getCallback() != null) getCallback().connect(this);
             } catch (SQLException e) {
@@ -67,7 +67,7 @@ public final class MySQL extends AbstractMySQL {
     @Override
     public boolean isConnected() {
         try {
-            return connection != null && !connection.isClosed();
+            return connection != null && connection.isValid(5);
         } catch (SQLException e) {
             e.printStackTrace();
         }

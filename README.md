@@ -26,7 +26,7 @@
   <dependency>
     <groupId>com.github.CrAfTsArMy</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.4.8-SNAPSHOT</version>
+    <version>v3.5.1-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -36,12 +36,12 @@
   <dependency>
     <groupId>com.google.code.gson</groupId>
     <artifactId>gson</artifactId>
-    <version>2.9.0</version>
+    <version>2.10</version>
   </dependency>
   <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.29</version>
+    <version>8.0.30</version>
   </dependency>
 </dependencies>
 ```
@@ -58,11 +58,11 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.4.8-SNAPSHOT'
+  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.5.1-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-  implementation 'com.google.code.gson:gson:2.9.0'
-  implementation 'mysql:mysql-connector-java:8.0.29'
+  implementation 'com.google.code.gson:gson:2.10'
+  implementation 'mysql:mysql-connector-java:8.0.30'
 }
 ```
 

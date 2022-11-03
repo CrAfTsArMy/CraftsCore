@@ -29,21 +29,6 @@
     <artifactId>CraftsCore</artifactId>
     <version>3.5.1-SNAPSHOT</version>
   </dependency>
-  <dependency>
-    <groupId>com.squareup.okhttp3</groupId>
-    <artifactId>okhttp</artifactId>
-    <version>4.10.0</version>
-  </dependency>
-  <dependency>
-    <groupId>com.google.code.gson</groupId>
-    <artifactId>gson</artifactId>
-    <version>2.10</version>
-  </dependency>
-  <dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.30</version>
-  </dependency>
 </dependencies>
 ```
 
@@ -60,10 +45,6 @@ repositories {
 dependencies {
   ...
   implementation 'de.craftsblock.craftscore:CraftsCore:3.5.1-SNAPSHOT'
-  implementation 'club.minnced:java-discord-rpc:2.0.2'
-  implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-  implementation 'com.google.code.gson:gson:2.10'
-  implementation 'mysql:mysql-connector-java:8.0.30'
 }
 ```
 

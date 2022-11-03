@@ -10,8 +10,9 @@
 <repositories>
   ...
   <repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
+    <id>craftsblock-releases</id>
+    <name>CraftsBlock Repositories</name>
+    <url>https://repo.craftsblock.de/releases</url>
   </repository>
   <repository> 
     <id>jcenter</id>
@@ -24,9 +25,9 @@
 <dependencies>
   ...
   <dependency>
-    <groupId>com.github.CrAfTsArMy</groupId>
+    <groupId>de.craftsblock.craftscore</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>v3.5.1-SNAPSHOT</version>
+    <version>3.5.1-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -50,7 +51,7 @@
 ```gradle
 repositories {
   ...
-  maven { url 'https://jitpack.io' }
+  maven { url "https://repo.craftsblock.de/releases" }
   mavenCentral()
   jcenter()
 }
@@ -58,7 +59,7 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.CrAfTsArMy:CraftsCore:v3.5.1-SNAPSHOT'
+  implementation 'de.craftsblock.craftscore:CraftsCore:3.5.1-SNAPSHOT'
   implementation 'club.minnced:java-discord-rpc:2.0.2'
   implementation 'com.squareup.okhttp3:okhttp:4.10.0'
   implementation 'com.google.code.gson:gson:2.10'

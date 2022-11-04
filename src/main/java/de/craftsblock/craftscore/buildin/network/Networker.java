@@ -1,6 +1,7 @@
 package de.craftsblock.craftscore.buildin.network;
 
 import de.craftsblock.craftscore.api.network.AbstractNetworker;
+import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 
@@ -40,10 +41,26 @@ public class Networker extends AbstractNetworker {
     }
 
     @Override
+    public Request post(String path, FormBody formBody) throws IOException {
+        return new Request.Builder()
+                .url(prepareURL(path))
+                .post(formBody)
+                .build();
+    }
+
+    @Override
     public Request put(String path, String data) throws IOException {
         return new Request.Builder()
                 .url(prepareURL(path))
                 .put(prepareData(data))
+                .build();
+    }
+
+    @Override
+    public Request put(String path, FormBody formBody) throws IOException {
+        return new Request.Builder()
+                .url(prepareURL(path))
+                .put(formBody)
                 .build();
     }
 
@@ -64,6 +81,14 @@ public class Networker extends AbstractNetworker {
     }
 
     @Override
+    public Request delete(String path, FormBody formBody) throws IOException {
+        return new Request.Builder()
+                .url(prepareURL(path))
+                .delete(formBody)
+                .build();
+    }
+
+    @Override
     public Request patch(String path, String data) throws IOException {
         return new Request.Builder()
                 .url(prepareURL(path))
@@ -71,4 +96,11 @@ public class Networker extends AbstractNetworker {
                 .build();
     }
 
+    @Override
+    public Request patch(String path, FormBody formBody) throws IOException {
+        return new Request.Builder()
+                .url(prepareURL(path))
+                .patch(formBody)
+                .build();
+    }
 }

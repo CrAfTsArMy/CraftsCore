@@ -16,13 +16,29 @@ public abstract class AbstractNetworker {
     }
 
     public abstract void shutdown() throws IOException;
+
     public abstract ResponseBody send(Request request) throws IOException;
+
     public abstract Request get(String path);
+
     public abstract Request post(String path, String data) throws IOException;
+
+    public abstract Request post(String path, FormBody formBody) throws IOException;
+
     public abstract Request put(String path, String data) throws IOException;
+
+    public abstract Request put(String path, FormBody formBody) throws IOException;
+
     public abstract Request delete(String path);
+
     public abstract Request delete(String path, String data) throws IOException;
+
+    public abstract Request delete(String path, FormBody formBody) throws IOException;
+
     public abstract Request patch(String path, String data) throws IOException;
+
+    public abstract Request patch(String path, FormBody formBody) throws IOException;
+
     public final OkHttpClient client() {
         return client;
     }
@@ -35,6 +51,10 @@ public abstract class AbstractNetworker {
         if (Validator.isJsonValid(data))
             return RequestBody.create(data, MediaType.parse("application/json"));
         throw new IOException("You could only post valid json data.");
+    }
+
+    public final FormBody.Builder create() {
+        return new FormBody.Builder();
     }
 
 }

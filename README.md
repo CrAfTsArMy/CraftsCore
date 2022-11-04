@@ -52,19 +52,23 @@ dependencies {
 If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/CraftsCore/issues)
 
 ## CraftsBlock
-**Who or what is CraftsBlock?**
-> CraftsBlock is a fairly new community server, which deals with the topic of programming. On our server you can ask questions about programming. But of course you can also just chill with the community.
->
-> Also we are currently building our own small company, where you can ask certain questions for free, for your own app and or other programs.
->
-> But we also offer you a free cloud where you get a storage limit of **momentarily** 500MB for free. (Later it will be 2.5GB!).
+Hey Du! 👋 
 
-**Is everything really free?**
-> CraftsBlock stands for implementing everything for free! That means you can get **all** services from CraftsBlock for free. However, we are currently working on a system where you can earn points by being active. With these points you can later buy more things, like the VIP rank.
+Kennst du CraftsBlock schon? Wir sind ein kleines Team, welches für euch kostenlose Dienstleistungen anbietet. Unser Hauptfokus liegt auf der Entwicklung von neuen und auch einzigartigen Systemen. Allerdings betreiben wir nebenbei auch noch eine kleine Cloud, bei der man 2GB kostenlosen Speicherplatz erhält.
 
-**How do you find us?**
-> We have a website where you can read more about it! https://craftsblock.de
->
-> Of course you can also come to our Discord Server! https://discord.gg/craftsblock
->
-> We are looking forward to you!
+Du möchtest bei CraftsBlock mitwirken? Wir nehmen jederzeit neue Teammitglieder auf!
+
+**👮‍♂️Moderator**<br>
+• Du solltest das 14. Lebensjahr erreicht haben<br>
+• Gute Menschenkenntnis besitzen<br>
+• Aktiv sein
+
+**👨‍💻 Developer**<br>
+• Du solltest das 13. Lebensjahr erreicht haben<br>
+• Kenntnisse in mindestens einer Programmiersprache<br>
+• Aktiv sein
+
+**👷‍♂️ Content**<br>
+• Du solltest das 13. Lebensjahr erreicht haben<br>
+• Kenntnisse im schreiben von Konzepten<br>
+• Aktiv sein

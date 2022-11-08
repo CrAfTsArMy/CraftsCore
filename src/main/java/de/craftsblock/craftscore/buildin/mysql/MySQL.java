@@ -13,6 +13,7 @@ public final class MySQL extends AbstractMySQL {
     private String host, database;
     private Integer port;
 
+    private String local;
     private Connection connection;
 
     @Override
@@ -35,8 +36,9 @@ public final class MySQL extends AbstractMySQL {
         if (!bind)
             throw new IllegalStateException("You have to bind your MySQL Connection! (Use \"bind(String, String)\" before connecting.)");
         if (!isConnected()) {
-            if (cache.containsKey(host + ":" + port + ":" + database)) {
-                connection = cache.get(host + ":" + port + ":" + database);
+            local = host + ":" + port + ":" + database;
+            if (cache.containsKey(local)) {
+                connection = cache.get(local);
                 if (getCallback() != null) getCallback().connect(this);
                 return this;
             }
@@ -54,6 +56,7 @@ public final class MySQL extends AbstractMySQL {
     @Override
     public AbstractMySQL disconnect() {
         try {
+            cache.remove(local);
             connection.close();
             connection = null;
             if (getCallback() != null)

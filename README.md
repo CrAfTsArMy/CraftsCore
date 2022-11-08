@@ -27,7 +27,7 @@
   <dependency>
     <groupId>de.craftsblock.craftscore</groupId>
     <artifactId>CraftsCore</artifactId>
-    <version>3.5.1-SNAPSHOT</version>
+    <version>3.5.3-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ```
@@ -44,7 +44,7 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'de.craftsblock.craftscore:CraftsCore:3.5.1-SNAPSHOT'
+  implementation 'de.craftsblock.craftscore:CraftsCore:3.5.3-SNAPSHOT'
 }
 ```
 

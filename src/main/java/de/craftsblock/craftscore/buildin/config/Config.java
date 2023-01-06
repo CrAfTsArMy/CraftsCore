@@ -20,14 +20,14 @@ public final class Config extends AbstractConfig {
     public boolean contains(String path) {
         path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object) && temp.has(object))
                 return true;
             else if (temp.has(s))
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             else
                 return false;
         }
@@ -38,10 +38,10 @@ public final class Config extends AbstractConfig {
     public String getString(String path) {
         path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 return temp.get(object).getAsString();
             else
@@ -54,10 +54,10 @@ public final class Config extends AbstractConfig {
     public int getInt(String path) {
         path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 return temp.get(object).getAsInt();
             else
@@ -70,10 +70,10 @@ public final class Config extends AbstractConfig {
     public long getLong(String path) {
         path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 return temp.get(object).getAsLong();
             else
@@ -86,10 +86,10 @@ public final class Config extends AbstractConfig {
     public boolean getBoolean(String path) {
         path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 return temp.get(object).getAsBoolean();
             else
@@ -102,10 +102,10 @@ public final class Config extends AbstractConfig {
     public double getDouble(String path) {
         path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 return temp.get(object).getAsDouble();
             else
@@ -120,10 +120,10 @@ public final class Config extends AbstractConfig {
         if (!contains(path))
             return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<String> list = new ConcurrentLinkedQueue<>();
@@ -134,7 +134,7 @@ public final class Config extends AbstractConfig {
                     throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
                 }
             else
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
         }
         return new ConcurrentLinkedQueue<>();
     }
@@ -145,10 +145,10 @@ public final class Config extends AbstractConfig {
         if (!contains(path))
             return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Integer> list = new ConcurrentLinkedQueue<>();
@@ -159,7 +159,7 @@ public final class Config extends AbstractConfig {
                     throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
                 }
             else
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
         }
         return new ConcurrentLinkedQueue<>();
     }
@@ -170,10 +170,10 @@ public final class Config extends AbstractConfig {
         if (!contains(path))
             return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Long> list = new ConcurrentLinkedQueue<>();
@@ -184,7 +184,7 @@ public final class Config extends AbstractConfig {
                     throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
                 }
             else
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
         }
         return new ConcurrentLinkedQueue<>();
     }
@@ -195,10 +195,10 @@ public final class Config extends AbstractConfig {
         if (!contains(path))
             return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Boolean> list = new ConcurrentLinkedQueue<>();
@@ -220,10 +220,10 @@ public final class Config extends AbstractConfig {
         if (!contains(path))
             return new ConcurrentLinkedQueue<>();
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (s.equals(object))
                 if (!temp.get(object).isJsonObject()) {
                     ConcurrentLinkedQueue<Double> list = new ConcurrentLinkedQueue<>();
@@ -259,12 +259,14 @@ public final class Config extends AbstractConfig {
 
     }
 
-    private void setString(String path, String data) {
+    @Override
+    public void remove(String path) {
+        path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
@@ -274,17 +276,37 @@ public final class Config extends AbstractConfig {
                 }
                 temp = temp.getAsJsonObject(s);
             } else {
-                temp.addProperty(object, data.replace("\u0026dot;", "."));
+                temp.remove(s);
+            }
+        }
+    }
+
+    private void setString(String path, String data) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1].replace("&dot;", ".");
+        JsonObject temp = getObject();
+        for (String s : args) {
+            s = s.replace("&dot;", ".");
+            if (!object.equals(s)) {
+                if (!temp.has(s))
+                    temp.add(s, new JsonObject());
+                if (!temp.get(s).isJsonObject()) {
+                    temp.remove(s);
+                    temp.add(s, new JsonObject());
+                }
+                temp = temp.getAsJsonObject(s);
+            } else {
+                temp.addProperty(object, data.replace("&dot;", "."));
             }
         }
     }
 
     private void setInt(String path, int data) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
@@ -301,10 +323,10 @@ public final class Config extends AbstractConfig {
 
     private void setLong(String path, long data) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
@@ -321,10 +343,10 @@ public final class Config extends AbstractConfig {
 
     private void setBoolean(String path, boolean data) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
-            s = s.replace("\u0026dot;", ".");
+            s = s.replace("&dot;", ".");
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
@@ -341,17 +363,17 @@ public final class Config extends AbstractConfig {
 
     private void setDouble(String path, double data) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 temp.addProperty(object, data);
             }
@@ -378,17 +400,17 @@ public final class Config extends AbstractConfig {
 
     private void setEmptyList(String path, Collection<?> collection) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 if (temp.has(object))
                     temp.remove(object);
@@ -401,17 +423,17 @@ public final class Config extends AbstractConfig {
 
     private void setStringList(String path, Collection<String> collection) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 if (temp.has(object))
                     temp.remove(object);
@@ -424,17 +446,17 @@ public final class Config extends AbstractConfig {
 
     private void setIntList(String path, Collection<Integer> collection) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 if (temp.has(object))
                     temp.remove(object);
@@ -447,17 +469,17 @@ public final class Config extends AbstractConfig {
 
     private void setLongList(String path, Collection<Long> collection) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 if (temp.has(object))
                     temp.remove(object);
@@ -470,17 +492,17 @@ public final class Config extends AbstractConfig {
 
     private void setBoolList(String path, Collection<Boolean> collection) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 if (temp.has(object))
                     temp.remove(object);
@@ -493,17 +515,17 @@ public final class Config extends AbstractConfig {
 
     private void setDoubleList(String path, Collection<Double> collection) {
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("\u0026dot;", ".");
+        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
         for (String s : args) {
             if (!object.equals(s)) {
                 if (!temp.has(s))
                     temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("\u0026dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("\u0026dot;", "."));
+                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
+                    temp.remove(s.replace("&dot;", "."));
                     temp.add(s, new JsonObject());
                 }
-                temp = temp.getAsJsonObject(s.replace("\u0026dot;", "."));
+                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
             } else {
                 if (temp.has(object))
                     temp.remove(object);

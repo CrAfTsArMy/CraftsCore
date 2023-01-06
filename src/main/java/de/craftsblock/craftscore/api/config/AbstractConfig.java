@@ -27,6 +27,7 @@ public abstract class AbstractConfig {
     public abstract Collection<Double> getDoubleList(String path);
 
     public abstract void set(String path, Object data);
+    public abstract void remove(String path);
 
     public abstract void save(File f);
     public abstract String asString();

@@ -1,7 +1,6 @@
 package de.craftsblock.craftscore.buildin.config;
 
 import com.google.gson.JsonParser;
-import de.craftsblock.craftscore.api.config.AbstractConfig;
 import de.craftsblock.craftscore.api.config.AbstractConfigParser;
 import de.craftsblock.craftscore.utils.Validator;
 
@@ -9,8 +8,14 @@ import java.io.*;
 
 public final class ConfigParser extends AbstractConfigParser {
 
+    /**
+     * Reading a File and convert it to a {@link Config} object
+     *
+     * @param f Represents the {@link File} that the Parse should read
+     * @return {@link Config}
+     */
     @Override
-    public AbstractConfig parse(File f) {
+    public Config parse(File f) {
         try {
             if (!f.getParentFile().exists())
                 f.getParentFile().mkdirs();
@@ -27,8 +32,14 @@ public final class ConfigParser extends AbstractConfigParser {
         return null;
     }
 
+    /**
+     * Reading a String and convert it to a {@link Config} object
+     *
+     * @param json Represents the {@link String} that the Parse should read
+     * @return {@link Config}
+     */
     @Override
-    public AbstractConfig parse(String json) {
+    public Config parse(String json) {
         try {
             if (json != null && Validator.isJsonValid(json))
                 return new Config(JsonParser.parseString(json).getAsJsonObject());

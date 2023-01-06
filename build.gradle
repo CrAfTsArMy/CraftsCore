@@ -7,11 +7,9 @@ version '3.5.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
-    implementation 'club.minnced:java-discord-rpc:2.0.2'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'mysql:mysql-connector-java:8.0.30'

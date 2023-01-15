@@ -14,11 +14,6 @@
     <name>CraftsBlock Repositories</name>
     <url>https://repo.craftsblock.de/releases</url>
   </repository>
-  <repository> 
-    <id>jcenter</id>
-    <url>https://jcenter.bintray.com</url>
-    <name>jcenter-bintray</name>
-  </repository>
 </repositories>
 ```
 ```xml
@@ -38,7 +33,6 @@ repositories {
   ...
   maven { url "https://repo.craftsblock.de/releases" }
   mavenCentral()
-  jcenter()
 }
 ```
 ```gradle

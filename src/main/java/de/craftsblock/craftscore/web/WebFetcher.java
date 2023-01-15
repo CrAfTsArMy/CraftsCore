@@ -1,5 +1,6 @@
-package de.craftsblock.craftscore.utils;
+package de.craftsblock.craftscore.web;
 
+import de.craftsblock.craftscore.utils.Validator;
 import okhttp3.*;
 import org.jetbrains.annotations.Nullable;
 

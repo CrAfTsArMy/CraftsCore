@@ -4,6 +4,8 @@ import okhttp3.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class provides a simple way to fetch web APIs
@@ -11,7 +13,7 @@ import java.io.IOException;
  * @author CraftsBlock
  * @version 3.5.4-SNAPSHOT
  */
-public class WebFetcher {
+public final class WebFetcher {
 
     private final String endpoint;
     private final OkHttpClient client;
@@ -42,15 +44,19 @@ public class WebFetcher {
      * @throws IOException Thrown if the {@link OkHttpClient} fails
      */
     public void send(Request request, Callback callback) throws IOException {
+        int code;
+        String result;
         try (Response response = client.newCall(request).execute()) {
             try (ResponseBody body = response.body()) {
                 assert body != null;
-                callback.callback(response.code(), body.string());
+                code = response.code();
+                result = body.string();
             }
         } catch (Exception e) {
-            callback.callback(500, null);
+            callback.callback(500, e.getMessage());
             throw e;
         }
+        callback.callback(code, result);
     }
 
     /**
@@ -59,6 +65,7 @@ public class WebFetcher {
     public static class Builder {
 
         private final WebFetcher networker;
+        private final ConcurrentHashMap<String, String> headers = new ConcurrentHashMap<>();
         private Method method;
         private RequestBody body;
         private String path;
@@ -105,19 +112,70 @@ public class WebFetcher {
         }
 
         /**
+         * Adds a custom Header to the Request
+         *
+         * @param name  The name of the Header to add
+         * @param value The value of the Header to add
+         * @return {@link Builder}
+         */
+        public Builder addHeader(String name, String value) {
+            headers.put(name, value);
+            return this;
+        }
+
+        /**
+         * Adds multiple custom Headers to the Request
+         *
+         * @param headers A Map of Headers that should be added to the Request
+         * @return {@link Builder}
+         */
+        public Builder addHeaders(Map<String, String> headers) {
+            this.headers.putAll(headers);
+            return this;
+        }
+
+        /**
+         * Removes custom Headers added by {@link Builder#addHeader(String, String)} or {@link Builder#addHeaders(Map)}
+         *
+         * @param name The name of the Header to remove
+         * @return {@link Builder}
+         */
+        public Builder removeHeader(String name) {
+            headers.remove(name);
+            return this;
+        }
+
+        /**
+         * Clears the list of custom Headers
+         *
+         * @return {@link Builder}
+         */
+        public Builder clearHeaders() {
+            headers.clear();
+            return this;
+        }
+
+        /**
          * Building the Request with {@link Builder#method}, {@link Builder#body} & if set {@link Builder#path}
          *
          * @return {@link Request}
          */
         public Request build() {
+            // Loading the request builder from the method
             Request.Builder builder = method.builder(body);
             String endpoint = networker.endpoint;
+
+            // Loading the path into the builder
             if (path != null) {
                 String separator = "";
                 if (!endpoint.trim().endsWith("/") && !path.trim().startsWith("/"))
                     separator = "/";
                 builder.url(endpoint.trim() + separator + path.trim());
             } else builder.url(endpoint.trim());
+
+            // Appending all custom Headers
+            for(Map.Entry<String, String> header : headers.entrySet())
+                builder.addHeader(header.getKey(), header.getValue());
 
             return builder.build();
         }

@@ -71,7 +71,7 @@ public final class WebFetcher {
         private String path;
 
         /**
-         * @param networker
+         * @param networker The representation of the {@link WebFetcher} wich stores the endpoint
          */
         public Builder(WebFetcher networker) {
             this.networker = networker;
@@ -249,7 +249,7 @@ public final class WebFetcher {
      *
      * @return {@link OkHttpClient}
      */
-    public final OkHttpClient client() {
+    public OkHttpClient client() {
         return client;
     }
 
@@ -260,7 +260,7 @@ public final class WebFetcher {
      * @return {@link RequestBody}
      * @throws IOException Throws this Exception if the data is not a valid json String
      */
-    public final RequestBody prepareData(String data) throws IOException {
+    public RequestBody prepareData(String data) throws IOException {
         if (Validator.isJsonValid(data)) return RequestBody.create(data, MediaType.parse("application/json"));
         throw new IOException("You could only post valid json data.");
     }
@@ -270,7 +270,7 @@ public final class WebFetcher {
      *
      * @return {@link FormBody.Builder}
      */
-    public final FormBody.Builder create() {
+    public FormBody.Builder create() {
         return new FormBody.Builder();
     }
 

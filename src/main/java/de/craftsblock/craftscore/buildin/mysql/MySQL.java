@@ -53,8 +53,10 @@ public final class MySQL extends AbstractMySQL {
     @Override
     public MySQL disconnect() throws SQLException {
         cache.remove(local);
-        connection.close();
-        connection = null;
+        if (connection != null) {
+            connection.close();
+            connection = null;
+        }
         if (getCallback() != null)
             getCallback().disconnect(this);
         return this;

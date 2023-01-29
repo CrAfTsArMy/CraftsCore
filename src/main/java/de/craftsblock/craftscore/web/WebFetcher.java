@@ -38,6 +38,16 @@ public final class WebFetcher {
     }
 
     /**
+     * Send the request produced by {@link Builder} but do not require a {@link Callback} like {@link WebFetcher#send(Request, Callback)}
+     *
+     * @param request The Request produced by {@link Builder}
+     * @throws IOException Thrown if the {@link OkHttpClient} fails
+     */
+    public void send(Request request) throws IOException {
+        send(request, null);
+    }
+
+    /**
      * Send the request produced by {@link Builder}
      *
      * @param request  The Request produced by {@link Builder}
@@ -45,19 +55,14 @@ public final class WebFetcher {
      * @throws IOException Thrown if the {@link OkHttpClient} fails
      */
     public void send(Request request, Callback callback) throws IOException {
-        int code;
-        String result;
+        Result result;
         try (Response response = client.newCall(request).execute()) {
-            try (ResponseBody body = response.body()) {
-                assert body != null;
-                code = response.code();
-                result = body.string();
-            }
+            result = new Result(response);
         } catch (Exception e) {
-            callback.callback(500, e.getMessage());
-            throw e;
+            e.printStackTrace();
+            result = null;
         }
-        callback.callback(code, result);
+        callback.callback(result);
     }
 
     /**
@@ -175,7 +180,7 @@ public final class WebFetcher {
             } else builder.url(endpoint.trim());
 
             // Appending all custom Headers
-            for(Map.Entry<String, String> header : headers.entrySet())
+            for (Map.Entry<String, String> header : headers.entrySet())
                 builder.addHeader(header.getKey(), header.getValue());
 
             return builder.build();
@@ -230,18 +235,6 @@ public final class WebFetcher {
             }
             return builder;
         }
-
-    }
-
-    public interface Callback {
-
-        /**
-         * Represents the callback wich is called after the {@link WebFetcher#send(Request, Callback)} method completed the fetch
-         *
-         * @param code   The HTTP code that was returned by the fetch
-         * @param result The Result body as {@link String} that the fetch returned
-         */
-        void callback(int code, String result);
 
     }
 

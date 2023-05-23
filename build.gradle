@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'de.craftsblock.craftscore'
-version '3.6#15-SNAPSHOT'
+version '3.6#16-SNAPSHOT'
 
 repositories {
     mavenCentral()

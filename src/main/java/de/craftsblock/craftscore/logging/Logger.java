@@ -1,4 +1,4 @@
-package de.craftsblock.craftscore.utils.logging;
+package de.craftsblock.craftscore.logging;
 
 public final class Logger {
 

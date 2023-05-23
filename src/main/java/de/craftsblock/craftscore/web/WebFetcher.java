@@ -43,7 +43,7 @@ public final class WebFetcher {
      * @param request The Request produced by {@link Builder}
      * @throws IOException Thrown if the {@link OkHttpClient} fails
      */
-    public void send(Request request) throws IOException {
+    public void send(Request request) throws Exception {
         send(request, null);
     }
 
@@ -54,15 +54,13 @@ public final class WebFetcher {
      * @param callback The {@link Callback} wich should be called after the fetch is done
      * @throws IOException Thrown if the {@link OkHttpClient} fails
      */
-    public void send(Request request, Callback callback) throws IOException {
-        Result result;
+    public void send(Request request, Callback callback) throws Exception {
+        Result result = null;
         try (Response response = client.newCall(request).execute()) {
             result = new Result(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = null;
         }
-        callback.callback(result);
+        if (callback != null)
+            callback.callback(result);
     }
 
     /**

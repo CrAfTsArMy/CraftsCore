@@ -1,14 +1,14 @@
-package de.craftsblock.craftscore.api.config;
+package de.craftsblock.craftscore.api.json;
 
 import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.util.Collection;
 
-public abstract class AbstractConfig {
+public abstract class AbstractJson {
 
     private JsonObject object;
-    public AbstractConfig(JsonObject object) {
+    public AbstractJson(JsonObject object) {
         this.object = object;
     }
 

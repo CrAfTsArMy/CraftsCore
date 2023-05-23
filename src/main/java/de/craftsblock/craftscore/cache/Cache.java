@@ -19,9 +19,14 @@ public class Cache<T> {
 
     public T get(final String key) {
         Node node = hashmap.get(key);
-        if (node == null) return null;
+        if (node == null)
+            return null;
         internalQueue.moveNodeToFront(node);
         return hashmap.get(key).value;
+    }
+
+    public boolean contains(final String key) {
+        return hashmap.containsKey(key) && get(key) != null;
     }
 
     public void put(final String key, final T value) {
@@ -43,10 +48,6 @@ public class Cache<T> {
         internalQueue.addNodeToFront(node);
         hashmap.put(key, node);
         size++;
-    }
-
-    public boolean contains(final String key) {
-        return get(key) != null;
     }
 
     private class Node {
@@ -99,10 +100,13 @@ public class Cache<T> {
         }
 
         private void removeNodeFromRear() {
-            if (rear == null) return;
+            if (rear == null) {
+                return;
+            }
 
-            if (front == rear) front = rear = null;
-            else {
+            if (front == rear) {
+                front = rear = null;
+            } else {
                 rear = rear.prev;
                 rear.next = null;
             }
@@ -112,5 +116,6 @@ public class Cache<T> {
             return rear.key;
         }
     }
+
 }
 

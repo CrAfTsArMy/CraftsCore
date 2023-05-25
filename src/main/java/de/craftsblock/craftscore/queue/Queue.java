@@ -15,6 +15,13 @@ public class Queue {
         return this;
     }
 
+    public boolean cancel(Runnable task) {
+        if(!tasks.contains(task))
+            return false;
+        tasks.remove(task);
+        return true;
+    }
+
     public int size() {
         return tasks.size();
     }

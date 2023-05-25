@@ -28,8 +28,22 @@ public class PrioritizedQueue extends Queue {
             runnables = tasks.get(priority);
         else runnables = new ConcurrentLinkedQueue<>();
         runnables.add(task);
-        tasks.put(priority, runnables);
         return this;
+    }
+
+    @Override
+    public boolean cancel(Runnable task) {
+        for (Priority priority : Priority.values()) {
+            ConcurrentLinkedQueue<Runnable> taskQueue = tasks.get(priority);
+            if (taskQueue != null && !taskQueue.isEmpty())
+                for(Runnable t : taskQueue) {
+                    if(!t.equals(task))
+                        continue;
+                    taskQueue.remove(task);
+                    return true;
+                }
+        }
+        return false;
     }
 
     @Override

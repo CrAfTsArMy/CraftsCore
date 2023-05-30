@@ -1,4 +1,4 @@
-package de.craftsblock.craftscore.web;
+package de.craftsblock.craftscore.web.fetcher;
 
 import de.craftsblock.craftscore.utils.Validator;
 import okhttp3.*;

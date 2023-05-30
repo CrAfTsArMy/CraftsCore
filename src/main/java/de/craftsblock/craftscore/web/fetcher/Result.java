@@ -1,4 +1,4 @@
-package de.craftsblock.craftscore.web;
+package de.craftsblock.craftscore.web.fetcher;
 
 import okhttp3.Call;
 import okhttp3.Headers;

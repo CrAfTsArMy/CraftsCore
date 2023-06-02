@@ -29,13 +29,13 @@ public class Result {
      * @throws Exception Thrown if something fails in the conversion process
      */
     public Result(Response response) throws Exception {
-        if (response == null)
-            return;
+        if (response == null) return;
         try (ResponseBody b = response.body()) {
             assert b != null;
             body = b.string();
             bodyLength = b.contentLength();
-            mediaType = Objects.requireNonNull(b.contentType()).type();
+            if (b.contentType() != null) mediaType = Objects.requireNonNull(b.contentType()).type();
+            else mediaType = null;
         }
         headers = response.headers();
         protocol = response.protocol().toString();

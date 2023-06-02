@@ -19,8 +19,7 @@ public class Cache<T> {
 
     public T get(final String key) {
         Node node = hashmap.get(key);
-        if (node == null)
-            return null;
+        if (node == null) return null;
         internalQueue.moveNodeToFront(node);
         return hashmap.get(key).value;
     }
@@ -48,6 +47,20 @@ public class Cache<T> {
         internalQueue.addNodeToFront(node);
         hashmap.put(key, node);
         size++;
+    }
+
+    public void remove(final String key) {
+        Node node = hashmap.get(key);
+        if (node == null) return;
+        internalQueue.removeNode(node);
+        hashmap.remove(key);
+        size--;
+    }
+
+    public void clear() {
+        hashmap.clear();
+        internalQueue.clear();
+        size = 0;
     }
 
     private class Node {
@@ -81,10 +94,7 @@ public class Cache<T> {
         }
 
         public void moveNodeToFront(final Node node) {
-            if (front == node) {
-                return;
-            }
-
+            if (front == node) return;
             if (node == rear) {
                 rear = rear.prev;
                 rear.next = null;
@@ -100,16 +110,24 @@ public class Cache<T> {
         }
 
         private void removeNodeFromRear() {
-            if (rear == null) {
-                return;
-            }
-
-            if (front == rear) {
-                front = rear = null;
-            } else {
+            if (rear == null) return;
+            if (front == rear) front = rear = null;
+            else {
                 rear = rear.prev;
                 rear.next = null;
             }
+        }
+
+        private void removeNode(final Node node) {
+            if (node == front) front = node.next;
+            if (node == rear) rear = node.prev;
+            if (node.prev != null) node.prev.next = node.next;
+            if (node.next != null) node.next.prev = node.prev;
+        }
+
+        private void clear() {
+            front = null;
+            rear = null;
         }
 
         private String getRearKey() {

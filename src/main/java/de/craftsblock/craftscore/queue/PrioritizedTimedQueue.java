@@ -37,6 +37,12 @@ public class PrioritizedTimedQueue extends PrioritizedQueue {
         return super.submit(priority, task);
     }
 
+    @Override
+    public boolean cancel(Runnable task) {
+        taskMappings.removeIf(mapping -> mapping.task.equals(task));
+        return super.cancel(task);
+    }
+
     private static class TimedTaskMapping {
 
         private final OffsetDateTime maturity;

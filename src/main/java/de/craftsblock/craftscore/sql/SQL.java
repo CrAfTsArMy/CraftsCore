@@ -14,11 +14,27 @@ public final class SQL {
     private Connection connection;
 
     public SQL() {
-        this(null);
+        this(null, true);
     }
 
     public SQL(Callback callback) {
+        this(callback, true);
+    }
+
+    public SQL(boolean autoclose) {
+        this(null, autoclose);
+    }
+
+    public SQL(Callback callback, boolean autoclose) {
         this.callback = callback;
+        if (autoclose)
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    disconnect();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }));
     }
 
     public void bind(String host, String database) {
@@ -58,17 +74,17 @@ public final class SQL {
         return new CompleteAbleActionImpl<>(() -> connection.prepareStatement(sql));
     }
 
-    public CompleteAbleActionImpl<Void> update(String sql) {
-        return new CompleteAbleActionImpl<>(() -> {
-            if (isConnected()) this.update(this.prepareStatement(sql).complete()).complete();
-            return null;
-        });
+    public CompleteAbleActionImpl<Integer> update(String sql) {
+        return new CompleteAbleActionImpl<>(() -> this.update(this.prepareStatement(sql).complete()).complete());
     }
 
-    public CompleteAbleActionImpl<Void> update(PreparedStatement statement) {
+    public CompleteAbleActionImpl<Integer> update(PreparedStatement statement) {
         return new CompleteAbleActionImpl<>(() -> {
-            if (isConnected()) statement.executeUpdate();
-            return null;
+            if (statement.isClosed())
+                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+            int result = statement.executeUpdate();
+            statement.close();
+            return result;
         });
     }
 
@@ -77,7 +93,13 @@ public final class SQL {
     }
 
     public CompleteAbleAction<ResultSet> query(PreparedStatement statement) {
-        return new CompleteAbleActionImpl<>(statement::executeQuery);
+        return new CompleteAbleActionImpl<>(() -> {
+            if (statement.isClosed())
+                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+            ResultSet result = statement.executeQuery();
+            statement.close();
+            return result;
+        });
     }
 
     public Callback callback() {

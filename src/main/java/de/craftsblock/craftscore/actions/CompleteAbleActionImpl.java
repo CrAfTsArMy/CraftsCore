@@ -29,7 +29,7 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
                 if (consumer != null)
                     consumer.accept(result);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         });
         return restFuture;

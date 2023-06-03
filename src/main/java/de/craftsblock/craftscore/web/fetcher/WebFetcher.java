@@ -160,7 +160,7 @@ public final class WebFetcher {
         }
 
         /**
-         * Building the Request with {@link Builder#method}, {@link Builder#body} & if set {@link Builder#path}
+         * Building the Request with {@link Builder#method}, {@link Builder#body} and if set {@link Builder#path}
          *
          * @return {@link Request}
          */

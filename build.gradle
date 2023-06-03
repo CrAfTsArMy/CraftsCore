@@ -2,8 +2,13 @@ plugins {
     id 'java'
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 group 'de.craftsblock.craftscore'
-version '3.7.2-SNAPSHOT'
+version '3.7.7-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -12,5 +17,5 @@ repositories {
 dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.google.code.gson:gson:2.10'
-    implementation 'mysql:mysql-connector-java:8.0.30'
+    implementation 'com.mysql:mysql-connector-j:8.0.33'
 }

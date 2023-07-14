@@ -7,6 +7,13 @@ import okhttp3.ResponseBody;
 
 import java.util.Objects;
 
+/**
+ * @author CraftsBlock
+ * @since  3.5.4-SNAPSHOT
+ * @version 1.3
+ * @see Callback
+ * @see WebFetcher
+ */
 public class Result {
 
     private int code;

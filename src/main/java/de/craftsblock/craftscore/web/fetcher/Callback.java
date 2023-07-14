@@ -2,6 +2,13 @@ package de.craftsblock.craftscore.web.fetcher;
 
 import okhttp3.Request;
 
+/**
+ * @author CraftsBlock
+ * @since  3.5.4-SNAPSHOT
+ * @version 1.0
+ * @see Result
+ * @see WebFetcher
+ */
 public interface Callback {
 
     /**

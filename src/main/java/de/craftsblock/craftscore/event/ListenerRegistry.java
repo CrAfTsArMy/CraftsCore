@@ -59,18 +59,7 @@ public class ListenerRegistry {
         }
     }
 
-    private static class Listener {
-
-        protected final Method method;
-        protected final Object self;
-        protected final EventPriority priority;
-
-        public Listener(Method method, Object self, EventPriority priority) {
-            this.method = method;
-            this.self = self;
-            this.priority = priority;
-        }
-
+    private record Listener(Method method, Object self, EventPriority priority) {
     }
 
 }

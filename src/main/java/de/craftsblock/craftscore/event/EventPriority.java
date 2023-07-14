@@ -10,20 +10,14 @@ public enum EventPriority {
     MONITOR;
 
     public static EventPriority next(EventPriority current) {
-        switch (current) {
-            case LOWEST:
-                return LOW;
-            case LOW:
-                return NORMAL;
-            case NORMAL:
-                return HIGH;
-            case HIGH:
-                return HIGHEST;
-            case HIGHEST:
-                return MONITOR;
-            default:
-                return null;
-        }
+        return switch (current) {
+            case LOWEST -> LOW;
+            case LOW -> NORMAL;
+            case NORMAL -> HIGH;
+            case HIGH -> HIGHEST;
+            case HIGHEST -> MONITOR;
+            default -> null;
+        };
     }
 
 }

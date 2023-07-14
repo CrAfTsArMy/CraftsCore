@@ -9,10 +9,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class provides a simple way to fetch web APIs
+ * This class provides an easy way to retrieve websites and apis using {@link OkHttpClient}.
  *
  * @author CraftsBlock
- * @version 3.5.4-SNAPSHOT
+ * @version 2.5
+ * @see Result
+ * @see Callback
+ * @since 3.5.4-SNAPSHOT
  */
 public final class WebFetcher {
 
@@ -20,6 +23,8 @@ public final class WebFetcher {
     private final OkHttpClient client;
 
     /**
+     * Creates a new instance of the WebFetcher which pointing to the given endpoint.
+     *
      * @param endpoint Represents the endpoint that will be fetched
      */
     public WebFetcher(String endpoint) {
@@ -48,7 +53,7 @@ public final class WebFetcher {
     }
 
     /**
-     * Send the request produced by {@link Builder}
+     * Send the request produced by {@link Builder} and calling a {@link Callback} after the request is done
      *
      * @param request  The Request produced by {@link Builder}
      * @param callback The {@link Callback} wich should be called after the fetch is done
@@ -70,14 +75,14 @@ public final class WebFetcher {
 
         private final WebFetcher networker;
         private final ConcurrentHashMap<String, String> headers = new ConcurrentHashMap<>();
-        private Method method;
+        private Method method = Method.GET;
         private RequestBody body;
         private String path;
 
         /**
          * @param networker The representation of the {@link WebFetcher} wich stores the endpoint
          */
-        public Builder(WebFetcher networker) {
+        protected Builder(WebFetcher networker) {
             this.networker = networker;
         }
 
@@ -217,13 +222,13 @@ public final class WebFetcher {
                 case GET:
                     return builder.get();
                 case POST:
-                    if (body == null) throw new NullPointerException("\"body\" may not be null!");
+                    if (body == null) builder.post(RequestBody.create(null, new byte[]{}));
                     else return builder.post(body);
                 case PUT:
-                    if (body == null) throw new NullPointerException("\"body\" may not be null!");
+                    if (body == null) builder.post(RequestBody.create(null, new byte[]{}));
                     else return builder.put(body);
                 case PATCH:
-                    if (body == null) throw new NullPointerException("\"body\" may not be null!");
+                    if (body == null) builder.post(RequestBody.create(null, new byte[]{}));
                     else return builder.patch(body);
                 case DELETE:
                     if (body == null) return builder.delete();
@@ -237,7 +242,16 @@ public final class WebFetcher {
     }
 
     /**
-     * Return the current instance of the {@link OkHttpClient} used by this class
+     * Returns a <strong>new</strong> instance of {@link Builder} for building request
+     *
+     * @return {@link Builder}
+     */
+    public Builder builder() {
+        return new Builder(this);
+    }
+
+    /**
+     * Return the <strong>current</strong> instance of {@link OkHttpClient}, used by this class
      *
      * @return {@link OkHttpClient}
      */

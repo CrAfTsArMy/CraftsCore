@@ -28,6 +28,7 @@ public class PrioritizedQueue extends Queue {
             runnables = tasks.get(priority);
         else runnables = new ConcurrentLinkedQueue<>();
         runnables.add(task);
+        tasks.put(priority, runnables);
         return this;
     }
 
@@ -50,9 +51,9 @@ public class PrioritizedQueue extends Queue {
     public int size() {
         int size = 0;
         for (Priority priority : Priority.values()) {
-            ConcurrentLinkedQueue<Runnable> runnables = tasks.get(priority);
-            if (runnables != null)
-                size += runnables.size();
+            ConcurrentLinkedQueue<Runnable> runnable = tasks.get(priority);
+            if (runnable != null)
+                size += runnable.size();
         }
         return size;
     }

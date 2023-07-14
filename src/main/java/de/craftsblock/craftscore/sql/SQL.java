@@ -102,6 +102,10 @@ public final class SQL {
         });
     }
 
+    public Connection unsafe() {
+        return connection;
+    }
+
     public Callback callback() {
         return callback;
     }

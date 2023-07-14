@@ -1,247 +1,173 @@
 package de.craftsblock.craftscore.json;
 
 import com.google.gson.*;
-import de.craftsblock.craftscore.api.json.AbstractJson;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-public final class Json extends AbstractJson {
+public final class Json {
+
+    private JsonObject object;
+    private Gson gson;
 
     public Json(JsonObject object) {
-        super(object);
+        this.object = object;
+        this.gson = new Gson();
     }
 
-    @Override
     public boolean contains(String path) {
-        path = path.replace("\\.", "&dot;");
         String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object) && temp.has(object))
-                return true;
-            else if (temp.has(s))
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            else
-                return false;
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (temp.has(s)) temp = temp.getAsJsonObject(s);
+            else return false;
         }
-        return false;
+        String object = args[args.length - 1].replace("&dot;", ".");
+        return temp.has(object);
     }
 
-    @Override
+    public Json remove(String path) {
+        String[] args = path.split("\\.");
+        JsonObject temp = getObject();
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
+            }
+            temp = element.getAsJsonObject();
+        }
+        String object = args[args.length - 1].replace("&dot;", ".");
+        temp.remove(object);
+        return this;
+    }
+
+    public <T> T deserialize(String path, Class<T> classOfT) {
+        path = path.replace("\\.", "&dot;");
+        String[] args = path.split("\\.");
+        JsonObject temp = getObject();
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (temp.has(s)) temp = temp.getAsJsonObject(s);
+            else return null;
+        }
+        String object = args[args.length - 1].replace("&dot;", ".");
+        if (temp.has(object)) return gson.fromJson(temp.get(object), classOfT);
+        return null;
+    }
+
+    public void serialize(String path, Object data) {
+        set(path, gson.toJson(data));
+    }
+
+    public JsonElement get(String path) {
+        path = path.replace("\\.", "&dot;");
+        String[] args = path.split("\\.");
+        JsonObject temp = getObject();
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (temp.has(s)) temp = temp.getAsJsonObject(s);
+            else return null;
+        }
+        String object = args[args.length - 1].replace("&dot;", ".");
+        if (temp.has(object)) return temp.get(object);
+        return null;
+    }
+
     public String getString(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                return temp.get(object).getAsString();
-            else
-                temp = temp.getAsJsonObject(s);
-        }
-        return path;
+        JsonElement element = get(path);
+        if (element != null && element.isJsonPrimitive()) return element.getAsString();
+        return "";
     }
 
-    @Override
     public int getInt(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                return temp.get(object).getAsInt();
-            else
-                temp = temp.getAsJsonObject(s);
-        }
+        JsonElement element = get(path);
+        if (element != null && element.isJsonPrimitive()) return element.getAsInt();
         return -1;
     }
 
-    @Override
     public long getLong(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                return temp.get(object).getAsLong();
-            else
-                temp = temp.getAsJsonObject(s);
-        }
+        JsonElement element = get(path);
+        if (element != null && element.isJsonPrimitive()) return element.getAsLong();
         return -1;
     }
 
-    @Override
     public boolean getBoolean(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                return temp.get(object).getAsBoolean();
-            else
-                temp = temp.getAsJsonObject(s);
-        }
+        JsonElement element = get(path);
+        if (element != null && element.isJsonPrimitive()) return element.getAsBoolean();
         return false;
     }
 
-    @Override
     public double getDouble(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                return temp.get(object).getAsDouble();
-            else
-                temp = temp.getAsJsonObject(s);
-        }
+        JsonElement element = get(path);
+        if (element != null && element.isJsonPrimitive()) return element.getAsDouble();
         return -1;
     }
 
-    @Override
     public Collection<String> getStringList(String path) {
-        path = path.replace("\\.", "&dot;");
-        if (!contains(path))
-            return new ConcurrentLinkedQueue<>();
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                if (!temp.get(object).isJsonObject()) {
-                    ConcurrentLinkedQueue<String> list = new ConcurrentLinkedQueue<>();
-                    for (JsonElement element : temp.get(object).getAsJsonArray())
-                        list.add(element.getAsString());
-                    return list;
-                } else {
-                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
-                }
-            else
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
+        JsonElement element = get(path);
+        if (element != null && element.isJsonArray()) {
+            Collection<String> list = new ArrayList<>();
+            for (JsonElement arrayElement : element.getAsJsonArray())
+                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsString());
+            return list;
         }
-        return new ConcurrentLinkedQueue<>();
+        return new ArrayList<>();
     }
 
-    @Override
     public Collection<Integer> getIntList(String path) {
-        path = path.replace("\\.", "&dot;");
-        if (!contains(path))
-            return new ConcurrentLinkedQueue<>();
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                if (!temp.get(object).isJsonObject()) {
-                    ConcurrentLinkedQueue<Integer> list = new ConcurrentLinkedQueue<>();
-                    for (JsonElement element : temp.get(object).getAsJsonArray())
-                        list.add(element.getAsInt());
-                    return list;
-                } else {
-                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
-                }
-            else
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
+        JsonElement element = get(path);
+        if (element != null && element.isJsonArray()) {
+            Collection<Integer> list = new ArrayList<>();
+            for (JsonElement arrayElement : element.getAsJsonArray())
+                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsInt());
+            return list;
         }
-        return new ConcurrentLinkedQueue<>();
+        return new ArrayList<>();
     }
 
-    @Override
     public Collection<Long> getLongList(String path) {
-        path = path.replace("\\.", "&dot;");
-        if (!contains(path))
-            return new ConcurrentLinkedQueue<>();
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                if (!temp.get(object).isJsonObject()) {
-                    ConcurrentLinkedQueue<Long> list = new ConcurrentLinkedQueue<>();
-                    for (JsonElement element : temp.get(object).getAsJsonArray())
-                        list.add(element.getAsLong());
-                    return list;
-                } else {
-                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
-                }
-            else
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
+        JsonElement element = get(path);
+        if (element != null && element.isJsonArray()) {
+            Collection<Long> list = new ArrayList<>();
+            for (JsonElement arrayElement : element.getAsJsonArray())
+                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsLong());
+            return list;
         }
-        return new ConcurrentLinkedQueue<>();
+        return new ArrayList<>();
     }
 
-    @Override
-    public Collection<Boolean> getBoolList(String path) {
-        path = path.replace("\\.", "&dot;");
-        if (!contains(path))
-            return new ConcurrentLinkedQueue<>();
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                if (!temp.get(object).isJsonObject()) {
-                    ConcurrentLinkedQueue<Boolean> list = new ConcurrentLinkedQueue<>();
-                    for (JsonElement element : temp.get(object).getAsJsonArray())
-                        list.add(element.getAsBoolean());
-                    return list;
-                } else {
-                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
-                }
-            else
-                temp = temp.getAsJsonObject(s);
+    public Collection<Boolean> getBooleanList(String path) {
+        JsonElement element = get(path);
+        if (element != null && element.isJsonArray()) {
+            Collection<Boolean> list = new ArrayList<>();
+            for (JsonElement arrayElement : element.getAsJsonArray())
+                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsBoolean());
+            return list;
         }
-        return new ConcurrentLinkedQueue<>();
+        return new ArrayList<>();
     }
 
-    @Override
     public Collection<Double> getDoubleList(String path) {
-        path = path.replace("\\.", "&dot;");
-        if (!contains(path))
-            return new ConcurrentLinkedQueue<>();
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (s.equals(object))
-                if (!temp.get(object).isJsonObject()) {
-                    ConcurrentLinkedQueue<Double> list = new ConcurrentLinkedQueue<>();
-                    for (JsonElement element : temp.get(object).getAsJsonArray())
-                        list.add(element.getAsDouble());
-                    return list;
-                } else {
-                    throw new IllegalArgumentException(path + " is not from type \"JsonArray\"!");
-                }
-            else
-                temp = temp.getAsJsonObject(s);
+        JsonElement element = get(path);
+        if (element != null && element.isJsonArray()) {
+            Collection<Double> list = new ArrayList<>();
+            for (JsonElement arrayElement : element.getAsJsonArray())
+                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsDouble());
+            return list;
         }
-        return new ConcurrentLinkedQueue<>();
+        return new ArrayList<>();
     }
 
-    @Override
-    public void set(String path, Object data) {
+
+    public Json set(String path, Object data) {
         path = path.replace("\\.", "&dot;");
         if (data instanceof String)
             setString(path, (String) data);
@@ -259,134 +185,99 @@ public final class Json extends AbstractJson {
             setList(path, Arrays.asList((Object[]) data));
         else
             throw new UnsupportedDataTypeException();
-    }
-
-    @Override
-    public void remove(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        String object = args[args.length - 1].replace("&dot;", ".");
-        JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.remove(s);
-            }
-        }
+        return this;
     }
 
     private void setString(String path, String data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data.replace("&dot;", "."));
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        temp.addProperty(object, data.replace("&dot;", "."));
     }
 
     private void setInt(String path, int data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        temp.addProperty(object, data);
     }
 
     private void setLong(String path, long data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        temp.addProperty(object, data);
     }
 
     private void setBoolean(String path, boolean data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            s = s.replace("&dot;", ".");
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s).isJsonObject()) {
-                    temp.remove(s);
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s);
-            } else {
-                temp.addProperty(object, data);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        temp.addProperty(object, data);
     }
 
     private void setDouble(String path, double data) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                temp.addProperty(object, data);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        temp.addProperty(object, data);
     }
 
     @SuppressWarnings("unchecked")
     private void setList(String path, Collection<?> collection) {
         assert collection != null;
         if (collection.isEmpty())
-            setEmptyList(path, Collections.emptyList());
+            setEmptyList(path);
         for (Object o : collection)
             if (o instanceof String)
                 setStringList(path, (Collection<String>) collection);
@@ -400,145 +291,121 @@ public final class Json extends AbstractJson {
                 setDoubleList(path, (Collection<Double>) collection);
     }
 
-    private void setEmptyList(String path, Collection<?> collection) {
+    private void setEmptyList(String path) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                if (temp.has(object))
-                    temp.remove(object);
-                temp.add(object, new JsonArray());
-                for (Object o : collection)
-                    temp.getAsJsonArray(object).add(o.toString());
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
     }
+
 
     private void setStringList(String path, Collection<String> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                if (temp.has(object))
-                    temp.remove(object);
-                temp.add(object, new JsonArray());
-                for (Object o : collection)
-                    temp.getAsJsonArray(object).add(o.toString());
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
+        for (String item : collection) temp.getAsJsonArray(object).add(item);
     }
+
 
     private void setIntList(String path, Collection<Integer> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                if (temp.has(object))
-                    temp.remove(object);
-                temp.add(object, new JsonArray());
-                for (Integer o : collection)
-                    temp.getAsJsonArray(object).add(o);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
+        for (int item : collection) temp.getAsJsonArray(object).add(item);
     }
 
     private void setLongList(String path, Collection<Long> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                if (temp.has(object))
-                    temp.remove(object);
-                temp.add(object, new JsonArray());
-                for (Long o : collection)
-                    temp.getAsJsonArray(object).add(o);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
+        for (long item : collection) temp.getAsJsonArray(object).add(item);
     }
 
     private void setBoolList(String path, Collection<Boolean> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                if (temp.has(object))
-                    temp.remove(object);
-                temp.add(object, new JsonArray());
-                for (Boolean o : collection)
-                    temp.getAsJsonArray(object).add(o);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
+        for (boolean item : collection) temp.getAsJsonArray(object).add(item);
     }
 
     private void setDoubleList(String path, Collection<Double> collection) {
         String[] args = path.split("\\.");
         String object = args[args.length - 1].replace("&dot;", ".");
         JsonObject temp = getObject();
-        for (String s : args) {
-            if (!object.equals(s)) {
-                if (!temp.has(s))
-                    temp.add(s, new JsonObject());
-                if (!temp.get(s.replace("&dot;", ".")).isJsonObject()) {
-                    temp.remove(s.replace("&dot;", "."));
-                    temp.add(s, new JsonObject());
-                }
-                temp = temp.getAsJsonObject(s.replace("&dot;", "."));
-            } else {
-                if (temp.has(object))
-                    temp.remove(object);
-                temp.add(object, new JsonArray());
-                for (Double o : collection)
-                    temp.getAsJsonArray(object).add(o);
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
             }
+            temp = element.getAsJsonObject();
         }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
+        for (double item : collection) temp.getAsJsonArray(object).add(item);
     }
 
-    @Override
     public void save(File f) {
         try {
             Gson gson = new GsonBuilder().create();
@@ -552,7 +419,6 @@ public final class Json extends AbstractJson {
         }
     }
 
-    @Override
     public String asString() {
         try {
             Gson gson = new GsonBuilder().create();
@@ -561,6 +427,19 @@ public final class Json extends AbstractJson {
             e.printStackTrace();
         }
         return "{\"code\":500,\"message\":\"CraftsCore failed to build a string from the config data!\"}";
+    }
+
+    public JsonObject getObject() {
+        return object;
+    }
+
+    public static class UnsupportedDataTypeException extends RuntimeException {
+
+        @Override
+        public String toString() {
+            return "The data type you specified is not supported yet!";
+        }
+
     }
 
 }

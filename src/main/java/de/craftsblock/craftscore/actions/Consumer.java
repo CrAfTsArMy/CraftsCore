@@ -5,10 +5,10 @@ import java.util.Objects;
 /**
  * This interface represents an operation that accepts a single input argument and returns no result.
  *
+ * @param <T> the type of the input to the operation
  * @author CraftsBlock
  * @version 1.0
  * @since 3.6#15-SNAPSHOT
- * @param <T> the type of the input to the operation
  */
 public interface Consumer<T> {
 
@@ -29,7 +29,10 @@ public interface Consumer<T> {
      */
     default Consumer<T> andThen(Consumer<? super T> after) throws Exception {
         Objects.requireNonNull(after);
-        return (T t) -> { accept(t); after.accept(t); };
+        return (T t) -> {
+            accept(t);
+            after.accept(t);
+        };
     }
 }
 

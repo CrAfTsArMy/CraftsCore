@@ -5,11 +5,11 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Defines a set of methods for performing an action asynchronously and handling its completion.
  *
+ * @param <T> the type of the action's result
  * @author CraftsBlock
  * @version 1.0
  * @see CompleteAbleActionImpl
  * @since 3.6#15-SNAPSHOT
- * @param <T> the type of the action's result
  */
 public interface CompleteAbleAction<T> {
 

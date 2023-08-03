@@ -64,8 +64,7 @@ public final class WebFetcher {
         try (Response response = client.newCall(request).execute()) {
             result = new Result(response);
         }
-        if (callback != null)
-            callback.callback(result);
+        if (callback != null) callback.callback(result);
     }
 
     /**

@@ -1,139 +1,115 @@
 package de.craftsblock.craftscore.cache;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class Cache<T> {
+/**
+ * A simple cache implementation that uses ConcurrentHashMap and ConcurrentLinkedDeque
+ * to store key-value pairs with a fixed capacity. When the capacity is exceeded,
+ * the least recently used items are automatically removed to make space for new entries.
+ *
+ * @param <S> The type of the keys in the cache.
+ * @param <T> The type of the values in the cache.
+ * @author CraftsBlock
+ * @since 3.6#4
+ * @version 2.0
+ */
+public class Cache<S, T> {
 
     private final int capacity;
-    private int size;
-    private final Map<String, Node> hashmap;
-    private final DoublyLinkedList internalQueue;
+    private final ConcurrentHashMap<S, T> hashmap;
+    private final ConcurrentLinkedDeque<S> internalQueue;
 
+    /**
+     * Constructs a new Cache object with the specified capacity.
+     *
+     * @param capacity The maximum number of key-value pairs the cache can hold.
+     */
     public Cache(final int capacity) {
         this.capacity = capacity;
-        this.hashmap = new HashMap<>();
-        this.internalQueue = new DoublyLinkedList();
-        this.size = 0;
+        this.hashmap = new ConcurrentHashMap<>(capacity);
+        this.internalQueue = new ConcurrentLinkedDeque<>();
     }
 
-    public T get(final String key) {
-        Node node = hashmap.get(key);
-        if (node == null) return null;
-        internalQueue.moveNodeToFront(node);
-        return hashmap.get(key).value;
+    /**
+     * Retrieves the value associated with the given key from the cache and updates its access order.
+     *
+     * @param key The key whose associated value is to be retrieved from the cache.
+     * @return The value associated with the given key, or null if the key is not in the cache.
+     */
+    public T get(final S key) {
+        moveToFront(key);
+        return hashmap.get(key);
     }
 
-    public boolean contains(final String key) {
-        return hashmap.containsKey(key) && get(key) != null;
+    /**
+     * Checks if the cache contains the specified key and updates its access order accordingly.
+     *
+     * @param key The key whose presence in the cache is to be checked.
+     * @return true if the cache contains the key, otherwise false.
+     */
+    public boolean containsKey(final S key) {
+        moveToFront(key);
+        return hashmap.containsKey(key);
     }
 
-    public void put(final String key, final T value) {
-        Node currentNode = hashmap.get(key);
-        if (currentNode != null) {
-            currentNode.value = value;
-            internalQueue.moveNodeToFront(currentNode);
-            return;
+    /**
+     * Adds a key-value pair to the cache and manages its capacity. If the key is not already present
+     * in the cache and the cache size exceeds its capacity, the least recently used item is removed
+     * to make space for the new entry.
+     *
+     * @param key   The key to be added to the cache.
+     * @param value The value associated with the key to be added.
+     */
+    public void put(final S key, final T value) {
+        hashmap.put(key, value);
+        // Move the key to the front of the queue to represent its recent use.
+        // If the key was not already present in the queue and the cache size exceeds capacity,
+        // remove the least recently used key-value pair from the cache.
+        if (!moveToFront(key) && hashmap.size() > capacity) {
+            S last = internalQueue.removeLast();
+            hashmap.remove(last);
         }
-
-        if (size == capacity) {
-            String rearNodeKey = internalQueue.getRearKey();
-            internalQueue.removeNodeFromRear();
-            hashmap.remove(rearNodeKey);
-            size--;
-        }
-
-        Node node = new Node(key, value);
-        internalQueue.addNodeToFront(node);
-        hashmap.put(key, node);
-        size++;
     }
 
-    public void remove(final String key) {
-        Node node = hashmap.get(key);
-        if (node == null) return;
-        internalQueue.removeNode(node);
+    /**
+     * Moves the given key to the front of the internal queue, representing its recent use.
+     * If the key is already present in the queue, it is removed and added to the front.
+     *
+     * @param key The key to be moved to the front of the queue.
+     * @return true if the key was already in the queue and moved, otherwise false.
+     */
+    private boolean moveToFront(final S key) {
+        boolean removed = internalQueue.remove(key);
+        internalQueue.addFirst(key);
+        return removed;
+    }
+
+    /**
+     * Removes the key-value pair with the specified key from the cache, if present.
+     *
+     * @param key The key whose associated key-value pair is to be removed from the cache.
+     */
+    public void remove(final S key) {
         hashmap.remove(key);
-        size--;
+        internalQueue.remove(key);
     }
 
+    /**
+     * Clears the cache, removing all key-value pairs from it.
+     */
     public void clear() {
         hashmap.clear();
         internalQueue.clear();
-        size = 0;
     }
 
-    private class Node {
-        String key;
-        T value;
-        Node next, prev;
-
-        public Node(final String key, final T value) {
-            this.key = key;
-            this.value = value;
-            this.next = null;
-            this.prev = null;
-        }
+    /**
+     * Returns a String representation of the cache, based on the String representation of the HashMap.
+     *
+     * @return A String representation of the cache.
+     */
+    @Override
+    public String toString() {
+        return hashmap.toString();
     }
-
-    private class DoublyLinkedList {
-        private Node front, rear;
-
-        public DoublyLinkedList() {
-            front = rear = null;
-        }
-
-        private void addNodeToFront(final Node node) {
-            if (rear == null) {
-                front = rear = node;
-                return;
-            }
-            node.next = front;
-            front.prev = node;
-            front = node;
-        }
-
-        public void moveNodeToFront(final Node node) {
-            if (front == node) return;
-            if (node == rear) {
-                rear = rear.prev;
-                rear.next = null;
-            } else {
-                node.prev.next = node.next;
-                node.next.prev = node.prev;
-            }
-
-            node.prev = null;
-            node.next = front;
-            front.prev = node;
-            front = node;
-        }
-
-        private void removeNodeFromRear() {
-            if (rear == null) return;
-            if (front == rear) front = rear = null;
-            else {
-                rear = rear.prev;
-                rear.next = null;
-            }
-        }
-
-        private void removeNode(final Node node) {
-            if (node == front) front = node.next;
-            if (node == rear) rear = node.prev;
-            if (node.prev != null) node.prev.next = node.next;
-            if (node.next != null) node.next.prev = node.prev;
-        }
-
-        private void clear() {
-            front = null;
-            rear = null;
-        }
-
-        private String getRearKey() {
-            return rear.key;
-        }
-    }
-
 }
-

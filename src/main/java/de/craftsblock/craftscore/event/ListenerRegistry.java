@@ -13,7 +13,7 @@ public class ListenerRegistry {
     private final ConcurrentHashMap<String, ConcurrentLinkedQueue<Listener>> data = new ConcurrentHashMap<>();
 
     public void register(ListenerAdapter adapter) {
-        for (Method method : Utils.getMethodeByAnnotation(adapter.getClass(), EventHandler.class))
+        for (Method method : Utils.getMethodByAnnotation(adapter.getClass(), EventHandler.class))
             try {
                 if (method.getParameterCount() <= 0)
                     throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
@@ -30,7 +30,7 @@ public class ListenerRegistry {
     }
 
     public void unregister(ListenerAdapter adapter) {
-        for (Method method : Utils.getMethodeByAnnotation(adapter.getClass(), EventHandler.class))
+        for (Method method : Utils.getMethodByAnnotation(adapter.getClass(), EventHandler.class))
             try {
                 if (method.getParameterCount() <= 0)
                     throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");

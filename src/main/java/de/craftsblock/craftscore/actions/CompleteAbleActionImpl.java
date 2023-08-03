@@ -8,16 +8,16 @@ import java.util.concurrent.Executors;
  * This class is an implementation of the {@link CompleteAbleAction} interface.
  * It allows submitting an action for asynchronous execution and provides methods to handle its completion.
  *
+ * @param <T> the type of the action's result
  * @author CraftsBlock
- * @version 1.0
+ * @version 1.1
  * @see CompleteAbleAction
  * @see CompleteAbleFuture
  * @since 3.6#15-SNAPSHOT
- * @param <T> the type of the action's result
  */
 public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
 
-    private static final ExecutorService service = Executors.newCachedThreadPool();
+    private static final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private final Action<T> action;
 
@@ -49,18 +49,22 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
      */
     @Override
     public CompletableFuture<T> submit(Consumer<T> consumer) {
-        CompleteAbleFuture<T> restFuture = new CompleteAbleFuture<>(this);
-        service.submit(() -> {
-            try {
-                T result = action.handle();
-                restFuture.complete(result);
-                if (consumer != null)
-                    consumer.accept(result);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        return restFuture;
+        synchronized (this) {
+            CompleteAbleFuture<T> restFuture = new CompleteAbleFuture<>(this);
+            service.submit(() -> {
+                try {
+                    synchronized (this) {
+                        T result = action.handle();
+                        restFuture.complete(result);
+                        if (consumer != null)
+                            consumer.accept(result);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            return restFuture;
+        }
     }
 
     /**

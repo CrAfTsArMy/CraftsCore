@@ -103,8 +103,9 @@ public final class Json {
      * @param data The data to be serialized and set at the path.
      * @return The Json object itself after setting the data at the path.
      */
-    public void serialize(String path, Object data) {
+    public Json serialize(String path, Object data) {
         set(path, gson.toJson(data));
+        return this;
     }
 
     /**
@@ -275,7 +276,7 @@ public final class Json {
     /**
      * Sets the value at the specified path in the JSON data.
      * If the path does not exist, it will be created.
-     * If the given data is of a supported type (String, Integer, Long, Boolean, Double, Collection<?> or Object[]),
+     * If the given data is of a supported type (String, Integer, Long, Boolean, Double, Collection or Object[]),
      * the appropriate setter method will be called. Otherwise, the data will be converted to a string and set as a value.
      *
      * @param path The path where the value should be set in the JSON data.

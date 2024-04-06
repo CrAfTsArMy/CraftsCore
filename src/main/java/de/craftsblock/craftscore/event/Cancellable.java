@@ -1,6 +1,6 @@
 package de.craftsblock.craftscore.event;
 
-public interface Cancelable {
+public interface Cancellable {
 
     void setCancelled(boolean cancelled);
 

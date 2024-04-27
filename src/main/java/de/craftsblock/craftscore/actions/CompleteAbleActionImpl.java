@@ -3,6 +3,7 @@ package de.craftsblock.craftscore.actions;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is an implementation of the {@link CompleteAbleAction} interface.
@@ -18,6 +19,17 @@ import java.util.concurrent.Executors;
 public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
 
     private static final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                service.shutdown();
+                if (!service.awaitTermination(1, TimeUnit.SECONDS))
+                    service.shutdownNow();
+            } catch (InterruptedException ignored) {
+            }
+        }));
+    }
 
     private final Action<T> action;
 
@@ -49,22 +61,19 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
      */
     @Override
     public CompletableFuture<T> submit(Consumer<T> consumer) {
-        synchronized (this) {
-            CompleteAbleFuture<T> restFuture = new CompleteAbleFuture<>(this);
-            service.submit(() -> {
-                try {
-                    synchronized (this) {
-                        T result = action.handle();
-                        restFuture.complete(result);
-                        if (consumer != null)
-                            consumer.accept(result);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            return restFuture;
-        }
+        CompleteAbleFuture<T> restFuture = new CompleteAbleFuture<>(this);
+        service.submit(() -> {
+            try {
+                T result = action.handle();
+                restFuture.complete(result);
+                if (consumer != null) consumer.accept(result);
+                Thread.currentThread().interrupt();
+            } catch (InterruptedException ignore) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return restFuture;
     }
 
     /**

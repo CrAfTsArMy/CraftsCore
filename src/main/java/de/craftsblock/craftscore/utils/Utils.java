@@ -63,7 +63,7 @@ public final class Utils {
      * @return A list of methods annotated with the specified annotation.
      */
     @NotNull
-    public static List<Method> getMethodByAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
+    public static List<Method> getMethodsByAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
         final List<Method> methods = new ArrayList<>();
         Class<?> clazz = type;
         while (clazz != Object.class) {

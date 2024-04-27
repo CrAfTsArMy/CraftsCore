@@ -6,6 +6,7 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -45,12 +46,12 @@ public class AES extends Encryptor {
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, parameterSpec);
 
         byte[] plaintext = cipher.doFinal(ciphertext);
-        return new String(plaintext, "UTF-8");
+        return new String(plaintext, StandardCharsets.UTF_8);
     }
 
     private byte[] sha256(String input) throws Exception {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        return digest.digest(input.getBytes("UTF-8"));
+        return digest.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
     private byte[] secureRandomBytes(int length) {

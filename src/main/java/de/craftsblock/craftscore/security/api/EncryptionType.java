@@ -15,7 +15,7 @@ public enum EncryptionType {
     }
 
     public Encryptor getInstance() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        return (Encryptor) clazz.getDeclaredConstructor().newInstance();
+        return clazz.getDeclaredConstructor().newInstance();
     }
 
 }

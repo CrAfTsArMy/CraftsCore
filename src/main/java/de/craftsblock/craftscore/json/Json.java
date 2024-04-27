@@ -43,7 +43,12 @@ public final class Json {
         JsonObject temp = getObject();
         for (int i = 0; i < args.length - 1; i++) {
             String s = args[i].replace("&dot;", ".");
-            if (temp.has(s)) temp = temp.getAsJsonObject(s);
+
+            if (!temp.has(s)) return false;
+            if (i == args.length - 1) return true;
+
+            JsonElement element = temp.get(s);
+            if (element.isJsonObject()) temp = element.getAsJsonObject();
             else return false;
         }
         String object = args[args.length - 1].replace("&dot;", ".");
@@ -103,8 +108,10 @@ public final class Json {
      * @param data The data to be serialized and set at the path.
      * @return The Json object itself after setting the data at the path.
      */
-    public Json serialize(String path, Object data) {
-        set(path, gson.toJson(data));
+    public <T> Json serialize(String path, T data) {
+        Json json = JsonParser.parse(gson.toJson(data));
+        if (json == null) return this;
+        set(path, json.getObject());
         return this;
     }
 
@@ -126,6 +133,18 @@ public final class Json {
         String object = args[args.length - 1].replace("&dot;", ".");
         if (temp.has(object)) return temp.get(object);
         return null;
+    }
+
+    /**
+     * Retrieves the JsonElement at the specified path in the JSON data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path     The path to the JsonElement in the JSON data.
+     * @param fallback The fallback data to return if no data is associated with the path
+     * @return The JsonElement at the given path, or null if the path does not exist.
+     */
+    public JsonElement getOrDefault(String path, JsonElement fallback) {
+        return get(path) != null ? get(path) : fallback;
     }
 
     /**
@@ -286,7 +305,8 @@ public final class Json {
     public Json set(String path, Object data) {
         synchronized (this) {
             path = path.replace("\\.", "&dot;");
-            if (data instanceof String) setString(path, (String) data);
+            if (data instanceof JsonElement) setJson(path, (JsonElement) data);
+            else if (data instanceof String) setString(path, (String) data);
             else if (data instanceof Integer) setInt(path, (int) data);
             else if (data instanceof Long) setLong(path, (long) data);
             else if (data instanceof Boolean) setBoolean(path, (boolean) data);
@@ -296,6 +316,29 @@ public final class Json {
             else setString(path, data.toString());
             return this;
         }
+    }
+
+    /**
+     * Sets a json element at the specified path in the JSON data.
+     *
+     * @param path The path where the string value should be set in the JSON data.
+     * @param data The string data to be set at the given path.
+     */
+    private void setJson(String path, JsonElement data) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1].replace("&dot;", ".");
+        JsonObject temp = getObject();
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
+            }
+            temp = element.getAsJsonObject();
+        }
+        temp.add(object, data);
     }
 
     /**
@@ -427,13 +470,16 @@ public final class Json {
     private void setList(String path, Collection<?> collection) {
         assert collection != null;
         if (collection.isEmpty()) setEmptyList(path);
-        for (Object o : collection)
-            if (o instanceof String) setStringList(path, (Collection<String>) collection);
+        for (Object o : collection) {
+            if (o instanceof JsonElement) setJsonList(path, (Collection<JsonElement>) collection);
+            else if (o instanceof String) setStringList(path, (Collection<String>) collection);
             else if (o instanceof Integer) setIntList(path, (Collection<Integer>) collection);
             else if (o instanceof Long) setLongList(path, (Collection<Long>) collection);
             else if (o instanceof Boolean) setBoolList(path, (Collection<Boolean>) collection);
             else if (o instanceof Double) setDoubleList(path, (Collection<Double>) collection);
             else setStringList(path, collection.stream().map(Object::toString).toList());
+            break;
+        }
     }
 
     /**
@@ -457,6 +503,25 @@ public final class Json {
         }
         if (temp.has(object)) temp.remove(object);
         temp.add(object, new JsonArray());
+    }
+
+    private void setJsonList(String path, Collection<JsonElement> collection) {
+        String[] args = path.split("\\.");
+        String object = args[args.length - 1].replace("&dot;", ".");
+        JsonObject temp = getObject();
+        for (int i = 0; i < args.length - 1; i++) {
+            String s = args[i].replace("&dot;", ".");
+            if (!temp.has(s)) temp.add(s, new JsonObject());
+            JsonElement element = temp.get(s);
+            if (!element.isJsonObject()) {
+                temp.remove(s);
+                temp.add(s, new JsonObject());
+            }
+            temp = element.getAsJsonObject();
+        }
+        if (temp.has(object)) temp.remove(object);
+        temp.add(object, new JsonArray());
+        for (JsonElement item : collection) temp.getAsJsonArray(object).add(item);
     }
 
     /**
@@ -617,7 +682,18 @@ public final class Json {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "{\"code\":500,\"message\":\"CraftsCore failed to build a string from the config data!\"}";
+        return "{\"code\":500,\"message\":\"CraftsCore failed to build a string from the json data!\"}";
+    }
+
+    /**
+     * Returns the JSON data as a JSON string.
+     * If any error occurs during the process, it returns a default error JSON string.
+     *
+     * @return The JSON data as a JSON string.
+     */
+    @Override
+    public String toString() {
+        return asString();
     }
 
     /**
@@ -627,6 +703,15 @@ public final class Json {
      */
     public JsonObject getObject() {
         return object;
+    }
+
+    /**
+     * Returns a new and empty Json Class
+     *
+     * @return The new Json class
+     */
+    public static Json empty() {
+        return new Json(new JsonObject());
     }
 
 }

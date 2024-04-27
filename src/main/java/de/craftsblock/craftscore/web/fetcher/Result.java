@@ -14,6 +14,7 @@ import java.util.Objects;
  * @see Callback
  * @see WebFetcher
  */
+@Deprecated(since = "3.7.40")
 public class Result {
 
     private int code;
@@ -51,7 +52,6 @@ public class Result {
         redirected = response.isRedirect();
         message = response.message();
         response.close();
-
     }
 
     /**

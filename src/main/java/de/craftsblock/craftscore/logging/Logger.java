@@ -1,82 +1,107 @@
 package de.craftsblock.craftscore.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
- * The Logger class provides simple logging functionality for various log types.
+ * The Logger class provides a simple logging mechanism for displaying log messages in the console with different log levels.
+ * It supports INFO, WARNING, ERROR, and DEBUG log levels. Log messages are displayed with colored output, and the logger can be
+ * configured to include or exclude DEBUG messages based on the debug mode setting. Additionally, the class provides helper methods
+ * to log error messages along with exception stack traces. The log messages include timestamps, log levels, thread names, and the
+ * actual log text to help with debugging and tracking application behavior.
  *
  * @author CraftsBlock
- * @version 1.0
- * @since 3.2-SNAPSHOT
- * @deprecated This class and its methods have been deprecated since version "3.7.24-SNAPSHOT" and should not be used.
- * There is no specific alternative implementation provided in this version.
- * Developers are encouraged to avoid using these deprecated elements.
+ * @version 1.1
  */
-@Deprecated(since = "3.7.24-SNAPSHOT", forRemoval = true)
-public final class Logger {
+public class Logger {
+
+    private boolean debug;
 
     /**
-     * Logs an informational message with the specified content.
+     * Constructs a Logger with the specified debug mode.
      *
-     * @param message The message content to be logged.
-     * @deprecated This method has been deprecated since version "3.7.24-SNAPSHOT" and should not be used.
-     * There is no specific alternative implementation provided in this version.
-     * Developers are encouraged to avoid using this deprecated method.
+     * @param debug If set to true, debug messages will be printed; otherwise, they will be ignored.
      */
-    @Deprecated(since = "3.7.24-SNAPSHOT", forRemoval = true)
-    public static void i(String message) {
-        log(LogType.INFO, message);
+    public Logger(boolean debug) {
+        this.debug = debug;
     }
 
     /**
-     * Logs a warning message with the specified content.
+     * Logs an informational message.
      *
-     * @param message The message content to be logged.
-     * @deprecated This method has been deprecated since version "3.7.24-SNAPSHOT" and should not be used.
-     * There is no specific alternative implementation provided in this version.
-     * Developers are encouraged to avoid using this deprecated method.
+     * @param text The message to be logged.
      */
-    @Deprecated(since = "3.7.24-SNAPSHOT", forRemoval = true)
-    public static void w(String message) {
-        log(LogType.WARN, message);
+    public void info(String text) {
+        log("\u001b[34;1mINFO\u001b[0m ", text);
     }
 
     /**
-     * Logs an error message with the specified content.
+     * Logs a warning message.
      *
-     * @param message The message content to be logged.
-     * @deprecated This method has been deprecated since version "3.7.24-SNAPSHOT" and should not be used.
-     * There is no specific alternative implementation provided in this version.
-     * Developers are encouraged to avoid using this deprecated method.
+     * @param text The warning message to be logged.
      */
-    @Deprecated(since = "3.7.24-SNAPSHOT", forRemoval = true)
-    public static void e(String message) {
-        log(LogType.ERROR, message);
+    public void warning(String text) {
+        log("\u001b[33mWARN\u001b[0m ", text);
     }
 
     /**
-     * Logs an exception message with the specified content.
+     * Logs an error message.
      *
-     * @param message The message content to be logged.
-     * @deprecated This method has been deprecated since version "3.7.24-SNAPSHOT" and should not be used.
-     * There is no specific alternative implementation provided in this version.
-     * Developers are encouraged to avoid using this deprecated method.
+     * @param text The error message to be logged.
      */
-    @Deprecated(since = "3.7.24-SNAPSHOT", forRemoval = true)
-    public static void ex(String message) {
-        log(LogType.EXCEPTION, message);
+    public void error(String text) {
+        log("\u001b[31;1mERROR\u001b[0m", text);
     }
 
     /**
-     * Logs a message with the specified log type and content.
+     * Logs an error message along with the stack trace of an exception.
      *
-     * @param type    The log type.
-     * @param message The message content to be logged.
-     * @deprecated This method has been deprecated since version "3.7.24-SNAPSHOT" and should not be used.
-     * There is no specific alternative implementation provided in this version.
-     * Developers are encouraged to avoid using this deprecated method.
+     * @param exception The exception to be logged.
      */
-    @Deprecated(since = "3.7.24-SNAPSHOT", forRemoval = true)
-    public static void log(LogType type, String message) {
-        System.out.println(type.getPrefix() + message);
+    public void error(Exception exception) {
+        log("\u001b[31;1mERROR\u001b[0m", exception.getMessage());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        for (String line : sw.toString().split("\n"))
+            error(line);
+    }
+
+    /**
+     * Logs an error message along with the stack trace of an exception and an additional comment.
+     *
+     * @param exception The exception to be logged.
+     * @param comment   An additional comment to be logged.
+     */
+    public void error(Exception exception, String comment) {
+        log("\u001b[31;1mERROR\u001b[0m", comment + " > " + exception.getMessage());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        for (String line : sw.toString().split("\n"))
+            error(line);
+    }
+
+    /**
+     * Logs a debug message. Debug messages are only printed if debug mode is enabled.
+     *
+     * @param text The debug message to be logged.
+     */
+    public void debug(String text) {
+        if (debug)
+            log("\u001b[38;5;147mDEBUG\u001b[0m", text);
+    }
+
+    /**
+     * Helper method to format and print the log message to the console.
+     *
+     * @param prefix The log level prefix (e.g., INFO, WARN, ERROR, DEBUG).
+     * @param text   The log message to be printed.
+     */
+    private void log(String prefix, String text) {
+        System.out.println("\u001b[38;5;228m" + OffsetDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "\u001b[0m " + prefix + " \u001b[38;5;219m|\u001b[0m \u001b[36m" + Thread.currentThread().getName() + "\u001b[0m\u001b[38;5;252m: " + text + "\u001b[0m");
     }
 
 }

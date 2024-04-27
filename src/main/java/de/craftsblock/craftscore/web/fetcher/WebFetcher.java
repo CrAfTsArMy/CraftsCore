@@ -17,10 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Callback
  * @since 3.5.4-SNAPSHOT
  */
+@Deprecated(since = "3.7.40")
 public final class WebFetcher {
 
+    private static final OkHttpClient client = new OkHttpClient();
     private final String endpoint;
-    private final OkHttpClient client;
 
     /**
      * Creates a new instance of the WebFetcher which pointing to the given endpoint.
@@ -29,17 +30,6 @@ public final class WebFetcher {
      */
     public WebFetcher(String endpoint) {
         this.endpoint = endpoint;
-        client = new OkHttpClient();
-    }
-
-    /**
-     * Flushes the Cache of the OkHttpClient
-     *
-     * @throws IOException Thrown if the {@link OkHttpClient} fails
-     */
-    public void flushCache() throws IOException {
-        assert client.cache() != null;
-        client.cache().flush();
     }
 
     /**
@@ -60,7 +50,7 @@ public final class WebFetcher {
      * @throws IOException Thrown if the {@link OkHttpClient} fails
      */
     public void send(Request request, Callback callback) throws Exception {
-        Result result = null;
+        Result result;
         try (Response response = client.newCall(request).execute()) {
             result = new Result(response);
         }
@@ -217,17 +207,18 @@ public final class WebFetcher {
          */
         public Request.Builder builder(@Nullable RequestBody body) {
             Request.Builder builder = new Request.Builder();
+
             switch (this) {
                 case GET:
                     return builder.get();
                 case POST:
-                    if (body == null) builder.post(RequestBody.create(null, new byte[]{}));
+                    if (body == null) builder.post(RequestBody.create(new byte[]{}, null));
                     else return builder.post(body);
                 case PUT:
-                    if (body == null) builder.post(RequestBody.create(null, new byte[]{}));
+                    if (body == null) builder.put(RequestBody.create(new byte[]{}, null));
                     else return builder.put(body);
                 case PATCH:
-                    if (body == null) builder.post(RequestBody.create(null, new byte[]{}));
+                    if (body == null) builder.patch(RequestBody.create(new byte[]{}, null));
                     else return builder.patch(body);
                 case DELETE:
                     if (body == null) return builder.delete();
@@ -247,15 +238,6 @@ public final class WebFetcher {
      */
     public Builder builder() {
         return new Builder(this);
-    }
-
-    /**
-     * Return the <strong>current</strong> instance of {@link OkHttpClient}, used by this class
-     *
-     * @return {@link OkHttpClient}
-     */
-    public OkHttpClient client() {
-        return client;
     }
 
     /**

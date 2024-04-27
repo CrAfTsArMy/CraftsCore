@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.sql;
 
 import de.craftsblock.craftscore.actions.CompleteAbleAction;
 import de.craftsblock.craftscore.actions.CompleteAbleActionImpl;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 
@@ -95,7 +96,7 @@ public class SQL {
      *
      * @param user     The MySQL database username.
      * @param password The MySQL database password.
-     * @throws SQLException If there is an error while connecting to the database.
+     * @throws SQLException if there is an error while connecting to the database.
      */
     public void connect(String user, String password) throws SQLException {
         if (host == null || port == null || database == null)
@@ -109,7 +110,7 @@ public class SQL {
     /**
      * Closes the existing connection to the MySQL database, if one exists.
      *
-     * @throws SQLException If there is an error while disconnecting from the database.
+     * @throws SQLException if there is an error while disconnecting from the database.
      */
     public void disconnect() throws SQLException {
         if (!isConnected())
@@ -126,71 +127,70 @@ public class SQL {
      *
      * @return True if a connection is active, false otherwise.
      * @throws SQLException If there is an error while checking the connection status.
+     * @throws SQLException if a database access error occurs; this method is called on a closed PreparedStatement
+     *                      or the SQL statement returns a ResultSet object
      */
     public boolean isConnected() throws SQLException {
         return connection != null && connection.isValid(5);
     }
 
     /**
-     * Creates and returns a new CompleteAbleAction for preparing a PreparedStatement for a given SQL query.
+     * Creates and returns a PreparedStatement for a given SQL query.
      *
      * @param sql The SQL query to be prepared.
-     * @return A CompleteAbleAction wrapping the creation of the PreparedStatement.
+     * @return The created PreparedStatement.
+     * @throws SQLException if a database access error occurs
+     *                      or this method is called on a closed connection
      */
-    public CompleteAbleActionImpl<PreparedStatement> prepareStatement(String sql) {
-        return new CompleteAbleActionImpl<>(() -> connection.prepareStatement(sql));
+    public PreparedStatement prepareStatement(String sql) throws SQLException {
+        return connection.prepareStatement(sql);
     }
 
     /**
      * Creates and returns a new CompleteAbleAction for executing an update query.
      *
      * @param sql The SQL update query to be executed.
-     * @return A CompleteAbleAction wrapping the execution of the update query.
+     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
+     * or (2) 0 for SQL statements that return nothing
+     * @throws SQLException if a database access error occurs; this method is called on a closed PreparedStatement
+     *                      or the SQL statement returns a ResultSet object
      */
-    public CompleteAbleActionImpl<Integer> update(String sql) {
-        return new CompleteAbleActionImpl<>(() -> this.update(this.prepareStatement(sql).complete()).complete());
+    public int update(String sql) throws SQLException {
+        return this.update(this.prepareStatement(sql));
     }
 
     /**
      * Creates and returns a new CompleteAbleAction for executing an update query using a prepared statement.
      *
      * @param statement The prepared statement containing the SQL update query to be executed.
-     * @return A CompleteAbleAction wrapping the execution of the update query.
+     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
+     * or (2) 0 for SQL statements that return nothing
+     * @throws SQLException if a database access error occurs; this method is called on a closed PreparedStatement
+     *                      or the SQL statement returns a ResultSet object
      */
-    public CompleteAbleActionImpl<Integer> update(PreparedStatement statement) {
-        return new CompleteAbleActionImpl<>(() -> {
-            if (statement.isClosed())
-                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
-            int result = statement.executeUpdate();
-            statement.close();
-            return result;
-        });
-    }
-
-    /**
-     * Creates and returns a new CompleteAbleAction for executing a select query.
-     *
-     * @param sql The SQL select query to be executed.
-     * @return A CompleteAbleAction wrapping the execution of the select query.
-     */
-    public CompleteAbleAction<ResultSet> query(String sql) {
-        return new CompleteAbleActionImpl<>(() -> this.query(this.prepareStatement(sql).complete()).complete());
+    public int update(PreparedStatement statement) throws SQLException {
+        if (statement.isClosed())
+            throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+        int result = statement.executeUpdate();
+        statement.close();
+        return result;
     }
 
     /**
      * Creates and returns a new CompleteAbleAction for executing a select query using a prepared statement.
      *
      * @param statement The prepared statement containing the SQL select query to be executed.
-     * @return A CompleteAbleAction wrapping the execution of the select query.
+     * @return a {@link ResultSet} object that contains the data produced by the
+     * query; never null
+     * @throws SQLException if a database access error occurs;
+     *                      this method is called on a closed  {@code PreparedStatement} or the SQL
+     *                      statement does not return a {@code ResultSet} object
      */
-    public CompleteAbleAction<ResultSet> query(PreparedStatement statement) {
-        return new CompleteAbleActionImpl<>(() -> {
-            if (statement.isClosed())
-                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
-            ResultSet result = statement.executeQuery();
-            statement.close();
-            return result;
-        });
+    @NotNull
+    public ResultSet query(PreparedStatement statement) throws SQLException {
+        if (statement.isClosed())
+            throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+        return statement.executeQuery();
     }
 
     /**

@@ -1,5 +1,7 @@
 package de.craftsblock.craftscore.json;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import de.craftsblock.craftscore.utils.Validator;
 
 import java.io.*;
@@ -17,22 +19,27 @@ import java.io.*;
 public final class JsonParser {
 
     /**
-     * Parses JSON data from a file and returns a Json object containing the parsed data.
+     * Parses JSON data from a file and returns a {@link Json} containing the parsed data.
      *
      * @param f The file containing the JSON data.
-     * @return A Json object containing the parsed JSON data, or an empty Json object if parsing fails or the file is empty.
+     * @return A {@link Json} containing the parsed JSON data, or an empty Json object if parsing fails or the file is empty.
      */
     public static Json parse(File f) {
         try {
             // Create the parent directories if they do not exist
-            if (!f.getParentFile().exists()) f.getParentFile().mkdirs();
+            if (f.getParentFile() != null && !f.getParentFile().exists()) f.getParentFile().mkdirs();
             // Create the file if it does not exist
             f.createNewFile();
+
             // Read the JSON data from the file
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-            String json = bufferedReader.readLine();
+            StringBuilder content = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)))) {
+                reader.lines().forEach(content::append);
+            }
+
             // Validate the JSON data and parse it into a Json object
-            if (json != null && Validator.isJsonValid(json))
+            String json = content.toString();
+            if (!json.isBlank() && Validator.isJsonValid(json))
                 return new Json(com.google.gson.JsonParser.parseString(json).getAsJsonObject());
             else return new Json(com.google.gson.JsonParser.parseString("{}").getAsJsonObject());
         } catch (Exception e) {
@@ -42,10 +49,10 @@ public final class JsonParser {
     }
 
     /**
-     * Parses JSON data from a String and returns a Json object containing the parsed data.
+     * Parses JSON data from a String and returns a {@link Json} containing the parsed data.
      *
      * @param json The JSON data as a String.
-     * @return A Json object containing the parsed JSON data, or null if parsing fails.
+     * @return A {@link Json} containing the parsed JSON data, or null if parsing fails.
      */
     public static Json parse(String json) {
         try {
@@ -57,6 +64,16 @@ public final class JsonParser {
         }
         // Return null if parsing fails or an exception occurs
         return null;
+    }
+
+    /**
+     * Parses JSON data from a json element and returns a {@link Json} containing the parsed data.
+     *
+     * @param element The json element.
+     * @return A {@link Json} containing the parsed JSON data, or null if parsing fails.
+     */
+    public static Json parse(JsonElement element) {
+        return parse(new Gson().toJson(element));
     }
 
 }

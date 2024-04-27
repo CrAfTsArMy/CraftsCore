@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.sql;
 
 import de.craftsblock.craftscore.actions.CompleteAbleAction;
 import de.craftsblock.craftscore.actions.CompleteAbleActionImpl;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -97,7 +98,7 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public CompleteAbleActionImpl<PreparedStatement> prepareStatement(String sql) {
+    public PreparedStatement prepareStatement(String sql) throws SQLException {
         synchronized (this) {
             return super.prepareStatement(sql);
         }
@@ -109,7 +110,7 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public CompleteAbleActionImpl<Integer> update(String sql) {
+    public int update(String sql) throws SQLException {
         synchronized (this) {
             return super.update(sql);
         }
@@ -121,7 +122,7 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public CompleteAbleActionImpl<Integer> update(PreparedStatement statement) {
+    public int update(PreparedStatement statement) throws SQLException {
         synchronized (this) {
             return super.update(statement);
         }
@@ -132,20 +133,9 @@ public class ThreadSafeSQL extends SQL {
      * <p>
      * This method is synchronized to ensure thread-safe connection establishment.
      */
+    @NotNull
     @Override
-    public CompleteAbleAction<ResultSet> query(String sql) {
-        synchronized (this) {
-            return super.query(sql);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This method is synchronized to ensure thread-safe connection establishment.
-     */
-    @Override
-    public CompleteAbleAction<ResultSet> query(PreparedStatement statement) {
+    public ResultSet query(PreparedStatement statement) throws SQLException {
         synchronized (this) {
             return super.query(statement);
         }

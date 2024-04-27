@@ -9,6 +9,7 @@ import okhttp3.Request;
  * @see Result
  * @see WebFetcher
  */
+@Deprecated(since = "3.7.40")
 public interface Callback {
 
     /**

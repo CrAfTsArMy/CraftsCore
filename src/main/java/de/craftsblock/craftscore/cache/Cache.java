@@ -1,5 +1,9 @@
 package de.craftsblock.craftscore.cache;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -8,17 +12,17 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * to store key-value pairs with a fixed capacity. When the capacity is exceeded,
  * the least recently used items are automatically removed to make space for new entries.
  *
- * @param <S> The type of the keys in the cache.
- * @param <T> The type of the values in the cache.
+ * @param <K> The type of the keys in the cache.
+ * @param <V> The type of the values in the cache.
  * @author CraftsBlock
- * @since 3.6#4
  * @version 2.0
+ * @since 3.6#4
  */
-public class Cache<S, T> {
+public class Cache<K, V> {
 
     private final int capacity;
-    private final ConcurrentHashMap<S, T> hashmap;
-    private final ConcurrentLinkedDeque<S> internalQueue;
+    private final ConcurrentHashMap<K, V> hashmap;
+    private final ConcurrentLinkedDeque<K> internalQueue;
 
     /**
      * Constructs a new Cache object with the specified capacity.
@@ -37,7 +41,7 @@ public class Cache<S, T> {
      * @param key The key whose associated value is to be retrieved from the cache.
      * @return The value associated with the given key, or null if the key is not in the cache.
      */
-    public T get(final S key) {
+    public V get(final K key) {
         moveToFront(key);
         return hashmap.get(key);
     }
@@ -48,7 +52,7 @@ public class Cache<S, T> {
      * @param key The key whose presence in the cache is to be checked.
      * @return true if the cache contains the key, otherwise false.
      */
-    public boolean containsKey(final S key) {
+    public boolean containsKey(final K key) {
         moveToFront(key);
         return hashmap.containsKey(key);
     }
@@ -61,13 +65,13 @@ public class Cache<S, T> {
      * @param key   The key to be added to the cache.
      * @param value The value associated with the key to be added.
      */
-    public void put(final S key, final T value) {
+    public void put(final K key, final V value) {
         hashmap.put(key, value);
         // Move the key to the front of the queue to represent its recent use.
         // If the key was not already present in the queue and the cache size exceeds capacity,
         // remove the least recently used key-value pair from the cache.
         if (!moveToFront(key) && hashmap.size() > capacity) {
-            S last = internalQueue.removeLast();
+            K last = internalQueue.removeLast();
             hashmap.remove(last);
         }
     }
@@ -79,7 +83,7 @@ public class Cache<S, T> {
      * @param key The key to be moved to the front of the queue.
      * @return true if the key was already in the queue and moved, otherwise false.
      */
-    private boolean moveToFront(final S key) {
+    private boolean moveToFront(final K key) {
         boolean removed = internalQueue.remove(key);
         internalQueue.addFirst(key);
         return removed;
@@ -90,7 +94,7 @@ public class Cache<S, T> {
      *
      * @param key The key whose associated key-value pair is to be removed from the cache.
      */
-    public void remove(final S key) {
+    public void remove(final K key) {
         hashmap.remove(key);
         internalQueue.remove(key);
     }
@@ -101,6 +105,22 @@ public class Cache<S, T> {
     public void clear() {
         hashmap.clear();
         internalQueue.clear();
+    }
+
+    public Set<Map.Entry<K, V>> entrySet() {
+        return hashmap.entrySet();
+    }
+
+    public Set<K> keySet() {
+        return hashmap.keySet();
+    }
+
+    public Collection<V> values() {
+        return hashmap.values();
+    }
+
+    public int size() {
+        return hashmap.size();
     }
 
     /**

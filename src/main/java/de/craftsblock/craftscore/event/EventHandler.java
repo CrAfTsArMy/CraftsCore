@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * @version 1.0
  *
  * @see Event
- * @see Cancelable
+ * @see Cancellable
  * @see EventPriority
  */
 @Target(ElementType.METHOD)

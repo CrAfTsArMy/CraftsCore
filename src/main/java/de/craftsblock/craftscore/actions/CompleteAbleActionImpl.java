@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
 
-    private static final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static final ExecutorService service = Executors.newCachedThreadPool();
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -27,6 +27,7 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
                 if (!service.awaitTermination(1, TimeUnit.SECONDS))
                     service.shutdownNow();
             } catch (InterruptedException ignored) {
+                service.shutdownNow();
             }
         }));
     }

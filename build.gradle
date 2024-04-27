@@ -8,7 +8,7 @@ java {
 }
 
 group 'de.craftsblock.craftscore'
-version '3.7.40-SNAPSHOT'
+version '3.7.41-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation 'com.mysql:mysql-connector-j:8.3.0'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.13'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.14'
     implementation 'com.google.code.gson:gson:2.10'
 }
 

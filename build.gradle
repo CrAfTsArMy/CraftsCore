@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'maven-publish'
 }
 
 java {
@@ -21,47 +20,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10'
 }
 
-publishing {
-    publications {
-        normal(MavenPublication) {
-            artifactId rootProject.name
-            from components.java
-            pom {
-                name = 'CraftsCore'
-                description = 'A simple Lib that simplifies some things'
-                url = 'https://github.com/CrAfTsArMy/CraftsCore'
-                scm {
-                    url = 'https://github.com/CrAfTsArMy/CraftsCore'
-                    connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
-                    developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
-                }
-                issueManagement {
-                    system = 'github'
-                    url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
-                }
-
-                licenses {
-                    license {
-                        name = 'All Rights Reserved, No redistribution.'
-                        url = ''
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            url('https://repo.craftsblock.de/releases')
-            authentication {
-                basic(BasicAuthentication) {
-                }
-            }
-            credentials {
-                username = "de.craftsblock"
-                password = "1AMcWjR9k+/zo/cY+6Zcds6WeT6CUU+/qvTEJp/iREPjAKBFkb4udjVCQ3gZ6oS6"
-            }
-        }
-    }
-}
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_18
+targetCompatibility = JavaVersion.VERSION_18

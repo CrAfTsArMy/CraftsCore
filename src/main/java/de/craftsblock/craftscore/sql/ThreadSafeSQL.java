@@ -74,6 +74,18 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
+    public void connect(String user, String password, boolean autoReconnect) throws SQLException {
+        synchronized (this) {
+            super.connect(user, password, autoReconnect);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This method is synchronized to ensure thread-safe connection establishment.
+     */
+    @Override
     public void disconnect() throws SQLException {
         synchronized (this) {
             super.disconnect();

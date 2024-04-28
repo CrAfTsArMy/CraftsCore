@@ -99,11 +99,25 @@ public class SQL {
      * @throws SQLException if there is an error while connecting to the database.
      */
     public void connect(String user, String password) throws SQLException {
+        connect(user, password, true);
+    }
+
+    /**
+     * Establishes a connection to the MySQL database using the provided credentials and set the autoReconnect flag accordingly.
+     *
+     * @param user          The MySQL database username.
+     * @param password      The MySQL database password.
+     * @param autoReconnect Whether the connection should be automatically reconnected when the connection was lost.
+     * @throws SQLException if there is an error while connecting to the database.
+     */
+    public void connect(String user, String password, boolean autoReconnect) throws SQLException {
         if (host == null || port == null || database == null)
             throw new IllegalStateException("You have to bind your MySQL Connection! (Use \"bind(String, String)\" before connecting.)");
         if (isConnected())
             return;
-        connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
+        connection = DriverManager.getConnection(
+                "jdbc:mysql://" + host + ":" + port + "/" + database + (autoReconnect ? "?autoReconnect=true" : "")
+                , user, password);
         if (callback != null) callback.connect(this);
     }
 

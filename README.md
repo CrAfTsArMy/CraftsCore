@@ -41,29 +41,13 @@ dependencies {
 }
 ```
 
+## Open Source Licenses
+We are using some third party open source libraries. Below you find a list of all third party open source libraries used:
+| Name                                                                   | Description                                                                                                                           | Licecnse                                                                                         |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [OkHttp](https://github.com/square/okhttp)                             | Square’s meticulous HTTP client for the JVM, Android, and GraalVM.                                                                    | [Apache License 2.0](https://github.com/square/okhttp/blob/master/LICENSE.txt)                   |
+| [MySQL Connector-J](https://github.com/mysql/mysql-connector-j)        | MySQL Connector/J                                                                                                                     | [GPLv2 with FOSS exception](https://github.com/mysql/mysql-connector-j/blob/release/8.x/LICENSE) |
+| [GSON](https://github.com/google/gson)                                 | A Java serialization/deserialization library to convert Java Objects into JSON and back                                               | [Apache License 2.0](https://github.com/google/gson/blob/main/LICENSE)                           |
+
 ## Issues
 If you find any issues from the plugin or documentation please [open up issue](https://github.com/CrAfTsArMy/CraftsCore/issues)
-
-## CraftsBlock
-Hey Du! 👋 
-
-Kennst du CraftsBlock schon? Wir sind ein kleines Team, welches für euch kostenlose Dienstleistungen anbietet. Unser Hauptfokus liegt auf der Entwicklung von neuen und auch einzigartigen Systemen. Allerdings betreiben wir nebenbei auch noch eine kleine Cloud, bei der man 2GB kostenlosen Speicherplatz erhält.
-
-Du möchtest bei CraftsBlock mitwirken? Wir nehmen jederzeit neue Teammitglieder auf!
-
-**👮‍♂️Moderator**<br>
-• Du solltest das 14. Lebensjahr erreicht haben<br>
-• Gute Menschenkenntnis besitzen<br>
-• Aktiv sein
-
-**👨‍💻 Developer**<br>
-• Du solltest das 13. Lebensjahr erreicht haben<br>
-• Kenntnisse in mindestens einer Programmiersprache<br>
-• Aktiv sein
-
-**👷‍♂️ Content**<br>
-• Du solltest das 13. Lebensjahr erreicht haben<br>
-• Kenntnisse im schreiben von Konzepten<br>
-• Aktiv sein
-
-https://dc.craftsblock.de/

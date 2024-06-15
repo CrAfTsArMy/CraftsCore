@@ -1,6 +1,5 @@
 package de.craftsblock.craftscore.json;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import de.craftsblock.craftscore.utils.Validator;
 
@@ -40,8 +39,8 @@ public final class JsonParser {
             // Validate the JSON data and parse it into a Json object
             String json = content.toString();
             if (!json.isBlank() && Validator.isJsonValid(json))
-                return new Json(com.google.gson.JsonParser.parseString(json).getAsJsonObject());
-            else return new Json(com.google.gson.JsonParser.parseString("{}").getAsJsonObject());
+                return new Json(com.google.gson.JsonParser.parseString(json));
+            else return new Json(com.google.gson.JsonParser.parseString("{}"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,7 +57,7 @@ public final class JsonParser {
         try {
             // Validate the JSON data and parse it into a Json object
             if (json != null && Validator.isJsonValid(json))
-                return new Json(com.google.gson.JsonParser.parseString(json).getAsJsonObject());
+                return new Json(com.google.gson.JsonParser.parseString(json));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,7 +72,9 @@ public final class JsonParser {
      * @return A {@link Json} containing the parsed JSON data, or null if parsing fails.
      */
     public static Json parse(JsonElement element) {
-        return parse(new Gson().toJson(element));
+        if (element.isJsonPrimitive())
+            return element.getAsJsonPrimitive().isString() ? parse(element.getAsJsonPrimitive().getAsString()) : null;
+        return new Json(element);
     }
 
 }

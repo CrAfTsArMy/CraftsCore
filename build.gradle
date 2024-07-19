@@ -20,5 +20,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10'
 }
 
-sourceCompatibility = JavaVersion.VERSION_18
-targetCompatibility = JavaVersion.VERSION_18
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16

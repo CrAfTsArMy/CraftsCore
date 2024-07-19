@@ -8,7 +8,7 @@ java {
 }
 
 group 'de.craftsblock.craftscore'
-version '3.7.49-SNAPSHOT'
+version '3.7.52-SNAPSHOT'
 
 repositories {
     mavenCentral()

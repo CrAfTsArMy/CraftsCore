@@ -8,16 +8,23 @@ java {
 }
 
 group 'de.craftsblock.craftscore'
-version '3.7.52-SNAPSHOT'
+version '3.7.54-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.mysql:mysql-connector-j:8.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.14'
-    implementation 'com.google.code.gson:gson:2.10'
+    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+    implementation 'com.mysql:mysql-connector-j:9.0.0'
+
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+//    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.14'
+
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+}
 }
 
 sourceCompatibility = JavaVersion.VERSION_16

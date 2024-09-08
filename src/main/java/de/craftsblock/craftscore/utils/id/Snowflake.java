@@ -1,4 +1,4 @@
-package de.craftsblock.craftscore.id;
+package de.craftsblock.craftscore.utils.id;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,6 +132,31 @@ public final class Utils {
             clazz = clazz.getSuperclass();
         }
         return false;
+    }
+
+    /**
+     * Checks if the given byte array is valid for the specified charset.
+     *
+     * <p>This method attempts to decode the byte array using the provided charset. If the decoding
+     * process completes without throwing a {@link CharacterCodingException}, the byte array is
+     * considered valid for that charset.</p>
+     *
+     * @param data    the byte array to be checked for validity
+     * @param charset the charset to be used for decoding
+     * @return {@code true} if the byte array can be successfully decoded using the specified charset,
+     * {@code false} otherwise
+     * @throws IllegalArgumentException if either the data or charset is {@code null}
+     */
+    public static boolean isEncodingValid(@NotNull byte[] data, @NotNull Charset charset) {
+        CharsetDecoder decoder = charset.newDecoder();
+        ByteBuffer buf = ByteBuffer.wrap(data);
+
+        try {
+            decoder.decode(buf);
+        } catch (CharacterCodingException e) {
+            return false;
+        }
+        return true;
     }
 
 }

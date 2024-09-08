@@ -1,6 +1,7 @@
 package de.craftsblock.craftscore.json;
 
 import com.google.gson.JsonElement;
+import de.craftsblock.craftscore.utils.Utils;
 import de.craftsblock.craftscore.utils.Validator;
 
 import java.io.*;
@@ -77,8 +78,8 @@ public final class JsonParser {
      * the corresponding {@link Json} object. The method ensures that the sub-array contains only valid UTF-8 bytes.
      * </p>
      *
-     * @param data The byte array containing JSON data
-     * @param pos The starting position of the sub-array
+     * @param data   The byte array containing JSON data
+     * @param pos    The starting position of the sub-array
      * @param length The length of the sub-array
      * @return A {@link Json} object representing the content of the sub-array
      * @throws IllegalArgumentException If the sub-array contains non-positive bytes
@@ -88,8 +89,8 @@ public final class JsonParser {
         assert length <= data.length;
         byte[] specific = Arrays.copyOfRange(data, pos, length);
 
-        if (IntStream.range(0, specific.length).map(i -> specific[i]).anyMatch(tmp -> tmp < 0))
-            throw new IllegalArgumentException("The sub-array contains non-positive bytes, which should not be present in utf8-encoded strings!");
+        if (!Utils.isEncodingValid(specific, StandardCharsets.UTF_8))
+            throw new IllegalArgumentException("The sub-array is not encoded as a utf8 string!");
 
         return parse(new String(specific, StandardCharsets.UTF_8));
     }

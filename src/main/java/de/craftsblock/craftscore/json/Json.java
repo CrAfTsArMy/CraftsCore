@@ -6,7 +6,13 @@ import com.google.gson.reflect.TypeToken;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -621,6 +627,29 @@ public final class Json {
     }
 
     /**
+     * Saves the json data to the specified path.
+     *
+     * @param path The path where the json data should be saved.
+     */
+    public void save(Path path) {
+        save(path, false);
+    }
+
+    /**
+     * Saves the json data to the specified path.
+     *
+     * @param path   The path where the json data should be saved.
+     * @param pretty Sets whether the output should be pretty formated or not.
+     */
+    public void save(Path path, boolean pretty) {
+        try {
+            Files.writeString(path, toString(pretty), StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Saves the json data to the specified file.
      *
      * @param f The file where the json data should be saved.
@@ -633,20 +662,17 @@ public final class Json {
      * Saves the json data to the specified file.
      *
      * @param f      The file where the json data should be saved.
-     * @param pretty Sets whether the file should be formated or not.
+     * @param pretty Sets whether the output should be pretty formated or not.
      */
     public void save(File f, boolean pretty) {
         synchronized (this) {
             try {
-                GsonBuilder gson = new GsonBuilder();
-                if (pretty) gson.setPrettyPrinting();
-                String json = gson.create().toJson(getObject());
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(f));
-                bufferedWriter.write(json);
+                bufferedWriter.write(toString(pretty));
                 bufferedWriter.flush();
                 bufferedWriter.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
@@ -657,24 +683,28 @@ public final class Json {
      *
      * @return The json data as a json string.
      */
-    public String asString() {
-        try {
-            return this.gson.toJson(this.object);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "{\"code\":500,\"message\":\"CraftsCore failed to build a string from the json data!\"}";
+    @Override
+    public String toString() {
+        return toString(false);
     }
 
     /**
      * Returns the json data as a json string.
      * If any error occurs during the process, it returns a default error json string.
      *
+     * @param pretty Sets whether the return should be pretty formated or not.
      * @return The json data as a json string.
      */
-    @Override
-    public String toString() {
-        return asString();
+    public String toString(boolean pretty) {
+        synchronized (this) {
+            try {
+                GsonBuilder gson = new GsonBuilder();
+                if (pretty) gson.setPrettyPrinting();
+                return gson.create().toJson(getObject());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**

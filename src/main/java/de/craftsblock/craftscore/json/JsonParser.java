@@ -6,6 +6,9 @@ import de.craftsblock.craftscore.utils.Validator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -42,6 +45,21 @@ public final class JsonParser {
             if (!json.isBlank() && Validator.isJsonValid(json))
                 return new Json(com.google.gson.JsonParser.parseString(json));
             else return new Json(com.google.gson.JsonParser.parseString("{}"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Parses the content of a given file at a specific path into a {@link Json} object.
+     *
+     * @param path The path to be parsed
+     * @return A {@link Json} object representing the content of the path
+     * @throws RuntimeException If an I/O error occurs during reading the path
+     */
+    public static Json parse(Path path) {
+        try {
+            return parse(Files.newInputStream(path, StandardOpenOption.READ));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

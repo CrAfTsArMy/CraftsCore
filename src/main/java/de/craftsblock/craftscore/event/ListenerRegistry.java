@@ -5,6 +5,7 @@ import de.craftsblock.craftscore.utils.Utils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -49,12 +50,18 @@ public class ListenerRegistry {
     public void call(Event event) throws InvocationTargetException, IllegalAccessException {
         if (!this.data.containsKey(event.getClass().getName()))
             return;
-        ConcurrentLinkedQueue<Listener> data = new ConcurrentLinkedQueue<>(Arrays.asList(this.data.get(event.getClass().getName()).toArray(new Listener[0])));
+
+        ConcurrentLinkedQueue<Listener> data = new ConcurrentLinkedQueue<>(List.of(this.data.get(event.getClass().getName()).toArray(new Listener[0])));
         EventPriority next = EventPriority.LOWEST;
         while (next != null) {
+            if (data.isEmpty()) break;
+
             for (Listener tile : data)
-                if (tile.priority == next)
+                if (tile.priority == next) {
                     tile.method.invoke(tile.self, event);
+                    data.remove(tile);
+                }
+
             next = EventPriority.next(next);
         }
     }

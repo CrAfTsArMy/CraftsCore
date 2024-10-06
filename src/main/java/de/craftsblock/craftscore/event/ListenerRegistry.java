@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ListenerRegistry {
 
     private final ConcurrentHashMap<String, ConcurrentLinkedQueue<Listener>> data = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Short, ConcurrentLinkedQueue<Event>> channelQueues = new ConcurrentHashMap<>();
 
     public void register(ListenerAdapter adapter) {
         for (Method method : Utils.getMethodsByAnnotation(adapter.getClass(), EventHandler.class))
@@ -64,6 +65,35 @@ public class ListenerRegistry {
 
             next = EventPriority.next(next);
         }
+    }
+
+    public void queueCall(Event event) {
+        queueCall((short) 0, event);
+    }
+
+    public void queueCall(Short channel, Event event) {
+        channelQueues.computeIfAbsent(channel, i -> new ConcurrentLinkedQueue<>()).add(event);
+    }
+
+    public void callQueued() throws InvocationTargetException, IllegalAccessException {
+        callQueued((short) 0);
+    }
+
+    public void callAllQueued() throws InvocationTargetException, IllegalAccessException {
+        for (Short channel : channelQueues.keySet())
+            callQueued(channel);
+    }
+
+    public void callQueued(Short channel) throws InvocationTargetException, IllegalAccessException {
+        if (!channelQueues.containsKey(channel)) return;
+
+        ConcurrentLinkedQueue<Event> queue = channelQueues.get(channel);
+        for (Event event : queue) {
+            call(event);
+            queue.remove(event);
+        }
+
+        if (queue.isEmpty()) channelQueues.remove(channel);
     }
 
     private record Listener(Method method, Object self, EventPriority priority) {

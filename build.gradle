@@ -8,13 +8,16 @@ java {
 }
 
 group 'de.craftsblock.craftscore'
-version '3.7.54-SNAPSHOT'
+version '3.7.57-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.jetbrains/annotations
+    implementation 'org.jetbrains:annotations:24.1.0'
+
     // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
     implementation 'com.mysql:mysql-connector-j:9.0.0'
 

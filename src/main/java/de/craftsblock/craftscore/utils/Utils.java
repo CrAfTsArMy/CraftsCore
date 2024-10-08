@@ -18,22 +18,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The Utils class provides various utility methods for common operations and reflections.
- * It offers functionalities like reading all bytes from an InputStream, finding methods with specific annotations,
- * and checking for the existence of certain annotations or methods in a class hierarchy.
+ * Utility class providing common functionality for byte and reflection operations.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.5
+ * @version 2.0
  * @since 3.0-SNAPSHOT
  */
 public final class Utils {
 
     /**
-     * Reads all bytes from the given InputStream and returns them as a byte array.
+     * Reads all bytes from an InputStream and returns them as a byte array.
      *
-     * @param inputStream The InputStream from which bytes will be read.
-     * @return The byte array containing all the bytes read from the InputStream.
-     * @throws IOException If an I/O error occurs during the reading process.
+     * @param inputStream The InputStream to read from.
+     * @return A byte array containing the read data.
+     * @throws IOException If an I/O error occurs while reading or closing the stream.
      */
     public static byte[] readAllBytes(InputStream inputStream) throws IOException {
         final int bufLen = 4 * 0x400; // 4KB
@@ -62,10 +61,10 @@ public final class Utils {
     }
 
     /**
-     * Finds and returns a list of all methods in the given class and its superclasses and interfaces that are annotated with the specified annotation.
+     * Retrieves all methods from a given class that are annotated with the specified annotation.
      *
      * @param type       The class to search for annotated methods.
-     * @param annotation The annotation class to be searched for.
+     * @param annotation The annotation to look for.
      * @return A list of methods annotated with the specified annotation.
      */
     @NotNull
@@ -75,6 +74,13 @@ public final class Utils {
         return methods;
     }
 
+    /**
+     * Recursively retrieves all methods with the specified annotation in the class hierarchy and adds them to the provided list.
+     *
+     * @param methods    The list to store the methods found.
+     * @param type       The class to search for annotated methods.
+     * @param annotation The annotation to look for.
+     */
     private static void getMethodsByAnnotation(final List<Method> methods, final Class<?> type, final Class<? extends Annotation> annotation) {
         if (type == null || type.equals(Object.class)) return;
 
@@ -93,11 +99,11 @@ public final class Utils {
     }
 
     /**
-     * Checks whether the given class or its superclasses and interfaces have the specified annotation.
+     * Checks if the class contains any methods annotated with the specified annotation.
      *
-     * @param type       The class to check for the annotation.
-     * @param annotation The annotation class to be checked for.
-     * @return True if the annotation is present in the class hierarchy, false otherwise.
+     * @param type       The class to search for annotated methods.
+     * @param annotation The annotation to look for.
+     * @return true if a method with the specified annotation is found, false otherwise.
      */
     public static boolean checkForMethodsWithAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
         if (type == null || type.equals(Object.class)) return false;
@@ -112,12 +118,12 @@ public final class Utils {
     }
 
     /**
-     * Finds and returns the Method object representing the specified method in the given class or its superclasses.
+     * Retrieves a method with the specified name and parameter types from the given class.
      *
      * @param type           The class to search for the method.
      * @param name           The name of the method.
-     * @param parameterTypes The parameter types of the method (null if none).
-     * @return The Method object representing the specified method, or null if not found.
+     * @param parameterTypes The parameter types of the method (optional).
+     * @return The method if found, or null if not found.
      */
     @Nullable
     public static Method getMethod(final Class<?> type, String name, @Nullable Class<?>... parameterTypes) {
@@ -133,12 +139,12 @@ public final class Utils {
     }
 
     /**
-     * Checks whether the given class or its superclasses contain the specified method with the provided name and parameter types.
+     * Checks if a method with the specified name and parameter types exists in the class.
      *
-     * @param type           The class to check for the method.
+     * @param type           The class to search for the method.
      * @param name           The name of the method.
-     * @param parameterTypes The parameter types of the method (null if none).
-     * @return True if the method exists in the class hierarchy, false otherwise.
+     * @param parameterTypes The parameter types of the method (optional).
+     * @return true if the method exists, false otherwise.
      */
     public static boolean checkForMethod(final Class<?> type, String name, @Nullable Class<?>... parameterTypes) {
         Class<?> clazz = type;
@@ -150,17 +156,11 @@ public final class Utils {
     }
 
     /**
-     * Checks if the given byte array is valid for the specified charset.
+     * Checks if a byte array can be decoded using the specified charset.
      *
-     * <p>This method attempts to decode the byte array using the provided charset. If the decoding
-     * process completes without throwing a {@link CharacterCodingException}, the byte array is
-     * considered valid for that charset.</p>
-     *
-     * @param data    the byte array to be checked for validity
-     * @param charset the charset to be used for decoding
-     * @return {@code true} if the byte array can be successfully decoded using the specified charset,
-     * {@code false} otherwise
-     * @throws IllegalArgumentException if either the data or charset is {@code null}
+     * @param data    The byte array to validate.
+     * @param charset The charset to use for decoding.
+     * @return true if the data can be decoded with the given charset, false otherwise.
      */
     public static boolean isEncodingValid(byte @NotNull [] data, @NotNull Charset charset) {
         CharsetDecoder decoder = charset.newDecoder();
@@ -174,6 +174,13 @@ public final class Utils {
         return true;
     }
 
+    /**
+     * Retrieves the overridden method for the given method, if it exists in a superclass or interface.
+     * Inspired by <a href="https://stackoverflow.com/a/15206147">Marek Potociar on stackoverflow</a>.
+     *
+     * @param method The method for which to find the overridden method.
+     * @return The overridden method, or null if not found.
+     */
     public static Method getOverrittenMethod(final Method method) {
         Class<?> declaringClass = method.getDeclaringClass();
         if (declaringClass.equals(Object.class)) return null;

@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -60,7 +62,7 @@ public final class Utils {
     }
 
     /**
-     * Finds and returns a list of all methods in the given class and its superclasses that are annotated with the specified annotation.
+     * Finds and returns a list of all methods in the given class and its superclasses and interfaces that are annotated with the specified annotation.
      *
      * @param type       The class to search for annotated methods.
      * @param annotation The annotation class to be searched for.
@@ -69,15 +71,44 @@ public final class Utils {
     @NotNull
     public static List<Method> getMethodsByAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
         final List<Method> methods = new ArrayList<>();
-        Class<?> clazz = type;
-        while (clazz != Object.class) {
-            for (final Method method : clazz.getDeclaredMethods())
-                if (method.isAnnotationPresent(annotation)) {
-                    methods.add(method);
-                }
-            clazz = clazz.getSuperclass();
-        }
+        getMethodsByAnnotation(methods, type, annotation);
         return methods;
+    }
+
+    private static void getMethodsByAnnotation(final List<Method> methods, final Class<?> type, final Class<? extends Annotation> annotation) {
+        if (type == null || type.equals(Object.class)) return;
+
+        for (final Class<?> iface : type.getInterfaces())
+            getMethodsByAnnotation(methods, iface, annotation);
+        getMethodsByAnnotation(methods, type.getSuperclass(), annotation);
+
+        for (final Method method : type.getDeclaredMethods()) {
+            Method overritten = getOverrittenMethod(method);
+            if (overritten != null) methods.remove(overritten);
+
+            if (method.isAnnotationPresent(annotation)) {
+                methods.add(method);
+            }
+        }
+    }
+
+    /**
+     * Checks whether the given class or its superclasses and interfaces have the specified annotation.
+     *
+     * @param type       The class to check for the annotation.
+     * @param annotation The annotation class to be checked for.
+     * @return True if the annotation is present in the class hierarchy, false otherwise.
+     */
+    public static boolean checkForMethodsWithAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
+        if (type == null || type.equals(Object.class)) return false;
+
+        for (final Method method : type.getDeclaredMethods())
+            if (method.isAnnotationPresent(annotation)) return true;
+
+        for (final Class<?> iface : type.getInterfaces())
+            if (checkForMethodsWithAnnotation(iface, annotation)) return true;
+
+        return checkForMethodsWithAnnotation(type.getSuperclass(), annotation);
     }
 
     /**
@@ -99,22 +130,6 @@ public final class Utils {
             clazz = clazz.getSuperclass();
         }
         return null;
-    }
-
-    /**
-     * Checks whether the given class or its superclasses have the specified annotation.
-     *
-     * @param type       The class to check for the annotation.
-     * @param annotation The annotation class to be checked for.
-     * @return True if the annotation is present in the class hierarchy, false otherwise.
-     */
-    public static boolean checkForAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
-        Class<?> clazz = type;
-        while (clazz != Object.class) {
-            if (clazz.isAnnotationPresent(annotation)) return true;
-            clazz = clazz.getSuperclass();
-        }
-        return false;
     }
 
     /**
@@ -147,7 +162,7 @@ public final class Utils {
      * {@code false} otherwise
      * @throws IllegalArgumentException if either the data or charset is {@code null}
      */
-    public static boolean isEncodingValid(@NotNull byte[] data, @NotNull Charset charset) {
+    public static boolean isEncodingValid(byte @NotNull [] data, @NotNull Charset charset) {
         CharsetDecoder decoder = charset.newDecoder();
         ByteBuffer buf = ByteBuffer.wrap(data);
 
@@ -157,6 +172,25 @@ public final class Utils {
             return false;
         }
         return true;
+    }
+
+    public static Method getOverrittenMethod(final Method method) {
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass.equals(Object.class)) return null;
+
+        try {
+            Class<?> superclass = declaringClass.getSuperclass();
+            if (superclass == null) throw new NoSuchMethodException();
+            return superclass.getMethod(method.getName(), method.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            for (Class<?> iface : declaringClass.getInterfaces())
+                try {
+                    return iface.getMethod(method.getName(), method.getParameterTypes());
+                } catch (NoSuchMethodException ignored) {
+                }
+
+            return null;
+        }
     }
 
 }

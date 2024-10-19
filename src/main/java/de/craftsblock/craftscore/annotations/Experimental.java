@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
  * This annotation indicates that the annotated element is experimental and subject to potential changes.
  * It is intended for elements that are not yet stable and may have evolving or unsupported functionality.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 3.6#16-SNAPSHOT
@@ -21,4 +22,5 @@ import java.lang.annotation.Target;
         ElementType.METHOD,
         ElementType.TYPE
 })
-public @interface Experimental {}
+public @interface Experimental {
+}

@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
  * to log error messages along with exception stack traces. The log messages include timestamps, log levels, thread names, and the
  * actual log text to help with debugging and tracking application behavior.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.1
  */

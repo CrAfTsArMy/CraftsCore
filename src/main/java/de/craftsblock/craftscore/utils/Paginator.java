@@ -8,6 +8,7 @@ import java.util.List;
  * It allows navigating through the pages and retrieving specific pages of the object list.
  *
  * @param <T> The type of objects to be paginated.
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 3.5.4-SNAPSHOT

@@ -16,6 +16,7 @@ import java.util.stream.IntStream;
  * The JsonParser class provides methods for parsing JSON data from a file or a String.
  * It returns a custom Json object containing the parsed data.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 2.0
  * @see Json

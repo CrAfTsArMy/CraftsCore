@@ -12,6 +12,7 @@ import java.io.StringReader;
  * The Validator class provides utility methods to validate JSON strings.
  * It checks if a given JSON string is valid and well-formed.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @see de.craftsblock.craftscore.json.Json

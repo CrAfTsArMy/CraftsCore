@@ -8,6 +8,11 @@ import java.security.NoSuchAlgorithmException;
 /**
  * The Snowflake class is responsible for generating unique IDs based on Twitter's Snowflake algorithm.
  * It utilizes a combination of timestamp, machine ID, and sequence number to ensure the uniqueness of each generated ID.
+ *
+ * @author Philipp Maywald
+ * @author CraftsBlock
+ * @version 1.0.0
+ * @since 3.7.40
  */
 public final class Snowflake {
 

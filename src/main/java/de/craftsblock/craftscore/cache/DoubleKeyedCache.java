@@ -11,6 +11,7 @@ import java.util.Set;
  * @param <K1> The type of the first key.
  * @param <K2> The type of the second key.
  * @param <V>  The type of value stored in the cache.
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @see Cache

@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
  * It allows submitting an action for asynchronous execution and provides methods to handle its completion.
  *
  * @param <T> the type of the action's result
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.1
  * @see CompleteAbleAction

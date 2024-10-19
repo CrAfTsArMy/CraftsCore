@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  *
  * @param <K> The type of the keys in the cache.
  * @param <V> The type of the values in the cache.
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 2.0
  * @since 3.6#4

@@ -1,7 +1,5 @@
 package de.craftsblock.craftscore.sql;
 
-import de.craftsblock.craftscore.actions.CompleteAbleAction;
-import de.craftsblock.craftscore.actions.CompleteAbleActionImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -11,6 +9,7 @@ import java.sql.*;
  * It provides methods to establish and close connections, execute queries and updates,
  * and handle callback events for connection status changes.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.3
  * @see ThreadSafeSQL

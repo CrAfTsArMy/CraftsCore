@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
  * Defines a set of methods for performing an action asynchronously and handling its completion.
  *
  * @param <T> the type of the action's result
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @see CompleteAbleActionImpl

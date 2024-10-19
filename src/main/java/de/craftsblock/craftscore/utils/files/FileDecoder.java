@@ -11,6 +11,7 @@ import java.util.Base64;
 /**
  * The FileDecoder class provides methods to decode Base64-encoded data and write it to a file.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 2.10-SNAPSHOT

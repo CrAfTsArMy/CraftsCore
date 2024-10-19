@@ -11,6 +11,7 @@ import java.util.Objects;
 /**
  * The FileUtils class provides utility methods for file operations.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 3.5.0-SNAPSHOT

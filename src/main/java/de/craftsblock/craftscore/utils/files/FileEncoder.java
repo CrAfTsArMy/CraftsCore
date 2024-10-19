@@ -10,6 +10,7 @@ import java.util.Base64;
 /**
  * The FileEncoder class provides methods to encode the content of a file to Base64.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 2.10-SNAPSHOT

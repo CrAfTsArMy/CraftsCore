@@ -6,6 +6,7 @@ import java.util.Objects;
  * This interface represents an operation that accepts a single input argument and returns no result.
  *
  * @param <T> the type of the input to the operation
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 3.6#15-SNAPSHOT

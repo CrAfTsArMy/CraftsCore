@@ -7,6 +7,7 @@ import java.util.Map;
  * The ArgumentParser class parses command-line arguments and provides methods to retrieve their values as different data types.
  * It allows easy access to command-line arguments and their values, making it convenient to handle command-line inputs.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @since 3.7.22-SNAPSHOT

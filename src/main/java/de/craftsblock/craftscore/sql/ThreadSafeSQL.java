@@ -1,7 +1,5 @@
 package de.craftsblock.craftscore.sql;
 
-import de.craftsblock.craftscore.actions.CompleteAbleAction;
-import de.craftsblock.craftscore.actions.CompleteAbleActionImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -13,6 +11,7 @@ import java.sql.SQLException;
  * This class is a thread-safe subclass of the {@link SQL} class. It provides synchronized access
  * to all the public methods of the parent class, making it safe to be used in multi-threaded environments.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 1.0
  * @see SQL

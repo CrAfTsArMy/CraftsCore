@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 /**
  * The Json class represents a json object and provides methods to work with json data.
  *
+ * @author Philipp Maywald
  * @author CraftsBlock
  * @version 2.0.6
  * @see JsonParser

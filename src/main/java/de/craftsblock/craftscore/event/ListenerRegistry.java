@@ -4,14 +4,13 @@ import de.craftsblock.craftscore.utils.Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ListenerRegistry {
 
-    private final ConcurrentHashMap<String, ConcurrentLinkedQueue<Listener>> data = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<? extends Event>, EnumMap<EventPriority, List<Listener>>> data = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Short, ConcurrentLinkedQueue<Event>> channelQueues = new ConcurrentHashMap<>();
 
     public void register(ListenerAdapter adapter) {
@@ -19,13 +18,16 @@ public class ListenerRegistry {
             try {
                 if (method.getParameterCount() <= 0)
                     throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
+
                 Class<?> parameter = method.getParameters()[0].getType();
                 if (!Event.class.isAssignableFrom(parameter))
                     throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
+
+                Class<? extends Event> event = parameter.asSubclass(Event.class);
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
-                ConcurrentLinkedQueue<Listener> tmp = data.getOrDefault(parameter.getName(), new ConcurrentLinkedQueue<>());
-                tmp.add(new Listener(method, adapter, eventHandler.priority()));
-                data.put(parameter.getName(), tmp);
+                data.computeIfAbsent(event, p -> new EnumMap<>(EventPriority.class))
+                        .computeIfAbsent(eventHandler.priority(), e -> new ArrayList<>())
+                        .add(new Listener(method, adapter, eventHandler.priority()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -36,34 +38,49 @@ public class ListenerRegistry {
             try {
                 if (method.getParameterCount() <= 0)
                     throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
+
                 Class<?> parameter = method.getParameters()[0].getType();
                 if (!Event.class.isAssignableFrom(parameter))
                     throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
+
+                Class<? extends Event> event = parameter.asSubclass(Event.class);
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
-                ConcurrentLinkedQueue<Listener> tmp = data.getOrDefault(parameter.getName(), new ConcurrentLinkedQueue<>());
-                tmp.removeIf(listener -> (listener.method.equals(method) && listener.priority.equals(eventHandler.priority())));
-                data.put(parameter.getName(), tmp);
+                if (!data.containsKey(event)) continue;
+
+                EnumMap<EventPriority, List<Listener>> listeners = data.get(event);
+                if (!listeners.containsKey(eventHandler.priority())) continue;
+                listeners.get(eventHandler.priority()).removeIf(listener -> listener.method().equals(method));
+
+                // Remove the event priority if there are no left listeners
+                if (listeners.get(eventHandler.priority()).isEmpty())
+                    listeners.remove(eventHandler.priority());
+                else
+                    // Continue as there are more listeners remaining
+                    continue;
+
+                // Remove the event type if no listeners are left
+                if (listeners.isEmpty()) data.remove(event);
             } catch (Exception e) {
                 e.printStackTrace();
             }
     }
 
     public void call(Event event) throws InvocationTargetException, IllegalAccessException {
-        if (!this.data.containsKey(event.getClass().getName()))
+        if (!this.data.containsKey(event.getClass()))
             return;
 
-        ConcurrentLinkedQueue<Listener> data = new ConcurrentLinkedQueue<>(List.of(this.data.get(event.getClass().getName()).toArray(new Listener[0])));
-        EventPriority next = EventPriority.LOWEST;
-        while (next != null) {
-            if (data.isEmpty()) break;
+        EnumMap<EventPriority, List<Listener>> data = this.data.get(event.getClass());
+        if (data.isEmpty()) return;
 
-            for (Listener tile : data)
-                if (tile.priority == next) {
-                    tile.method.invoke(tile.self, event);
-                    data.remove(tile);
-                }
 
-            next = EventPriority.next(next);
+        for (EventPriority priority : EventPriority.values()) {
+            if (!data.containsKey(priority)) continue;
+
+            List<Listener> listeners = data.get(priority);
+            if (listeners.isEmpty()) continue;
+
+            for (Listener tile : listeners)
+                tile.method.invoke(tile.self, event);
         }
     }
 

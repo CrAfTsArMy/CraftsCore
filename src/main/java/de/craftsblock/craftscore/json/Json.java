@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * The Json class represents a json object and provides methods to work with json data.
  *
  * @author CraftsBlock
- * @version 2.0
+ * @version 2.0.6
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -184,7 +184,31 @@ public final class Json {
      * @return The JsonElement at the given path, or null if the path does not exist.
      */
     public JsonElement getOrDefault(String path, JsonElement fallback) {
-        return get(path) != null ? get(path) : fallback;
+        JsonElement element = get(path);
+        return element != null ? element : fallback;
+    }
+
+    /**
+     * Retrieves the JsonElement at the specified path in the json data and returns it as a new instance of {@link Json}.
+     *
+     * @param path The path to the data in the json data.
+     * @return The {@link Json} at the given path, or null if the path does not exist.
+     */
+    public Json getJson(String path) {
+        return getJson(path, null);
+    }
+
+    /**
+     * Retrieves the JsonElement at the specified path in the json data and returns it as a new instance of {@link Json}.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path     The path to the data in the json data.
+     * @param fallback The fallback data to return if no data is associated with the path
+     * @return The {@link Json} at the given path, or the fallback value if the path does not exist.
+     */
+    public Json getJson(String path, Json fallback) {
+        JsonElement element = get(path);
+        return element != null ? JsonParser.parse(element) : fallback;
     }
 
     /**
@@ -260,20 +284,41 @@ public final class Json {
     }
 
     /**
+     * Retrieves a list of {@link JsonElement} at the specified path in the json data.
+     *
+     * @param path The path to the list of strings in the json data.
+     * @return A Collection of {@link JsonElement} at the given path, or an empty list if the path does not exist.
+     */
+    public Collection<JsonElement> getList(String path) {
+        JsonElement element = get(path);
+        if (element != null && element.isJsonArray())
+            return new ArrayList<>(element.getAsJsonArray().asList());
+        return new ArrayList<>();
+    }
+
+    /**
+     * Retrieves a list of {@link Json} at the specified path in the json data.
+     *
+     * @param path The path to the list of strings in the json data.
+     * @return A Collection of {@link Json} at the given path, or an empty list if the path does not exist.
+     */
+    public Collection<Json> getJsonList(String path) {
+        return getList(path).stream().map(JsonParser::parse).toList();
+    }
+
+    /**
      * Retrieves a list of strings at the specified path in the json data.
      *
      * @param path The path to the list of strings in the json data.
      * @return A Collection of strings at the given path, or an empty list if the path does not exist or the value is not a json array of strings.
      */
     public Collection<String> getStringList(String path) {
-        JsonElement element = get(path);
-        if (element != null && element.isJsonArray()) {
-            Collection<String> list = new ArrayList<>();
-            for (JsonElement arrayElement : element.getAsJsonArray())
-                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsString());
-            return list;
-        }
-        return new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
+
+        for (JsonElement arrayElement : getList(path))
+            if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsString());
+
+        return list;
     }
 
     /**
@@ -286,21 +331,18 @@ public final class Json {
      */
     @SuppressWarnings("unchecked")
     public <T extends Number> Collection<T> getNumberList(String path, Class<T> type) {
-        JsonElement element = get(path);
-        if (element != null && element.isJsonArray()) {
-            Collection<T> list = new ArrayList<>();
-            for (JsonElement arrayElement : element.getAsJsonArray())
-                if (arrayElement.isJsonPrimitive()) {
-                    try {
-                        Number num = arrayElement.getAsNumber();
-                        list.add((T) num.getClass().getDeclaredMethod(type + "Value").invoke(num));
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
+        Collection<T> list = new ArrayList<>();
+
+        for (JsonElement arrayElement : getList(path))
+            if (arrayElement.isJsonPrimitive())
+                try {
+                    Number num = arrayElement.getAsNumber();
+                    list.add((T) num.getClass().getDeclaredMethod(type + "Value").invoke(num));
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
                 }
-            return list;
-        }
-        return new ArrayList<>();
+
+        return list;
     }
 
     /**
@@ -499,10 +541,12 @@ public final class Json {
         if (collection.isEmpty()) setEmptyList(path);
         for (Object o : collection) {
             if (o instanceof JsonElement) setJsonList(path, (Collection<JsonElement>) collection);
+            else if (o instanceof Json) setJsonList(path, ((Collection<Json>) collection).stream().map(Json::getObject).toList());
             else if (o instanceof String) setStringList(path, (Collection<String>) collection);
             else if (o instanceof Number) setNumberList(path, (Collection<Number>) collection);
             else if (o instanceof Boolean) setBoolList(path, (Collection<Boolean>) collection);
             else setStringList(path, collection.stream().map(Object::toString).toList());
+
             break;
         }
     }

@@ -13,7 +13,7 @@ import java.sql.SQLException;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0
+ * @version 1.0.1
  * @see SQL
  * @see de.craftsblock.craftscore.sql.SQL.Callback
  * @since 3.7.24-SNAPSHOT
@@ -136,6 +136,18 @@ public class ThreadSafeSQL extends SQL {
     public int update(PreparedStatement statement) throws SQLException {
         synchronized (this) {
             return super.update(statement);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This method is synchronized to ensure thread-safe connection establishment.
+     */
+    @Override
+    public @NotNull ResultSet query(String query) throws SQLException {
+        synchronized (this) {
+            return super.query(query);
         }
     }
 

@@ -191,6 +191,21 @@ public class SQL {
     /**
      * Creates and returns a new CompleteAbleAction for executing a select query using a prepared statement.
      *
+     * @param query The SQL query to be executed.
+     * @return a {@link ResultSet} object that contains the data produced by the
+     * query; never null
+     * @throws SQLException if a database access error occurs;
+     *                      this method is called on a closed  {@code PreparedStatement} or the SQL
+     *                      statement does not return a {@code ResultSet} object
+     */
+    @NotNull
+    public ResultSet query(String query) throws SQLException {
+        return this.query(this.prepareStatement(query));
+    }
+
+    /**
+     * Creates and returns a new CompleteAbleAction for executing a select query using a prepared statement.
+     *
      * @param statement The prepared statement containing the SQL select query to be executed.
      * @return a {@link ResultSet} object that contains the data produced by the
      * query; never null

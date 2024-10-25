@@ -1,21 +1,22 @@
 package de.craftsblock.craftscore.event;
 
 /**
- * Represents an abstract base class for events that can be cancelled.
+ * An abstract base class for events that can be cancelled.
  * <p>
- * This class provides a mechanism to mark events as cancelled, which can be checked
- * to determine whether further processing should occur.
+ * This class extends {@link Event} and implements {@link Cancellable}, providing
+ * a mechanism to set and check the cancellation status of an event. When an event
+ * is marked as cancelled, subsequent handlers may skip further processing depending
+ * on the implementation of the event system.
  * </p>
- *
- * <p>Subclasses that extend {@link CancellableEvent} inherit this cancellable behavior.</p>
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @see Cancellable
  * @version 1.0.0
+ * @see Event
+ * @see Cancellable
  * @since 3.7.62-SNAPSHOT
  */
-public abstract class CancellableEvent implements Cancellable {
+public abstract class CancellableEvent extends Event implements Cancellable {
 
     private boolean cancelled = false;
 

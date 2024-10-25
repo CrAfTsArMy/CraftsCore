@@ -61,10 +61,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public void connect(String user, String password) throws SQLException {
-        synchronized (this) {
-            super.connect(user, password);
-        }
+    public synchronized void connect(String user, String password) throws SQLException {
+        super.connect(user, password);
     }
 
     /**
@@ -73,10 +71,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public void connect(String user, String password, boolean autoReconnect) throws SQLException {
-        synchronized (this) {
-            super.connect(user, password, autoReconnect);
-        }
+    public synchronized void connect(String user, String password, boolean autoReconnect) throws SQLException {
+        super.connect(user, password, autoReconnect);
     }
 
     /**
@@ -85,10 +81,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public void disconnect() throws SQLException {
-        synchronized (this) {
-            super.disconnect();
-        }
+    public synchronized void disconnect() throws SQLException {
+        super.disconnect();
     }
 
     /**
@@ -97,10 +91,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public boolean isConnected() throws SQLException {
-        synchronized (this) {
-            return super.isConnected();
-        }
+    public synchronized boolean isConnected() throws SQLException {
+        return super.isConnected();
     }
 
     /**
@@ -109,10 +101,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
-        synchronized (this) {
-            return super.prepareStatement(sql);
-        }
+    public synchronized PreparedStatement prepareStatement(String sql) throws SQLException {
+        return super.prepareStatement(sql);
     }
 
     /**
@@ -121,10 +111,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public int update(String sql) throws SQLException {
-        synchronized (this) {
-            return super.update(sql);
-        }
+    public synchronized int update(String sql) throws SQLException {
+        return super.update(sql);
     }
 
     /**
@@ -133,10 +121,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public int update(PreparedStatement statement) throws SQLException {
-        synchronized (this) {
-            return super.update(statement);
-        }
+    public synchronized int update(PreparedStatement statement) throws SQLException {
+        return super.update(statement);
     }
 
     /**
@@ -145,10 +131,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public @NotNull ResultSet query(String query) throws SQLException {
-        synchronized (this) {
-            return super.query(query);
-        }
+    public synchronized @NotNull ResultSet query(String query) throws SQLException {
+        return super.query(query);
     }
 
     /**
@@ -158,10 +142,8 @@ public class ThreadSafeSQL extends SQL {
      */
     @NotNull
     @Override
-    public ResultSet query(PreparedStatement statement) throws SQLException {
-        synchronized (this) {
-            return super.query(statement);
-        }
+    public synchronized ResultSet query(PreparedStatement statement) throws SQLException {
+        return super.query(statement);
     }
 
     /**
@@ -170,10 +152,8 @@ public class ThreadSafeSQL extends SQL {
      * This method is synchronized to ensure thread-safe connection establishment.
      */
     @Override
-    public Connection unsafe() {
-        synchronized (this) {
-            return super.unsafe();
-        }
+    public synchronized Connection unsafe() {
+        return super.unsafe();
     }
 
 }

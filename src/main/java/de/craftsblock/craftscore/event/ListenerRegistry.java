@@ -112,10 +112,7 @@ public class ListenerRegistry {
         EnumMap<EventPriority, List<Listener>> data = this.data.get(event.getClass());
         if (data.isEmpty()) return;
 
-
-        for (EventPriority priority : EventPriority.values()) {
-            if (!data.containsKey(priority)) continue;
-
+        for (EventPriority priority : data.keySet()) {
             List<Listener> listeners = data.get(priority);
             if (listeners.isEmpty()) continue;
 

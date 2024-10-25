@@ -1,7 +1,6 @@
 package de.craftsblock.craftscore.json;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;

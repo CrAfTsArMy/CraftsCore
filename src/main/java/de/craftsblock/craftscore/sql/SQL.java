@@ -11,8 +11,7 @@ import java.sql.*;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.3
- * @see ThreadSafeSQL
+ * @version 1.3.1
  * @see de.craftsblock.craftscore.sql.SQL.Callback
  * @since 3.6#15-SNAPSHOT
  */
@@ -182,11 +181,11 @@ public class SQL {
      *                      or the SQL statement returns a ResultSet object
      */
     public int update(PreparedStatement statement) throws SQLException {
-        if (statement.isClosed())
-            throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
-        int result = statement.executeUpdate();
-        statement.close();
-        return result;
+        try (statement) {
+            if (statement.isClosed())
+                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+            return statement.executeUpdate();
+        }
     }
 
     /**
@@ -201,9 +200,11 @@ public class SQL {
      */
     @NotNull
     public ResultSet query(PreparedStatement statement) throws SQLException {
-        if (statement.isClosed())
-            throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
-        return statement.executeQuery();
+        try (statement) {
+            if (statement.isClosed())
+                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+            return statement.executeQuery();
+        }
     }
 
     /**

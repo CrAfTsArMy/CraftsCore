@@ -702,8 +702,32 @@ public final class Json {
     }
 
     /**
+     * Retrieves the size of the root json object or array.
      *
+     * @return the size of the root json object or array
+     * @throws NullPointerException  if the root json element does not exist
+     * @throws IllegalStateException if the root element is neither a JSON object nor a JSON array
      */
+    public int size() {
+        return size("");
+    }
+
+    /**
+     * Retrieves the size of the json object or array at the specified path.
+     *
+     * @param path the path within the json structure to the target element
+     * @return the size of the json object or array located at the specified path
+     * @throws NullPointerException  if there is no JSON element at the specified path
+     * @throws IllegalStateException if the target element is neither a JSON object nor a JSON array
+     */
+    public int size(String path) {
+        JsonElement element = get(path);
+        if (element == null) throw new NullPointerException("No such json element under " + path);
+
+        if (element.isJsonObject()) return element.getAsJsonObject().size();
+        if (element.isJsonArray()) return element.getAsJsonArray().size();
+
+        throw new IllegalStateException("Can not retrieve the values of " + element.getClass().getSimpleName());
     }
 
     /**

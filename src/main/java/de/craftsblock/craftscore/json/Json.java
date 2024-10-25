@@ -471,6 +471,24 @@ public final class Json {
     }
 
     /**
+     * Converts an argument to its index representation while respecting the allowance of new indexes.
+     *
+     * @param arg      The argument as its string representation.
+     * @param array    The json array for which the index is applied.
+     * @param allowNew {@code true} if new creation of new indexes is supported, {@code false} otherwise.
+     * @return The converted index.
+     */
+    private int argumentToIndex(String arg, JsonArray array, boolean allowNew) {
+        try {
+            if (arg.equalsIgnoreCase("$last")) return array.size() - 1;
+            else if (arg.equalsIgnoreCase("$new") && allowNew) return array.size();
+            return Integer.parseInt(arg.replace("$", ""));
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("Not a valid array index! (" + arg + ")", e);
+        }
+    }
+
+    /**
      * Initializes a json path by setting up a new json element based on the specified path.
      *
      * @param path    the path within the json structure to initialize, as a string
@@ -684,21 +702,8 @@ public final class Json {
     }
 
     /**
-     * Converts an argument to its index representation while respecting the allowance of new indexes.
      *
-     * @param arg      The argument as its string representation.
-     * @param array    The json array for which the index is applied.
-     * @param allowNew {@code true} if new creation of new indexes is supported, {@code false} otherwise.
-     * @return The converted index.
      */
-    private int argumentToIndex(String arg, JsonArray array, boolean allowNew) {
-        try {
-            if (arg.equalsIgnoreCase("$last")) return array.size() - 1;
-            else if (arg.equalsIgnoreCase("$new") && allowNew) return array.size();
-            return Integer.parseInt(arg.replace("$", ""));
-        } catch (NumberFormatException e) {
-            throw new IllegalStateException("Not a valid array index! (" + arg + ")", e);
-        }
     }
 
     /**

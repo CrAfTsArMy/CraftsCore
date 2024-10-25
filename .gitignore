@@ -17,6 +17,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 META-INF/
+/src/test/**
 
 ### Eclipse ###
 .apt_generated

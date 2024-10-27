@@ -19,10 +19,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:24.1.0'
 
     // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
-    implementation 'com.mysql:mysql-connector-j:9.0.0'
-
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-//    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.14'
+    implementation 'com.mysql:mysql-connector-j:9.1.0'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.11.0'

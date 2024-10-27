@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
-    implementation 'org.jetbrains:annotations:24.1.0'
+    implementation 'org.jetbrains:annotations:26.0.1'
 
     // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
     implementation 'com.mysql:mysql-connector-j:9.1.0'

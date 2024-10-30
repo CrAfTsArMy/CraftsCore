@@ -25,7 +25,9 @@ import java.util.stream.Collectors;
  */
 public final class Json {
 
-    private final Gson gson;
+    private static final Gson GSON = new Gson();
+    private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
+
 
     private JsonElement object;
 
@@ -36,7 +38,6 @@ public final class Json {
      */
     public Json(JsonElement object) {
         this.object = object;
-        this.gson = new Gson();
     }
 
     /**
@@ -123,7 +124,7 @@ public final class Json {
      * @return The deserialized object of the specified class, or null if the path does not exist.
      */
     public <T> T deserialize(String path, Class<T> classOfT) {
-        if (contains(path)) return gson.fromJson(get(path), classOfT);
+        if (contains(path)) return GSON.fromJson(get(path), classOfT);
         return null;
     }
 
@@ -135,7 +136,7 @@ public final class Json {
      * @return The Json object itself after setting the data at the path.
      */
     public <T> Json serialize(String path, T data) {
-        Json json = JsonParser.parse(gson.toJson(data));
+        Json json = JsonParser.parse(GSON.toJson(data));
         if (json == null) return this;
         set(path, json.getObject());
         return this;
@@ -802,9 +803,7 @@ public final class Json {
     public String toString(boolean pretty) {
         synchronized (this) {
             try {
-                GsonBuilder gson = new GsonBuilder();
-                if (pretty) gson.setPrettyPrinting();
-                return gson.create().toJson(getObject());
+                return (pretty ? GSON : PRETTY_GSON).toJson(getObject());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

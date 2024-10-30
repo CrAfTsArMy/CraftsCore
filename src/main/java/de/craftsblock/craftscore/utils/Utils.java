@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -212,7 +213,7 @@ public final class Utils {
      * in ascending order by modification date.
      * @throws RuntimeException if an {@link IOException} occurs while accessing the folder.
      */
-    public static List<Path> getOldestNFiles(Path folder, long amount) {
+    public static List<Path> getOldestNFiles(@NotNull Path folder, @Range(from = 0, to = Long.MAX_VALUE) long amount) {
         try (Stream<Path> paths = Files.walk(folder)) {
             return paths.filter(Files::isRegularFile)
                     .sorted(Comparator.comparingLong(p -> p.toFile().lastModified()))

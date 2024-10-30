@@ -215,11 +215,9 @@ public class SQL {
      */
     @NotNull
     public ResultSet query(PreparedStatement statement) throws SQLException {
-        try (statement) {
-            if (statement.isClosed())
-                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
-            return statement.executeQuery();
-        }
+        if (statement.isClosed())
+            throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+        return statement.executeQuery();
     }
 
     /**

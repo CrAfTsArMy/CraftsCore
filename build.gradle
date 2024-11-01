@@ -24,7 +24,14 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.11.0'
 
-}
+    // Artifact resolving dependencies ----------------------------------------------------------------------------------------
+
+    /* https://mvnrepository.com/artifact/org.apache.maven/maven-resolver-provider
+       Stay with this version as there is no update available for the maven-resolver-supplier. */
+//    implementation 'org.apache.maven:maven-resolver-provider:4.0.0-alpha-13'
+
+    // https://mvnrepository.com/artifact/org.apache.maven.resolver/maven-resolver-supplier
+//    implementation 'org.apache.maven.resolver:maven-resolver-supplier:2.0.0-alpha-8'
 }
 
 sourceCompatibility = JavaVersion.VERSION_16

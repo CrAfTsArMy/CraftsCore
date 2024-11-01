@@ -7,7 +7,7 @@ java {
     withSourcesJar()
 }
 
-group 'de.craftsblock.craftscore'
+group 'de.craftsblock'
 version '3.7.65-SNAPSHOT'
 
 repositories {

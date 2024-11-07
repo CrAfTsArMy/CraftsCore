@@ -458,17 +458,22 @@ public final class Json {
         }
 
         // Handling for the last element in the path
+        JsonElement last;
         String lastArg = args[args.length - 1].replace("&dot;", ".");
         if (lastArg.startsWith("$")) {
             JsonArray array = destination.isJsonNull() ? new JsonArray() : destination.getAsJsonArray();
             int index = argumentToIndex(lastArg, array, true);
             if (index == array.size()) array.add(data);
             else array.set(index, data);
-            return;
+            last = array;
+        } else {
+            JsonObject obj = destination.isJsonNull() ? new JsonObject() : destination.getAsJsonObject();
+            obj.add(lastArg, data);
+            last = obj;
         }
 
-        JsonObject obj = destination.isJsonNull() ? new JsonObject() : destination.getAsJsonObject();
-        obj.add(lastArg, data);
+        if (this.getObject().equals(JsonNull.INSTANCE))
+            this.object = last;
     }
 
     /**

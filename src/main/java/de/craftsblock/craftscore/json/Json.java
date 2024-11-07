@@ -784,7 +784,6 @@ public final class Json {
 
     /**
      * Returns the json data as a json string.
-     * If any error occurs during the process, it returns a default error json string.
      *
      * @return The json data as a json string.
      */
@@ -795,7 +794,6 @@ public final class Json {
 
     /**
      * Returns the json data as a json string.
-     * If any error occurs during the process, it returns a default error json string.
      *
      * @param pretty Sets whether the return should be pretty formated or not.
      * @return The json data as a json string.
@@ -803,7 +801,7 @@ public final class Json {
     public String toString(boolean pretty) {
         synchronized (this) {
             try {
-                return (pretty ? GSON : PRETTY_GSON).toJson(getObject());
+                return (pretty ? PRETTY_GSON : GSON).toJson(getObject());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

@@ -1,5 +1,5 @@
 # CraftsCore
-![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/CraftsCore?color=40c14a&name=CraftsCore&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore?color=40c14a&name=CraftsCore&prefix=v)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrAfTsArMy/CraftsCore)
 ![GitHub](https://img.shields.io/github/license/CrAfTsArMy/CraftsCore)
 ![GitHub issues](https://img.shields.io/github/issues-raw/CrAfTsArMy/CraftsCore)
@@ -19,8 +19,8 @@
 <dependencies>
   ...
   <dependency>
-    <groupId>de.craftsblock.craftscore</groupId>
-    <artifactId>CraftsCore</artifactId>
+    <groupId>de.craftsblock</groupId>
+    <artifactId>craftscore</artifactId>
     <version>X.X.X-SNAPSHOT</version>
   </dependency>
 </dependencies>
@@ -37,7 +37,7 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'de.craftsblock.craftscore:CraftsCore:X.X.X-SNAPSHOT'
+  implementation 'de.craftsblock:craftscore:X.X.X-SNAPSHOT'
 }
 ```
 

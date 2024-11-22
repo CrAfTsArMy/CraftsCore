@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.1
+ * @version 2.0.2
  * @since 3.0-SNAPSHOT
  */
 public final class Utils {
@@ -109,16 +109,16 @@ public final class Utils {
      * @param annotation The annotation to look for.
      * @return true if a method with the specified annotation is found, false otherwise.
      */
-    public static boolean checkForMethodsWithAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
+    public static boolean hasMethodsWithAnnotation(final Class<?> type, final Class<? extends Annotation> annotation) {
         if (type == null || type.equals(Object.class)) return false;
 
         for (final Method method : type.getDeclaredMethods())
             if (method.isAnnotationPresent(annotation)) return true;
 
         for (final Class<?> iface : type.getInterfaces())
-            if (checkForMethodsWithAnnotation(iface, annotation)) return true;
+            if (hasMethodsWithAnnotation(iface, annotation)) return true;
 
-        return checkForMethodsWithAnnotation(type.getSuperclass(), annotation);
+        return hasMethodsWithAnnotation(type.getSuperclass(), annotation);
     }
 
     /**
@@ -132,13 +132,12 @@ public final class Utils {
     @Nullable
     public static Method getMethod(final Class<?> type, String name, @Nullable Class<?>... parameterTypes) {
         Class<?> clazz = type;
-        while (clazz != Object.class) {
+        while (clazz != Object.class)
             try {
                 return clazz.getDeclaredMethod(name, parameterTypes);
             } catch (NoSuchMethodException ignored) {
+                clazz = clazz.getSuperclass();
             }
-            clazz = clazz.getSuperclass();
-        }
         return null;
     }
 

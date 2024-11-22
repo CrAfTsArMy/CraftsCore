@@ -2,7 +2,6 @@ package de.craftsblock.craftscore.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,20 +12,15 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Utility class providing common functionality for byte and reflection operations.
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.2
+ * @version 2.0.3
  * @since 3.0-SNAPSHOT
  */
 public final class Utils {
@@ -203,24 +197,6 @@ public final class Utils {
         }
     }
 
-    /**
-     * Retrieves the oldest n files from a specified folder.
-     *
-     * @param folder the {@link Path} of the folder to search within.
-     * @param amount the maximum number of oldest files to retrieve.
-     * @return a list of the {@link Path} objects representing the oldest files, sorted
-     * in ascending order by modification date.
-     * @throws RuntimeException if an {@link IOException} occurs while accessing the folder.
-     */
-    public static List<Path> getOldestNFiles(@NotNull Path folder, @Range(from = 0, to = Long.MAX_VALUE) long amount) {
-        try (Stream<Path> paths = Files.walk(folder)) {
-            return paths.filter(Files::isRegularFile)
-                    .sorted(Comparator.comparingLong(p -> p.toFile().lastModified()))
-                    .limit(amount)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
 }

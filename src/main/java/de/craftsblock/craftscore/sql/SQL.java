@@ -11,7 +11,7 @@ import java.sql.*;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.3.1
+ * @version 1.3.2
  * @see de.craftsblock.craftscore.sql.SQL.Callback
  * @since 3.6#15-SNAPSHOT
  */
@@ -155,7 +155,21 @@ public class SQL {
      *                      or this method is called on a closed connection
      */
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return connection.prepareStatement(sql);
+        return this.prepareStatement(sql, false);
+    }
+
+    /**
+     * Creates and returns a PreparedStatement for a given SQL query.
+     * This method allows specifying whether the statement should return generated keys.
+     *
+     * @param sql        The SQL query to be prepared.
+     * @param returnKeys If {@code true}, the statement will return generated keys, otherwise, it will not.
+     * @return The created PreparedStatement.
+     * @throws SQLException if a database access error occurs
+     *                      or this method is called on a closed connection
+     */
+    public PreparedStatement prepareStatement(String sql, boolean returnKeys) throws SQLException {
+        return connection.prepareStatement(sql, returnKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
     }
 
     /**

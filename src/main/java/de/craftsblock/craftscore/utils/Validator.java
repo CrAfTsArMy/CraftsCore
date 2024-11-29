@@ -1,12 +1,11 @@
 package de.craftsblock.craftscore.utils;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 
 /**
  * The Validator class provides utility methods to validate JSON strings.
@@ -14,7 +13,7 @@ import java.io.StringReader;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0
+ * @version 2.0.0
  * @see de.craftsblock.craftscore.json.Json
  * @see de.craftsblock.craftscore.json.JsonParser
  * @since 2.4-SNAPSHOT
@@ -29,7 +28,12 @@ public final class Validator {
      * @throws IOException If an I/O error occurs while validating the JSON string.
      */
     public static boolean isJsonValid(final String json) throws IOException {
-        return isJsonValid(new StringReader(json));
+        try {
+            JsonElement element = JsonParser.parseString(json);
+            return element != null && !element.isJsonPrimitive() && !element.isJsonNull();
+        } catch (JsonSyntaxException e) {
+            return false;
+        }
     }
 
     /**
@@ -40,54 +44,14 @@ public final class Validator {
      * @throws IOException If an I/O error occurs while validating the JSON data.
      */
     public static boolean isJsonValid(final Reader reader) throws IOException {
-        return isJsonValid(new JsonReader(reader));
-    }
+        StringBuilder read  = new StringBuilder();
+        char[] buffer = new char[1024];
+        int length;
 
-    /**
-     * Validates whether the JSON data read from the provided JsonReader is valid and well-formed.
-     *
-     * @param jsonReader The JsonReader instance to read the JSON data.
-     * @return True if the JSON data is valid, false otherwise.
-     * @throws IOException If an I/O error occurs while validating the JSON data.
-     */
-    public static boolean isJsonValid(final JsonReader jsonReader) throws IOException {
-        try {
-            JsonToken token;
-            loop:
-            // Loop through the JSON data using the JsonReader to validate its structure.
-            while ((token = jsonReader.peek()) != JsonToken.END_DOCUMENT && token != null) {
-                switch (token) {
-                    case BEGIN_ARRAY:
-                        jsonReader.beginArray();
-                        break;
-                    case END_ARRAY:
-                        jsonReader.endArray();
-                        break;
-                    case BEGIN_OBJECT:
-                        jsonReader.beginObject();
-                        break;
-                    case END_OBJECT:
-                        jsonReader.endObject();
-                        break;
-                    case NAME:
-                        jsonReader.nextName();
-                        break;
-                    case STRING:
-                    case NUMBER:
-                    case BOOLEAN:
-                    case NULL:
-                        jsonReader.skipValue();
-                        break;
-                    case END_DOCUMENT:
-                        break loop;
-                    default:
-                        throw new AssertionError(token);
-                }
-            }
-            return true; // If the loop completes without any exceptions, the JSON data is valid.
-        } catch (final MalformedJsonException ignored) {
-            return false; // If a MalformedJsonException is caught, it indicates that the JSON data is not valid.
-        }
+        while ((length = reader.read(buffer)) != -1)
+            read.append(buffer, 0, length);
+
+        return isJsonValid(read.toString());
     }
 
 }

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.0
+ * @version 2.0.1
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -106,10 +106,23 @@ public class ListenerRegistry {
      * @throws IllegalAccessException    If the listener method is inaccessible.
      */
     public void call(Event event) throws InvocationTargetException, IllegalAccessException {
+        call(event, event.getClass());
+    }
+
+    /**
+     * Calls the event by invoking all registered listeners for the given event type
+     * in order of their {@link EventPriority}.
+     *
+     * @param event The event to be dispatched.
+     * @param type  The type of the event listener to call.
+     * @throws InvocationTargetException If the listener method cannot be invoked.
+     * @throws IllegalAccessException    If the listener method is inaccessible.
+     */
+    private void call(Event event, Class<? extends Event> type) throws InvocationTargetException, IllegalAccessException {
         if (!this.data.containsKey(event.getClass()))
             return;
 
-        EnumMap<EventPriority, List<Listener>> data = this.data.get(event.getClass());
+        EnumMap<EventPriority, List<Listener>> data = this.data.get(type);
         if (data.isEmpty()) return;
 
         for (EventPriority priority : data.keySet()) {
@@ -119,6 +132,11 @@ public class ListenerRegistry {
             for (Listener tile : listeners)
                 tile.method.invoke(tile.self, event);
         }
+
+        @SuppressWarnings("unchecked")
+        Class<? extends Event> superClass = (Class<? extends Event>) type.getSuperclass();
+        if (superClass != null && Event.class.isAssignableFrom(superClass))
+            call(event, superClass);
     }
 
     /**

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.1
+ * @version 2.1.0
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -146,7 +146,12 @@ public class ListenerRegistry {
      * @throws IllegalAccessException    If the listener method is inaccessible.
      */
     private void call(Event event, Class<? extends Event> type) throws InvocationTargetException, IllegalAccessException {
-        if (!this.data.containsKey(event.getClass()))
+        @SuppressWarnings("unchecked")
+        Class<? extends Event> superClass = (Class<? extends Event>) type.getSuperclass();
+        if (superClass != null && Event.class.isAssignableFrom(superClass))
+            call(event, superClass);
+
+        if (!this.data.containsKey(type))
             return;
 
         EnumMap<EventPriority, List<Listener>> data = this.data.get(type);
@@ -159,11 +164,6 @@ public class ListenerRegistry {
             for (Listener tile : listeners)
                 tile.method.invoke(tile.self, event);
         }
-
-        @SuppressWarnings("unchecked")
-        Class<? extends Event> superClass = (Class<? extends Event>) type.getSuperclass();
-        if (superClass != null && Event.class.isAssignableFrom(superClass))
-            call(event, superClass);
     }
 
     /**

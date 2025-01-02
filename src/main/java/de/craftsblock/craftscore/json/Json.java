@@ -352,7 +352,7 @@ public final class Json {
      * @return A Collection of bytes at the given path, or an empty list if the path does not exist or the value is not a json array of bytes.
      */
     public Collection<Byte> getByteList(String path) {
-        return getNumberList(path, byte.class);
+        return getIntList(path).stream().map(Integer::byteValue).toList();
     }
 
     /**

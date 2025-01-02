@@ -98,6 +98,33 @@ public class ListenerRegistry {
     }
 
     /**
+     * Checks if the given {@link ListenerAdapter} is registered.
+     * This class is a wrapper for {@link ListenerRegistry#isRegistered(Class)}.
+     *
+     * @param listenerAdapter The {@link ListenerAdapter} to check.
+     * @return {@code true} when the {@link ListenerAdapter} was registered, {@code false} otherwise.
+     */
+    public boolean isRegistered(ListenerAdapter listenerAdapter) {
+        return isRegistered(listenerAdapter.getClass());
+    }
+
+    /**
+     * Checks if the given class representation of the {@link ListenerAdapter} is registered.
+     *
+     * @param type The class representation of the {@link ListenerAdapter} to check.
+     * @return {@code true} when the {@link ListenerAdapter} was registered, {@code false} otherwise.
+     */
+    public boolean isRegistered(Class<? extends ListenerAdapter> type) {
+        if (data.isEmpty()) return false;
+
+        return data.values().stream()
+                .flatMap(map -> map.values().stream())
+                .flatMap(List::stream)
+                .map(Listener::self)
+                .anyMatch(type::isInstance);
+    }
+
+    /**
      * Calls the event by invoking all registered listeners for the given event type
      * in order of their {@link EventPriority}.
      *

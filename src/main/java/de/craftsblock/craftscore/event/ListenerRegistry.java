@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.0
+ * @version 2.1.1
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -118,7 +118,9 @@ public class ListenerRegistry {
         if (data.isEmpty()) return false;
 
         return data.values().stream()
+                .filter(map -> !map.isEmpty())
                 .flatMap(map -> map.values().stream())
+                .filter(list -> !list.isEmpty())
                 .flatMap(List::stream)
                 .map(Listener::self)
                 .anyMatch(type::isInstance);
@@ -161,8 +163,15 @@ public class ListenerRegistry {
             List<Listener> listeners = data.get(priority);
             if (listeners.isEmpty()) continue;
 
-            for (Listener tile : listeners)
-                tile.method.invoke(tile.self, event);
+            for (Listener tile : listeners) {
+                Method method = tile.method();
+                try {
+                    method.setAccessible(true);
+                    method.invoke(tile.self, event);
+                } finally {
+                    method.setAccessible(false);
+                }
+            }
         }
     }
 

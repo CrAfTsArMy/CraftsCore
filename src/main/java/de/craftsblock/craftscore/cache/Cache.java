@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * @param <V> The type of the values in the cache.
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0
+ * @version 2.0.1
  * @since 3.6#4
  */
 public class Cache<K, V> {
@@ -73,7 +73,7 @@ public class Cache<K, V> {
         // remove the least recently used key-value pair from the cache.
         if (!moveToFront(key) && hashmap.size() > capacity) {
             K last = internalQueue.removeLast();
-            hashmap.remove(last);
+            remove(last);
         }
     }
 
@@ -84,7 +84,7 @@ public class Cache<K, V> {
      * @param key The key to be moved to the front of the queue.
      * @return true if the key was already in the queue and moved, otherwise false.
      */
-    private boolean moveToFront(final K key) {
+    protected boolean moveToFront(final K key) {
         boolean removed = internalQueue.remove(key);
         internalQueue.addFirst(key);
         return removed;
@@ -104,8 +104,7 @@ public class Cache<K, V> {
      * Clears the cache, removing all key-value pairs from it.
      */
     public void clear() {
-        hashmap.clear();
-        internalQueue.clear();
+        internalQueue.forEach(this::remove);
     }
 
     public Set<Map.Entry<K, V>> entrySet() {

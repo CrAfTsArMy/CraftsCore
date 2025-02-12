@@ -22,7 +22,7 @@ dependencies {
     implementation 'com.mysql:mysql-connector-j:9.2.0'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.google.code.gson:gson:2.12.1'
 
     // Artifact resolving dependencies ----------------------------------------------------------------------------------------
 

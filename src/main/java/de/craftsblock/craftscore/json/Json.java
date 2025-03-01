@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.6
+ * @version 2.0.7
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -383,6 +383,16 @@ public final class Json {
      */
     public Collection<Double> getDoubleList(String path) {
         return getNumberList(path, double.class);
+    }
+
+    /**
+     * Retrieves a list of floats at the specified path in the json data.
+     *
+     * @param path The path to the list of floats in the json data.
+     * @return A Collection of floats at the given path, or an empty list if the path does not exist or the value is not a json array of floats.
+     */
+    public Collection<Float> getFloatList(String path) {
+        return getNumberList(path, float.class);
     }
 
     /**

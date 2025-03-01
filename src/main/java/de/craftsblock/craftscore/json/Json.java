@@ -284,6 +284,18 @@ public final class Json {
     }
 
     /**
+     * Retrieves the float value at the specified path in the json data.
+     *
+     * @param path The path to the float value in the json data.
+     * @return The float value at the given path, or -1 if the path does not exist or the value is not a float.
+     */
+    public float getFloat(String path) {
+        JsonElement element = get(path);
+        if (element != null && element.isJsonPrimitive()) return element.getAsFloat();
+        return -1;
+    }
+
+    /**
      * Retrieves a list of {@link JsonElement} at the specified path in the json data.
      *
      * @param path The path to the list of strings in the json data.

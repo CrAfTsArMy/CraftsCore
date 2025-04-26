@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.7
+ * @version 2.0.8
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -452,11 +452,11 @@ public final class Json {
     /**
      * Moves a json object if it exists to a desired output path.
      *
-     * @param source The path from witch is copied from and afterwards deleted
+     * @param source The path from witch is copied from and afterward deleted
      * @param target The desired output path (where the object is moved to)
+     * @since 3.8.4-SNAPSHOT
      * */
     public Json moveTo(String source, String target) {
-
         copyTo(source, target);
         remove(source);
 
@@ -468,9 +468,9 @@ public final class Json {
      *
      * @param source The path from witch is copied from
      * @param target The desired output path (where the object is copied to)
+     * @since 3.8.4-SNAPSHOT
      * */
     public Json copyTo(String source, String target) {
-
         if(contains(source))
             set(target, get(source));
 

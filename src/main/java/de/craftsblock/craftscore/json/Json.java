@@ -456,8 +456,10 @@ public final class Json {
      * @param target The desired output path (where the object is moved to)
      * */
     public Json moveTo(String source, String target) {
+
         copyTo(source, target);
         remove(source);
+
         return this;
     }
 
@@ -469,9 +471,8 @@ public final class Json {
      * */
     public Json copyTo(String source, String target) {
 
-        if(contains(source)){
+        if(contains(source))
             set(target, get(source));
-        }
 
         return this;
     }

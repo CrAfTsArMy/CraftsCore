@@ -450,6 +450,33 @@ public final class Json {
     }
 
     /**
+     * Moves a json object if it exists to a desired output path.
+     *
+     * @param source The path from witch is copied from and afterwards deleted
+     * @param target The desired output path (where the object is moved to)
+     * */
+    public Json moveTo(String source, String target) {
+        copyTo(source, target);
+        remove(source);
+        return this;
+    }
+
+    /**
+     * Copys a json object if it exists to a desired output path.
+     *
+     * @param source The path from witch is copied from
+     * @param target The desired output path (where the object is copied to)
+     * */
+    public Json copyTo(String source, String target) {
+
+        if(contains(source)){
+            set(target, get(source));
+        }
+
+        return this;
+    }
+
+    /**
      * Sets a json element at the specified path in the json data.
      *
      * @param path The path where the string value should be set in the json data.

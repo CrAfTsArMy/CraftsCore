@@ -1,16 +1,19 @@
 package de.craftsblock.craftscore.json;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import de.craftsblock.craftscore.utils.Utils;
 import de.craftsblock.craftscore.utils.Validator;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 /**
  * The JsonParser class provides methods for parsing JSON data from a file or a String.
@@ -18,7 +21,7 @@ import java.util.stream.IntStream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0
+ * @version 2.0.2
  * @see Json
  * @see Validator
  * @since 3.6#16-SNAPSHOT
@@ -28,27 +31,12 @@ public final class JsonParser {
     /**
      * Parses the content of a given file into a {@link Json} object.
      *
-     * @param f The file to be parsed
+     * @param file The file to be parsed
      * @return A {@link Json} object representing the content of the file
      * @throws RuntimeException If an I/O error occurs during reading or file creation
      */
-    public static Json parse(File f) {
-        try {
-            if (f.getParentFile() != null && !f.getParentFile().exists()) f.getParentFile().mkdirs();
-            f.createNewFile();
-
-            StringBuilder content = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)))) {
-                reader.lines().forEach(content::append);
-            }
-
-            String json = content.toString();
-            if (!json.isBlank() && Validator.isJsonValid(json))
-                return new Json(com.google.gson.JsonParser.parseString(json));
-            else return new Json(com.google.gson.JsonParser.parseString("{}"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static Json parse(File file) {
+        return parse(file.toPath());
     }
 
     /**
@@ -60,6 +48,10 @@ public final class JsonParser {
      */
     public static Json parse(Path path) {
         try {
+            Path parent = path.getParent();
+            if (Files.notExists(parent)) Files.createDirectories(parent);
+            if (Files.notExists(path)) Files.createFile(path);
+
             return parse(Files.newInputStream(path, StandardOpenOption.READ));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -79,9 +71,11 @@ public final class JsonParser {
     public static Json parse(InputStream stream) {
         try (ByteArrayOutputStream data = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[2048];
+
             int read;
             while ((read = stream.read(buffer)) != -1)
                 data.write(buffer, 0, read);
+
             Arrays.fill(buffer, (byte) 0);
             return parse(data.toByteArray(), 0, data.size());
         } catch (IOException e) {
@@ -128,7 +122,8 @@ public final class JsonParser {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+
+        return Json.empty();
     }
 
     /**
@@ -143,8 +138,11 @@ public final class JsonParser {
      * @return A {@link Json} object representing the content of the {@link JsonElement}
      */
     public static Json parse(JsonElement element) {
-        if (element.isJsonPrimitive())
-            return element.getAsJsonPrimitive().isString() ? parse(element.getAsJsonPrimitive().getAsString()) : null;
+        if (element.isJsonPrimitive()) {
+            JsonPrimitive primitive = element.getAsJsonPrimitive();
+            return primitive.isString() ? parse(primitive.getAsString()) : null;
+        }
+
         return new Json(element);
     }
 

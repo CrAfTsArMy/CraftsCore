@@ -2,9 +2,7 @@ package de.craftsblock.craftscore.json;
 
 import com.google.gson.*;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
@@ -13,13 +11,14 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The Json class represents a json object and provides methods to work with json data.
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.8
+ * @version 2.0.9
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -298,14 +297,27 @@ public final class Json {
     /**
      * Retrieves a list of {@link JsonElement} at the specified path in the json data.
      *
-     * @param path The path to the list of strings in the json data.
+     * @param path The path to the list in the json data.
      * @return A Collection of {@link JsonElement} at the given path, or an empty list if the path does not exist.
      */
     public Collection<JsonElement> getList(String path) {
         JsonElement element = get(path);
         if (element != null && element.isJsonArray())
-            return new ArrayList<>(element.getAsJsonArray().asList());
-        return new ArrayList<>();
+            return element.getAsJsonArray().asList();
+        return List.of();
+    }
+
+    /**
+     * Retrieves a {@link Stream stream} of {@link JsonPrimitive json primitives} at the
+     * specified path in the json data.
+     *
+     * @param path The path to the list of json primitives.
+     * @return A {@link Stream stream} of {@link JsonPrimitive json primitives}.
+     */
+    private Stream<JsonPrimitive> getJsonPrimitiveStream(String path) {
+        return getList(path).stream()
+                .filter(JsonElement::isJsonPrimitive)
+                .map(JsonElement::getAsJsonPrimitive);
     }
 
     /**
@@ -325,12 +337,7 @@ public final class Json {
      * @return A Collection of strings at the given path, or an empty list if the path does not exist or the value is not a json array of strings.
      */
     public Collection<String> getStringList(String path) {
-        ArrayList<String> list = new ArrayList<>();
-
-        for (JsonElement arrayElement : getList(path))
-            if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsString());
-
-        return list;
+        return getJsonPrimitiveStream(path).map(JsonElement::getAsString).toList();
     }
 
     /**
@@ -343,18 +350,15 @@ public final class Json {
      */
     @SuppressWarnings("unchecked")
     public <T extends Number> Collection<T> getNumberList(String path, Class<T> type) {
-        Collection<T> list = new ArrayList<>();
-
-        for (JsonElement arrayElement : getList(path))
-            if (arrayElement.isJsonPrimitive())
-                try {
-                    Number num = arrayElement.getAsNumber();
-                    list.add((T) num.getClass().getDeclaredMethod(type + "Value").invoke(num));
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-
-        return list;
+        return getJsonPrimitiveStream(path)
+                .map(JsonElement::getAsNumber)
+                .map(number -> {
+                    try {
+                        return (T) number.getClass().getDeclaredMethod(type + "Value").invoke(number);
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
     }
 
     /**
@@ -414,14 +418,7 @@ public final class Json {
      * @return A Collection of booleans at the given path, or an empty list if the path does not exist or the value is not a json array of booleans.
      */
     public Collection<Boolean> getBooleanList(String path) {
-        JsonElement element = get(path);
-        if (element != null && element.isJsonArray()) {
-            Collection<Boolean> list = new ArrayList<>();
-            for (JsonElement arrayElement : element.getAsJsonArray())
-                if (arrayElement.isJsonPrimitive()) list.add(arrayElement.getAsBoolean());
-            return list;
-        }
-        return new ArrayList<>();
+        return getJsonPrimitiveStream(path).map(JsonElement::getAsBoolean).toList();
     }
 
     /**
@@ -455,7 +452,7 @@ public final class Json {
      * @param source The path from witch is copied from and afterward deleted
      * @param target The desired output path (where the object is moved to)
      * @since 3.8.4-SNAPSHOT
-     * */
+     */
     public Json moveTo(String source, String target) {
         copyTo(source, target);
         remove(source);
@@ -469,9 +466,9 @@ public final class Json {
      * @param source The path from witch is copied from
      * @param target The desired output path (where the object is copied to)
      * @since 3.8.4-SNAPSHOT
-     * */
+     */
     public Json copyTo(String source, String target) {
-        if(contains(source))
+        if (contains(source))
             set(target, get(source));
 
         return this;
@@ -803,7 +800,9 @@ public final class Json {
      */
     public void save(Path path, boolean pretty) {
         try {
-            Files.writeString(path, toString(pretty), StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+            synchronized (this) {
+                Files.writeString(path, toString(pretty), StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -812,29 +811,20 @@ public final class Json {
     /**
      * Saves the json data to the specified file.
      *
-     * @param f The file where the json data should be saved.
+     * @param file The file where the json data should be saved.
      */
-    public void save(File f) {
-        save(f, false);
+    public void save(File file) {
+        save(file, false);
     }
 
     /**
      * Saves the json data to the specified file.
      *
-     * @param f      The file where the json data should be saved.
+     * @param file   The file where the json data should be saved.
      * @param pretty Sets whether the output should be pretty formated or not.
      */
-    public void save(File f, boolean pretty) {
-        synchronized (this) {
-            try {
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(f));
-                bufferedWriter.write(toString(pretty));
-                bufferedWriter.flush();
-                bufferedWriter.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public void save(File file, boolean pretty) {
+        this.save(file.toPath(), pretty);
     }
 
     /**
@@ -854,12 +844,10 @@ public final class Json {
      * @return The json data as a json string.
      */
     public String toString(boolean pretty) {
-        synchronized (this) {
-            try {
-                return (pretty ? PRETTY_GSON : GSON).toJson(getObject());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            return (pretty ? PRETTY_GSON : GSON).toJson(getObject());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,38 +1,67 @@
 plugins {
     id 'java'
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
+    id 'maven-publish'
 }
 
 group 'de.craftsblock'
-version '3.8.5'
+version '3.8.6'
 
-repositories {
-    mavenCentral()
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    group = "${rootProject.group}.${rootProject.name.toLowerCase()}"
+    version = rootProject.version
+
+    publishing {
+        publications {
+            normal(MavenPublication) {
+                artifactId project.name.toLowerCase()
+
+                from components.java
+
+                pom {
+                    name = "CraftsCore ${project.name}"
+                    description = 'A simple Lib that simplifies some things'
+                    url = 'https://github.com/CrAfTsArMy/CraftsCore'
+
+                    scm {
+                        url = 'https://github.com/CrAfTsArMy/CraftsCore'
+                        connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
+                        developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
+                    }
+
+                    issueManagement {
+                        system = 'github'
+                        url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'Apache License 2.0'
+                            url = 'https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE'
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                url('https://repo.craftsblock.de/releases')
+                authentication {
+                    basic(BasicAuthentication) {
+                    }
+                }
+                credentials {
+                    username = project.findProperty("craftsblockRepoUsername")
+                    password = project.findProperty("craftsblockRepoPassword")
+                }
+            }
+        }
+    }
 }
-
-dependencies {
-    // https://mvnrepository.com/artifact/org.jetbrains/annotations
-    implementation 'org.jetbrains:annotations:26.0.2'
-
-    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
-    implementation 'com.mysql:mysql-connector-j:9.3.0'
-
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.13.1'
-
-    // Artifact resolving dependencies ----------------------------------------------------------------------------------------
-
-    /* https://mvnrepository.com/artifact/org.apache.maven/maven-resolver-provider
-       Stay with this version as there is no update available for the maven-resolver-supplier. */
-//    implementation 'org.apache.maven:maven-resolver-provider:4.0.0-alpha-13'
-
-    // https://mvnrepository.com/artifact/org.apache.maven.resolver/maven-resolver-supplier
-//    implementation 'org.apache.maven.resolver:maven-resolver-supplier:2.0.0-alpha-8'
-}
-
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16

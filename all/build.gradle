@@ -1,0 +1,33 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+
+    def version = rootProject.subprojects
+            .findAll {
+                it.name != project.name &&
+                        (it.plugins.hasPlugin('java') || it.plugins.hasPlugin('java-library'))
+            }
+            .collect { it.java.sourceCompatibility as String }
+            .findAll { it != null }
+            .collect { JavaVersion.toVersion(it) }
+            .max() ?: JavaVersion.VERSION_1_8
+
+    sourceCompatibility = version
+    targetCompatibility = version
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    rootProject.subprojects
+            .findAll { it.name != project.name }
+            .each { api project(":${it.name}") }
+
+}

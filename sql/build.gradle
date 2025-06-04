@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_1_9
+    targetCompatibility = JavaVersion.VERSION_1_9
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.jetbrains/annotations
+    implementation 'org.jetbrains:annotations:26.0.2'
+
+    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+    implementation 'com.mysql:mysql-connector-j:9.3.0'
+}

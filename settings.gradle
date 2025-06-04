@@ -1,2 +1,12 @@
 rootProject.name = 'CraftsCore'
 
+
+include 'json'
+include 'event'
+include 'actions'
+include 'cache'
+include 'queue'
+include 'sql'
+include 'encryption'
+include 'utils'
+include 'all'

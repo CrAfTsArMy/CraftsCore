@@ -1,5 +1,5 @@
 # CraftsCore
-![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore?color=40c14a&name=CraftsCore&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/all?color=40c14a&name=CraftsCore&prefix=v)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CrAfTsArMy/CraftsCore)
 ![GitHub](https://img.shields.io/github/license/CrAfTsArMy/CraftsCore)
 ![GitHub issues](https://img.shields.io/github/issues-raw/CrAfTsArMy/CraftsCore)

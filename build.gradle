@@ -1,65 +1,62 @@
-plugins {
-    id 'java'
-    id 'maven-publish'
-}
-
 group 'de.craftsblock'
 version '3.8.6'
 
 subprojects {
-    apply plugin: 'java'
     apply plugin: 'maven-publish'
-
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
 
     group = "${rootProject.group}.${rootProject.name.toLowerCase()}"
     version = rootProject.version
 
-    publishing {
-        publications {
-            normal(MavenPublication) {
-                artifactId project.name.toLowerCase()
+    afterEvaluate {
+        publishing {
+            publications {
+                normal(MavenPublication) {
+                    artifactId project.name.toLowerCase()
 
-                from components.java
+                    def component = project.components.findByName('java') ?: project.components.findByName('javaPlatform')
+                    if (component == null) {
+                        logger.warn("${project.name} does not contain a component that is publishable!")
+                        return
+                    }
 
-                pom {
-                    name = "CraftsCore ${project.name}"
-                    description = 'A simple Lib that simplifies some things'
-                    url = 'https://github.com/CrAfTsArMy/CraftsCore'
+                    from component
 
-                    scm {
+                    pom {
+                        name = "CraftsCore ${project.name}"
+                        description = 'A simple Lib that simplifies some things'
                         url = 'https://github.com/CrAfTsArMy/CraftsCore'
-                        connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
-                        developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
-                    }
 
-                    issueManagement {
-                        system = 'github'
-                        url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
-                    }
+                        scm {
+                            url = 'https://github.com/CrAfTsArMy/CraftsCore'
+                            connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
+                            developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
+                        }
 
-                    licenses {
-                        license {
-                            name = 'Apache License 2.0'
-                            url = 'https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE'
+                        issueManagement {
+                            system = 'github'
+                            url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
+                        }
+
+                        licenses {
+                            license {
+                                name = 'Apache License 2.0'
+                                url = 'https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE'
+                            }
                         }
                     }
                 }
             }
-        }
-        repositories {
-            maven {
-                url('https://repo.craftsblock.de/releases')
-                authentication {
-                    basic(BasicAuthentication) {
+            repositories {
+                maven {
+                    url('https://repo.craftsblock.de/releases')
+                    authentication {
+                        basic(BasicAuthentication) {
+                        }
                     }
-                }
-                credentials {
-                    username = project.findProperty("craftsblockRepoUsername")
-                    password = project.findProperty("craftsblockRepoPassword")
+                    credentials {
+                        username = project.findProperty("craftsblockRepoUsername")
+                        password = project.findProperty("craftsblockRepoPassword")
+                    }
                 }
             }
         }

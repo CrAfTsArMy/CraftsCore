@@ -4,6 +4,18 @@
 ![GitHub](https://img.shields.io/github/license/CrAfTsArMy/CraftsCore)
 ![GitHub issues](https://img.shields.io/github/issues-raw/CrAfTsArMy/CraftsCore)
 
+## Modules
+
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/actions?color=40c14a&name=actions&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/all?color=40c14a&name=all&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/cache?color=40c14a&name=cache&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/encryption?color=40c14a&name=encryption&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/event?color=40c14a&name=event&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/json?color=40c14a&name=json&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/queue?color=40c14a&name=queue&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/sql?color=40c14a&name=sql&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/utils?color=40c14a&name=utils&prefix=v)
+
 ### Maven
 ```xml
 <repositories>
@@ -19,8 +31,8 @@
 <dependencies>
   ...
   <dependency>
-    <groupId>de.craftsblock</groupId>
-    <artifactId>craftscore</artifactId>
+    <groupId>de.craftsblock.craftscore</groupId>
+    <artifactId>MODULE</artifactId>
     <version>X.X.X-SNAPSHOT</version>
   </dependency>
 </dependencies>
@@ -37,7 +49,7 @@ repositories {
 ```gradle
 dependencies {
   ...
-  implementation 'de.craftsblock:craftscore:X.X.X-SNAPSHOT'
+  implementation 'de.craftsblock.craftscore:MODULE:X.X.X-SNAPSHOT'
 }
 ```
 

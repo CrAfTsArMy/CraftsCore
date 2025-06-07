@@ -1,3 +1,8 @@
+def env = new Properties()
+file(".env").withInputStream {
+    env.load(it)
+}
+
 group 'de.craftsblock'
 version '3.8.6'
 
@@ -54,8 +59,8 @@ subprojects {
                         }
                     }
                     credentials {
-                        username = project.findProperty("craftsblockRepoUsername")
-                        password = project.findProperty("craftsblockRepoPassword")
+                        username = env["username"]
+                        password = env["password"]
                     }
                 }
             }

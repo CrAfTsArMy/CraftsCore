@@ -1,0 +1,19 @@
+plugins {
+    id 'java-platform'
+}
+
+gradle.projectsEvaluated {
+    def validSubprojects = rootProject.subprojects.findAll { sub ->
+        sub.name != project.name &&
+                (!sub.ext.has("shouldPublish") || sub.ext["shouldPublish"]) &&
+                sub.tasks.findByName("classes") != null
+    }
+
+    dependencies {
+        constraints {
+            validSubprojects.each {
+                api project(":${it.name}")
+            }
+        }
+    }
+}

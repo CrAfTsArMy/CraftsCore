@@ -63,11 +63,11 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
      */
     @Override
     public CompletableFuture<T> submit(Consumer<T> consumer) {
-        CompleteAbleFuture<T> restFuture = new CompleteAbleFuture<>(this);
+        CompleteAbleFuture<T> future = new CompleteAbleFuture<>(this);
         service.submit(() -> {
             try {
                 T result = action.handle();
-                restFuture.complete(result);
+                future.complete(result);
                 if (consumer != null) consumer.accept(result);
                 Thread.currentThread().interrupt();
             } catch (InterruptedException ignore) {
@@ -75,7 +75,7 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
                 e.printStackTrace();
             }
         });
-        return restFuture;
+        return future;
     }
 
     /**

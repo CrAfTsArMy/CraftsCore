@@ -22,6 +22,9 @@ subprojects {
                 implementation 'org.jetbrains:annotations:26.0.2'
             }
 
+        if (project.ext.has("shouldPublish") && !project.ext["shouldPublish"])
+            return
+
         publishing {
             publications {
                 normal(MavenPublication) {

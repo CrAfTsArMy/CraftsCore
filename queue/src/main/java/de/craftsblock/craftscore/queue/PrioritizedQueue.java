@@ -1,19 +1,21 @@
 package de.craftsblock.craftscore.queue;
 
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PrioritizedQueue extends Queue {
 
-    private final ConcurrentHashMap<Priority, ConcurrentLinkedQueue<Runnable>> tasks = new ConcurrentHashMap<>();
+    private final EnumMap<Priority, ConcurrentLinkedQueue<Runnable>> tasks = new EnumMap<>(Priority.class);
 
     @Override
     public Runnable poll() {
-        for (Priority priority : Priority.values()) {
-            ConcurrentLinkedQueue<Runnable> taskQueue = tasks.get(priority);
-            if (taskQueue != null && !taskQueue.isEmpty())
-                return taskQueue.poll();
+        for (ConcurrentLinkedQueue<Runnable> queue : tasks.values()) {
+            if (queue.isEmpty()) continue;
+            return queue.poll();
         }
+
         return null;
     }
 
@@ -23,39 +25,21 @@ public class PrioritizedQueue extends Queue {
     }
 
     public PrioritizedQueue submit(Priority priority, Runnable task) {
-        ConcurrentLinkedQueue<Runnable> runnables;
-        if (tasks.containsKey(priority))
-            runnables = tasks.get(priority);
-        else runnables = new ConcurrentLinkedQueue<>();
-        runnables.add(task);
-        tasks.put(priority, runnables);
+        tasks.computeIfAbsent(priority, p -> new ConcurrentLinkedQueue<>())
+                .add(task);
+
         return this;
     }
 
     @Override
     public boolean cancel(Runnable task) {
-        for (Priority priority : Priority.values()) {
-            ConcurrentLinkedQueue<Runnable> taskQueue = tasks.get(priority);
-            if (taskQueue != null && !taskQueue.isEmpty())
-                for(Runnable t : taskQueue) {
-                    if(!t.equals(task))
-                        continue;
-                    taskQueue.remove(task);
-                    return true;
-                }
-        }
+        tasks.values().forEach(runnables -> runnables.removeIf(task::equals));
         return false;
     }
 
     @Override
     public int size() {
-        int size = 0;
-        for (Priority priority : Priority.values()) {
-            ConcurrentLinkedQueue<Runnable> runnable = tasks.get(priority);
-            if (runnable != null)
-                size += runnable.size();
-        }
-        return size;
+        return tasks.values().stream().mapToInt(Collection::size).sum();
     }
 
     public enum Priority {

@@ -1,18 +1,34 @@
 plugins {
-    id 'java-platform'
+    id 'java-library'
 }
 
-javaPlatform {
-    allowDependencies()
+repositories {
+    mavenCentral()
 }
 
-dependencies {
-    constraints {
+gradle.projectsEvaluated {
 
-        rootProject.subprojects
-                .findAll { it.name != project.name }
-                .each { api project(":${it.name}") }
-
-
+    def validSubprojects = rootProject.subprojects.findAll { sub ->
+        sub.name != project.name &&
+                (!sub.ext.has("shouldPublish") || sub.ext["shouldPublish"]) &&
+                sub.tasks.findByName("classes") != null
     }
+
+    java {
+        def version = validSubprojects
+                .collect { it.java.sourceCompatibility as String }
+                .findAll { it != null }
+                .collect { JavaVersion.toVersion(it) }
+                .max() ?: JavaVersion.VERSION_1_8
+
+        sourceCompatibility = version
+        targetCompatibility = version
+    }
+
+    dependencies {
+        validSubprojects.each { sub ->
+            api project(":${sub.name}")
+        }
+    }
+
 }

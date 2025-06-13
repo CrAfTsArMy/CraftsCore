@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.2
+ * @version 2.1.3
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -49,7 +49,10 @@ public class ListenerRegistry {
                         .computeIfAbsent(eventHandler.priority(), e -> new ArrayList<>())
                         .add(new Listener(method, adapter, eventHandler.priority()));
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("Could not register handler %s#%s(%s)!".formatted(
+                        method.getDeclaringClass().getSimpleName(),
+                        method.getName(), String.join(", ", Arrays.stream(method.getParameterTypes()).map(Class::getSimpleName).toList())
+                ), e);
             }
     }
 

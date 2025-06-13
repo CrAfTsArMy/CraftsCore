@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.event;
 
 import de.craftsblock.craftscore.utils.Utils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.1
+ * @version 2.1.2
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -42,14 +43,7 @@ public class ListenerRegistry {
     public void register(ListenerAdapter adapter) {
         for (Method method : Utils.getMethodsByAnnotation(adapter.getClass(), EventHandler.class))
             try {
-                if (method.getParameterCount() <= 0)
-                    throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
-
-                Class<?> parameter = method.getParameters()[0].getType();
-                if (!Event.class.isAssignableFrom(parameter))
-                    throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
-
-                Class<? extends Event> event = parameter.asSubclass(Event.class);
+                Class<? extends Event> event = getEventTypeOrThrow(method);
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 data.computeIfAbsent(event, p -> new EnumMap<>(EventPriority.class))
                         .computeIfAbsent(eventHandler.priority(), e -> new ArrayList<>())
@@ -68,14 +62,7 @@ public class ListenerRegistry {
     public void unregister(ListenerAdapter adapter) {
         for (Method method : Utils.getMethodsByAnnotation(adapter.getClass(), EventHandler.class))
             try {
-                if (method.getParameterCount() <= 0)
-                    throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
-
-                Class<?> parameter = method.getParameters()[0].getType();
-                if (!Event.class.isAssignableFrom(parameter))
-                    throw new IllegalStateException("The methode " + method.getName() + " is provided with " + EventHandler.class.getName() + " but does not include " + Event.class.getName() + " as argument!");
-
-                Class<? extends Event> event = parameter.asSubclass(Event.class);
+                Class<? extends Event> event = getEventTypeOrThrow(method);
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 if (!data.containsKey(event)) continue;
 
@@ -95,6 +82,28 @@ public class ListenerRegistry {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+    }
+
+    /**
+     * Retrieves the event type for which the handler is listening.
+     *
+     * @param method The method which handles a given event type.
+     * @return The type of the event the handler listens for.
+     * @since 3.8.7
+     */
+    private static @NotNull Class<? extends Event> getEventTypeOrThrow(Method method) {
+        String exception = "The method %s is provided with %s but does not include %s as the first argument!".formatted(
+                method.getName(), EventHandler.class.getName(), Event.class.getName()
+        );
+
+        if (method.getParameterCount() <= 0)
+            throw new IllegalStateException(exception);
+
+        Class<?> parameter = method.getParameters()[0].getType();
+        if (!Event.class.isAssignableFrom(parameter))
+            throw new IllegalStateException(exception);
+
+        return parameter.asSubclass(Event.class);
     }
 
     /**

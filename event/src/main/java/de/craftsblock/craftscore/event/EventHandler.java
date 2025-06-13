@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0.0
+ * @version 1.0.1
  * @see EventPriority
  * @since 3.6.16-SNAPSHOT
  */
@@ -36,6 +36,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EventHandler {
 
+    /**
+     * Specifies the priority of the handler.
+     *
+     * @return The {@link EventPriority} of the handler.
+     * @since 3.8.7
+     */
     EventPriority priority() default EventPriority.NORMAL;
 
 }

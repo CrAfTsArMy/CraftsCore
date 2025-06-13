@@ -1,6 +1,6 @@
-plugins {
-    id 'java-platform'
-}
+description = "Bill of Materials"
+
+apply plugin: 'java-platform'
 
 gradle.projectsEvaluated {
     def validSubprojects = rootProject.subprojects.findAll { sub ->
@@ -11,8 +11,8 @@ gradle.projectsEvaluated {
 
     dependencies {
         constraints {
-            validSubprojects.each {
-                api project(":${it.name}")
+            validSubprojects.sort { "$it.name" }.each {
+                api it
             }
         }
     }

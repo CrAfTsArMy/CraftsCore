@@ -1,80 +1,9 @@
-def env = new Properties()
-file(".env").withInputStream {
-    env.load(it)
-}
-
 group 'de.craftsblock'
 version '3.8.6'
 
 subprojects {
-    apply plugin: 'maven-publish'
+    apply from: "$rootDir/gradle/publications.gradle"
 
     group = "${rootProject.group}.${rootProject.name.toLowerCase()}"
     version = rootProject.version
-
-    afterEvaluate {
-        def component = project.components.findByName('java')
-                ?: project.components.findByName('javaPlatform')
-
-        if (component != null && component.name.equalsIgnoreCase("java"))
-            dependencies {
-                // https://mvnrepository.com/artifact/org.jetbrains/annotations
-                implementation 'org.jetbrains:annotations:26.0.2'
-            }
-
-        if (project.ext.has("shouldPublish") && !project.ext["shouldPublish"])
-            return
-
-        publishing {
-            publications {
-                normal(MavenPublication) {
-                    artifactId project.name.toLowerCase()
-
-                    if (component == null) {
-                        logger.warn("${project.name} does not contain a component that is publishable!")
-                        return
-                    }
-
-                    from(component)
-
-                    pom {
-                        name = "CraftsCore ${project.name}"
-                        description = 'A simple Lib that simplifies some things'
-                        url = 'https://github.com/CrAfTsArMy/CraftsCore'
-
-                        scm {
-                            url = 'https://github.com/CrAfTsArMy/CraftsCore'
-                            connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
-                            developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
-                        }
-
-                        issueManagement {
-                            system = 'github'
-                            url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
-                        }
-
-                        licenses {
-                            license {
-                                name = 'Apache License 2.0'
-                                url = 'https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE'
-                            }
-                        }
-                    }
-                }
-            }
-            repositories {
-                maven {
-                    url('https://repo.craftsblock.de/releases')
-                    authentication {
-                        basic(BasicAuthentication) {
-                        }
-                    }
-                    credentials {
-                        username = env["username"]
-                        password = env["password"]
-                    }
-                }
-            }
-        }
-    }
 }

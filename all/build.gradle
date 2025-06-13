@@ -1,6 +1,4 @@
-plugins {
-    id 'java-library'
-}
+apply plugin: 'java-library'
 
 repositories {
     mavenCentral()
@@ -26,7 +24,7 @@ gradle.projectsEvaluated {
     }
 
     dependencies {
-        validSubprojects.each { sub ->
+        validSubprojects.sort { "${it.name}" }.each { sub ->
             api project(":${sub.name}")
         }
     }

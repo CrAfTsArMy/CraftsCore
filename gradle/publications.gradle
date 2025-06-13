@@ -1,0 +1,75 @@
+afterEvaluate {
+    if (project.ext.has("shouldPublish") && !project.ext["shouldPublish"])
+        return
+
+    apply plugin: 'maven-publish'
+
+    def env = new Properties()
+    file("$rootDir/.env").withInputStream {
+        env.load(it)
+    }
+
+    def suffix = description ?: project.name.capitalize()
+    description = "${rootProject.name} (${suffix})"
+
+    def component = project.components.findByName('java')
+            ?: project.components.findByName('javaPlatform')
+
+    if (component != null && component.name.equalsIgnoreCase("java"))
+        dependencies {
+            // https://mvnrepository.com/artifact/org.jetbrains/annotations
+            implementation 'org.jetbrains:annotations:26.0.2'
+        }
+
+    publishing {
+        publications {
+            normal(MavenPublication) {
+                artifactId project.name.toLowerCase()
+
+                if (component == null) {
+                    logger.warn("${project.name} does not contain a component that is publishable!")
+                    return
+                }
+
+                from(component)
+
+                pom {
+                    name = project.description
+                    description = project.description
+                    url = 'https://github.com/CrAfTsArMy/CraftsCore'
+
+                    scm {
+                        url = 'https://github.com/CrAfTsArMy/CraftsCore'
+                        connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
+                        developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
+                    }
+
+                    issueManagement {
+                        system = 'github'
+                        url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'Apache License 2.0'
+                            url = 'https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE'
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                url('https://repo.craftsblock.de/releases')
+                authentication {
+                    basic(BasicAuthentication) {
+                    }
+                }
+                credentials {
+                    username = env["username"]
+                    password = env["password"]
+                }
+            }
+        }
+    }
+}

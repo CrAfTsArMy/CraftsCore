@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.4
+ * @version 2.1.5
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -83,7 +83,10 @@ public class ListenerRegistry {
                 // Remove the event type if no listeners are left
                 if (listeners.isEmpty()) data.remove(event);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("Could not unregister handler %s#%s(%s)!".formatted(
+                        method.getDeclaringClass().getSimpleName(),
+                        method.getName(), String.join(", ", Arrays.stream(method.getParameterTypes()).map(Class::getSimpleName).toList())
+                ), e);
             }
     }
 

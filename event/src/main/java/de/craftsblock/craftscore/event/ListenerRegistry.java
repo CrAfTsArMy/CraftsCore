@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.3
+ * @version 2.1.4
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
@@ -47,7 +47,7 @@ public class ListenerRegistry {
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 data.computeIfAbsent(event, p -> new EnumMap<>(EventPriority.class))
                         .computeIfAbsent(eventHandler.priority(), e -> new ArrayList<>())
-                        .add(new Listener(method, adapter, eventHandler.priority()));
+                        .add(new Listener(method, adapter, eventHandler.priority(), eventHandler.ignoreCancelled()));
             } catch (Exception e) {
                 throw new RuntimeException("Could not register handler %s#%s(%s)!".formatted(
                         method.getDeclaringClass().getSimpleName(),
@@ -176,6 +176,9 @@ public class ListenerRegistry {
             if (listeners.isEmpty()) continue;
 
             for (Listener tile : listeners) {
+                if (event instanceof Cancellable cancellable && cancellable.isCancelled() && !tile.ignoreCancelled())
+                    continue;
+
                 Method method = tile.method();
                 try {
                     method.setAccessible(true);
@@ -249,12 +252,13 @@ public class ListenerRegistry {
     /**
      * Internal record representing a registered listener.
      *
-     * @param method   The method to be invoked for the event.
-     * @param self     The instance of the listener object.
-     * @param priority The priority of the event handler.
+     * @param method          The method to be invoked for the event.
+     * @param self            The instance of the listener object.
+     * @param priority        The priority of the event handler.
+     * @param ignoreCancelled Whether the listener is still performed even when the event is already cancelled.
      */
     @ApiStatus.Internal
-    private record Listener(Method method, Object self, EventPriority priority) {
+    private record Listener(Method method, Object self, EventPriority priority, boolean ignoreCancelled) {
     }
 
 }

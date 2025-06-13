@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0.1
+ * @version 1.1.0
  * @see EventPriority
  * @since 3.6.16-SNAPSHOT
  */
@@ -43,5 +43,15 @@ public @interface EventHandler {
      * @since 3.8.7
      */
     EventPriority priority() default EventPriority.NORMAL;
+
+    /**
+     * Specifies whether this handler should be ignored when the
+     * event is already cancelled.
+     *
+     * @return {@code true} if this handler is ignored when the
+     * event is cancelled, {@code false} otherwise.
+     * @since 3.8.7
+     */
+    boolean ignoreCancelled() default false;
 
 }

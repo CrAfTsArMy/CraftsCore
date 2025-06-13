@@ -1,6 +1,7 @@
 package de.craftsblock.craftscore.actions;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Defines a set of methods for performing an action asynchronously and handling its completion.
@@ -8,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <T> the type of the action's result
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0
+ * @version 1.1.0
  * @see CompleteAbleActionImpl
  * @since 3.6#15-SNAPSHOT
  */
@@ -28,7 +29,7 @@ public interface CompleteAbleAction<T> {
      * @param consumer the {@link Consumer<T>} to handle the result of the action
      * @return a {@link CompletableFuture<T>} representing the result of the action
      */
-    CompletableFuture<T> submit(Consumer<T> consumer);
+    CompletableFuture<T> submit(final Consumer<T> consumer);
 
     /**
      * Completes the action synchronously and returns its result.

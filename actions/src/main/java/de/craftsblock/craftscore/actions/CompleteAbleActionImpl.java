@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * This class is an implementation of the {@link CompleteAbleAction} interface.
@@ -12,9 +13,8 @@ import java.util.concurrent.TimeUnit;
  * @param <T> the type of the action's result
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.1
+ * @version 1.2.0
  * @see CompleteAbleAction
- * @see CompleteAbleFuture
  * @since 3.6#15-SNAPSHOT
  */
 public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
@@ -62,8 +62,8 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
      * @return a {@link CompletableFuture<T>} representing the result of the action
      */
     @Override
-    public CompletableFuture<T> submit(Consumer<T> consumer) {
-        CompleteAbleFuture<T> future = new CompleteAbleFuture<>(this);
+    public CompletableFuture<T> submit(final Consumer<T> consumer) {
+        CompletableFuture<T> future = new CompletableFuture<>();
         service.submit(() -> {
             try {
                 T result = action.handle();
@@ -72,7 +72,7 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
                 Thread.currentThread().interrupt();
             } catch (InterruptedException ignore) {
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("Could not complete action!", e);
             }
         });
         return future;
@@ -105,7 +105,7 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
      * @param consumer the {@link Consumer<T>} to handle the result of the action
      */
     @Override
-    public void queue(Consumer<T> consumer) {
+    public void queue(final Consumer<T> consumer) {
         submit(consumer);
     }
 }

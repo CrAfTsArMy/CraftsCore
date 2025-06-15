@@ -20,7 +20,7 @@ import java.util.Arrays;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.2
+ * @version 2.0.3
  * @see Json
  * @see JsonValidator
  * @since 3.6#16-SNAPSHOT
@@ -52,7 +52,7 @@ public final class JsonParser {
     public static Json parse(Path path) {
         try {
             Path parent = path.getParent();
-            if (Files.notExists(parent)) Files.createDirectories(parent);
+            if (parent != null && Files.notExists(parent)) Files.createDirectories(parent);
             if (Files.notExists(path)) Files.createFile(path);
 
             return parse(Files.newInputStream(path, StandardOpenOption.READ));

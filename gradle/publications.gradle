@@ -1,4 +1,13 @@
 afterEvaluate {
+    def component = project.components.findByName('java')
+            ?: project.components.findByName('javaPlatform')
+
+    if (component != null && component.name.equalsIgnoreCase("java"))
+        dependencies {
+            // https://mvnrepository.com/artifact/org.jetbrains/annotations
+            implementation 'org.jetbrains:annotations:26.0.2'
+        }
+
     if (project.ext.has("shouldPublish") && !project.ext["shouldPublish"])
         return
 
@@ -8,18 +17,6 @@ afterEvaluate {
     file("$rootDir/.env").withInputStream {
         env.load(it)
     }
-
-    def suffix = description ?: project.name.capitalize()
-    description = "${rootProject.name} (${suffix})"
-
-    def component = project.components.findByName('java')
-            ?: project.components.findByName('javaPlatform')
-
-    if (component != null && component.name.equalsIgnoreCase("java"))
-        dependencies {
-            // https://mvnrepository.com/artifact/org.jetbrains/annotations
-            implementation 'org.jetbrains:annotations:26.0.2'
-        }
 
     publishing {
         publications {

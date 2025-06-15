@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.4
+ * @version 2.0.5
  * @see Json
  * @see JsonValidator
  * @since 3.6#16-SNAPSHOT
@@ -59,7 +59,7 @@ public final class JsonParser {
 
             return parse(Files.newInputStream(path, StandardOpenOption.READ));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not parse path %s to json!".formatted(path.toString()), e);
         }
     }
 
@@ -84,7 +84,7 @@ public final class JsonParser {
             Arrays.fill(buffer, (byte) 0);
             return parse(data.toByteArray(), 0, data.size());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not parse the input stream to json!", e);
         }
     }
 
@@ -125,7 +125,7 @@ public final class JsonParser {
             if (json != null && JsonValidator.isValid(json))
                 return new Json(com.google.gson.JsonParser.parseString(json));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not parse %s to json!".formatted(Utils.abbreviate(json, 50)), e);
         }
 
         return Json.empty();

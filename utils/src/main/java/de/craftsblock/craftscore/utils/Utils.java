@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.3
+ * @version 2.0.4
  * @since 3.0-SNAPSHOT
  */
 public final class Utils {
@@ -56,6 +56,27 @@ public final class Utils {
                 exception.addSuppressed(e);
             }
         }
+    }
+
+    /**
+     * Truncates the given string to a specified maximum length and appends an ellipsis ("...")
+     * if the string exceeds that length.
+     * <p>
+     * If the input string is {@code null} or its length is less than or equal to {@code maxLength},
+     * it is returned unchanged. If truncation is needed, the resulting string will have a maximum
+     * length equal to {@code maxLength}, including the ellipsis.
+     * </p>
+     *
+     * @param input     The string to be abbreviated; may be {@code null}.
+     * @param maxLength The maximum allowed length for the result string, including the ellipsis;
+     *                  must be at least 3 to allow space for the "...".
+     * @return The possibly abbreviated string, or {@code null} if the input was {@code null}.
+     * @throws IllegalArgumentException If {@code maxLength} is less than 3.
+     * @since 3.8.7
+     */
+    public static String abbreviate(String input, int maxLength) {
+        if (input == null || input.length() <= maxLength) return input;
+        return input.substring(0, Math.max(0, maxLength - 3)) + "...";
     }
 
     /**
@@ -196,7 +217,5 @@ public final class Utils {
             return null;
         }
     }
-
-
 
 }

@@ -18,15 +18,23 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.9
+ * @version 2.0.10
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
 public final class Json {
 
-    private static final Gson GSON = new Gson();
-    private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = newGsonBuilder().create();
+    private static final Gson PRETTY_GSON = newGsonBuilder().setPrettyPrinting().create();
 
+    /**
+     * Creates a new {@link GsonBuilder} with some preset values.
+     *
+     * @return The new {@link GsonBuilder}.
+     */
+    private static GsonBuilder newGsonBuilder() {
+        return new GsonBuilder().serializeNulls().disableHtmlEscaping();
+    }
 
     private JsonElement object;
 

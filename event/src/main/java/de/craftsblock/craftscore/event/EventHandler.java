@@ -52,6 +52,6 @@ public @interface EventHandler {
      * event is cancelled, {@code false} otherwise.
      * @since 3.8.7
      */
-    boolean ignoreCancelled() default false;
+    boolean ignoreWhenCancelled() default false;
 
 }

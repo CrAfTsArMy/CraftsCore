@@ -47,7 +47,7 @@ public class ListenerRegistry {
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 data.computeIfAbsent(event, p -> new EnumMap<>(EventPriority.class))
                         .computeIfAbsent(eventHandler.priority(), e -> new ArrayList<>())
-                        .add(new Listener(method, adapter, eventHandler.priority(), eventHandler.ignoreCancelled()));
+                        .add(new Listener(method, adapter, eventHandler.priority(), eventHandler.ignoreWhenCancelled()));
             } catch (Exception e) {
                 throw new RuntimeException("Could not register handler %s#%s(%s)!".formatted(
                         method.getDeclaringClass().getSimpleName(),
@@ -179,7 +179,7 @@ public class ListenerRegistry {
             if (listeners.isEmpty()) continue;
 
             for (Listener tile : listeners) {
-                if (event instanceof Cancellable cancellable && cancellable.isCancelled() && !tile.ignoreCancelled())
+                if (event instanceof Cancellable cancellable && cancellable.isCancelled() && tile.ignoreWhenCancelled())
                     continue;
 
                 Method method = tile.method();
@@ -258,10 +258,10 @@ public class ListenerRegistry {
      * @param method          The method to be invoked for the event.
      * @param self            The instance of the listener object.
      * @param priority        The priority of the event handler.
-     * @param ignoreCancelled Whether the listener is still performed even when the event is already cancelled.
+     * @param ignoreWhenCancelled Whether the handler is skipped, when the event is cancelled.
      */
     @ApiStatus.Internal
-    private record Listener(Method method, Object self, EventPriority priority, boolean ignoreCancelled) {
+    private record Listener(Method method, Object self, EventPriority priority, boolean ignoreWhenCancelled) {
     }
 
 }

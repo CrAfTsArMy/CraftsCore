@@ -1,6 +1,9 @@
 package de.craftsblock.craftscore.json;
 
 import com.google.gson.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +21,7 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.0
+ * @version 2.1.1
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -32,7 +35,7 @@ public final class Json {
      *
      * @return The new {@link GsonBuilder}.
      */
-    private static GsonBuilder newGsonBuilder() {
+    public static @NotNull GsonBuilder newGsonBuilder() {
         return new GsonBuilder().serializeNulls().disableHtmlEscaping();
     }
 
@@ -43,7 +46,7 @@ public final class Json {
      *
      * @param object The underlying JsonElement to work with.
      */
-    public Json(JsonElement object) {
+    public Json(@NotNull JsonElement object) {
         this.object = object;
     }
 
@@ -53,7 +56,7 @@ public final class Json {
      * @param path The path to the value in the json data.
      * @return true if the value exists at the path, false otherwise.
      */
-    public boolean contains(String path) {
+    public boolean contains(@NotNull String path) {
         String[] args = path.split("(?<!\\\\)\\.");
         JsonElement destination = getParentOfPath(path, false);
 
@@ -80,7 +83,7 @@ public final class Json {
      * @param path The path to the value to remove from the json data.
      * @return The Json object itself after removing the value.
      */
-    public Json remove(String path) {
+    public @NotNull Json remove(@NotNull String path) {
         String[] args = path.split("(?<!\\\\)\\.");
         JsonElement target = getParentOfPath(path, false);
 
@@ -106,7 +109,7 @@ public final class Json {
      * @param <T>      The type of the deserialized object.
      * @return The deserialized object of the specified class, or null if the path does not exist.
      */
-    public <T> T deserialize(String path, Class<T> classOfT) {
+    public <T> @Nullable T deserialize(@NotNull String path, @NotNull Class<T> classOfT) {
         if (contains(path)) return GSON.fromJson(get(path), classOfT);
         return null;
     }
@@ -118,7 +121,7 @@ public final class Json {
      * @param data The data to be serialized and set at the path.
      * @return The Json object itself after setting the data at the path.
      */
-    public <T> Json serialize(String path, T data) {
+    public <T> @NotNull Json serialize(@NotNull String path, @NotNull T data) {
         Json json = JsonParser.parse(GSON.toJson(data));
         set(path, json.getObject());
         return this;
@@ -135,7 +138,7 @@ public final class Json {
      * {@code null} if it doesn't exist and {@code initIfMissing} is {@code false}
      * @since 3.8.9
      */
-    private JsonElement getParentOfPath(String path, boolean initIfMissing) {
+    private @Nullable JsonElement getParentOfPath(@NotNull String path, boolean initIfMissing) {
         String[] segments = path.split("(?<!\\\\)\\.");
         JsonElement current = getObject();
         StringBuilder processedPath = new StringBuilder();
@@ -176,19 +179,18 @@ public final class Json {
         return current;
     }
 
-
     /**
      * Retrieves the JsonElement at the specified path in the json data.
      *
      * @param path The path to the JsonElement in the json data.
      * @return The JsonElement at the given path, or null if the path does not exist.
      */
-    public JsonElement get(String path) {
+    public @NotNull JsonElement get(@NotNull String path) {
         String[] args = path.split("(?<!\\\\)\\.");
-        if (args.length == 0) return getObject();
+        if (path.isBlank()) return getObject();
 
         JsonElement destination = getParentOfPath(path, false);
-        if (destination == null || destination.isJsonNull()) return destination;
+        if (destination == null || destination.isJsonNull()) return JsonNull.INSTANCE;
 
         String arg = args[args.length - 1].replace("\\.", ".");
         if (destination.isJsonObject()) return destination.getAsJsonObject().get(arg);
@@ -205,9 +207,9 @@ public final class Json {
      * @param fallback The fallback data to return if no data is associated with the path
      * @return The JsonElement at the given path, or null if the path does not exist.
      */
-    public JsonElement getOrDefault(String path, JsonElement fallback) {
+    public @NotNull JsonElement getOrDefault(@NotNull String path, @NotNull JsonElement fallback) {
         JsonElement element = get(path);
-        return element != null ? element : fallback;
+        return !element.isJsonNull() ? element : fallback;
     }
 
     /**
@@ -216,7 +218,7 @@ public final class Json {
      * @param path The path to the data in the json data.
      * @return The {@link Json} at the given path, or null if the path does not exist.
      */
-    public Json getJson(String path) {
+    public @Nullable Json getJson(@NotNull String path) {
         return getJson(path, null);
     }
 
@@ -228,9 +230,9 @@ public final class Json {
      * @param fallback The fallback data to return if no data is associated with the path
      * @return The {@link Json} at the given path, or the fallback value if the path does not exist.
      */
-    public Json getJson(String path, Json fallback) {
+    public @Nullable Json getJson(@NotNull String path, @Nullable Json fallback) {
         JsonElement element = get(path);
-        return element != null ? JsonParser.parse(element) : fallback;
+        return !element.isJsonNull() ? JsonParser.parse(element) : fallback;
     }
 
     /**
@@ -239,9 +241,9 @@ public final class Json {
      * @param path The path to the String value in the json data.
      * @return The String value at the given path, or an empty string if the path does not exist or the value is not a string.
      */
-    public String getString(String path) {
+    public @NotNull String getString(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsString();
+        if (!element.isJsonNull() && element.isJsonPrimitive()) return element.getAsString();
         return "";
     }
 
@@ -251,9 +253,9 @@ public final class Json {
      * @param path The path to the byte value in the json data.
      * @return The byte value at the given path, or -1 if the path does not exist or the value is not a byte.
      */
-    public byte getByte(String path) {
+    public byte getByte(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsByte();
+        if (!element.isJsonNull() && element.isJsonPrimitive()) return element.getAsByte();
         return -1;
     }
 
@@ -263,9 +265,9 @@ public final class Json {
      * @param path The path to the integer value in the json data.
      * @return The integer value at the given path, or -1 if the path does not exist or the value is not an integer.
      */
-    public int getInt(String path) {
+    public int getInt(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsInt();
+        if (element.isJsonPrimitive()) return element.getAsInt();
         return -1;
     }
 
@@ -275,9 +277,9 @@ public final class Json {
      * @param path The path to the long value in the json data.
      * @return The long value at the given path, or -1 if the path does not exist or the value is not a long.
      */
-    public long getLong(String path) {
+    public long getLong(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsLong();
+        if (element.isJsonPrimitive()) return element.getAsLong();
         return -1;
     }
 
@@ -287,9 +289,9 @@ public final class Json {
      * @param path The path to the boolean value in the json data.
      * @return The boolean value at the given path, or false if the path does not exist or the value is not a boolean.
      */
-    public boolean getBoolean(String path) {
+    public boolean getBoolean(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsBoolean();
+        if (element.isJsonPrimitive()) return element.getAsBoolean();
         return false;
     }
 
@@ -299,9 +301,9 @@ public final class Json {
      * @param path The path to the double value in the json data.
      * @return The double value at the given path, or -1 if the path does not exist or the value is not a double.
      */
-    public double getDouble(String path) {
+    public double getDouble(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsDouble();
+        if (element.isJsonPrimitive()) return element.getAsDouble();
         return -1;
     }
 
@@ -311,9 +313,9 @@ public final class Json {
      * @param path The path to the float value in the json data.
      * @return The float value at the given path, or -1 if the path does not exist or the value is not a float.
      */
-    public float getFloat(String path) {
+    public float getFloat(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonPrimitive()) return element.getAsFloat();
+        if (element.isJsonPrimitive()) return element.getAsFloat();
         return -1;
     }
 
@@ -323,9 +325,9 @@ public final class Json {
      * @param path The path to the list in the json data.
      * @return A Collection of {@link JsonElement} at the given path, or an empty list if the path does not exist.
      */
-    public Collection<JsonElement> getList(String path) {
+    public Collection<JsonElement> getList(@NotNull String path) {
         JsonElement element = get(path);
-        if (element != null && element.isJsonArray())
+        if (element.isJsonArray())
             return element.getAsJsonArray().asList();
         return List.of();
     }
@@ -337,7 +339,7 @@ public final class Json {
      * @param path The path to the list of json primitives.
      * @return A {@link Stream stream} of {@link JsonPrimitive json primitives}.
      */
-    private Stream<JsonPrimitive> getJsonPrimitiveStream(String path) {
+    private @NotNull Stream<JsonPrimitive> getJsonPrimitiveStream(@NotNull String path) {
         return getList(path).stream()
                 .filter(JsonElement::isJsonPrimitive)
                 .map(JsonElement::getAsJsonPrimitive);
@@ -349,7 +351,7 @@ public final class Json {
      * @param path The path to the list of strings in the json data.
      * @return A Collection of {@link Json} at the given path, or an empty list if the path does not exist.
      */
-    public Collection<Json> getJsonList(String path) {
+    public @NotNull @Unmodifiable Collection<Json> getJsonList(@NotNull String path) {
         return getList(path).stream().map(JsonParser::parse).toList();
     }
 
@@ -359,7 +361,7 @@ public final class Json {
      * @param path The path to the list of strings in the json data.
      * @return A Collection of strings at the given path, or an empty list if the path does not exist or the value is not a json array of strings.
      */
-    public Collection<String> getStringList(String path) {
+    public @NotNull @Unmodifiable Collection<String> getStringList(@NotNull String path) {
         return getJsonPrimitiveStream(path).map(JsonElement::getAsString).toList();
     }
 
@@ -372,7 +374,7 @@ public final class Json {
      * @return A Collection of numbers at the given path, or an empty list if the path does not exist or the value is not a json array of numbers.
      */
     @SuppressWarnings("unchecked")
-    public <T extends Number> Collection<T> getNumberList(String path, Class<T> type) {
+    public <T extends Number> @NotNull @Unmodifiable Collection<T> getNumberList(@NotNull String path, @NotNull Class<T> type) {
         return getJsonPrimitiveStream(path)
                 .map(JsonElement::getAsNumber)
                 .map(number -> {
@@ -390,7 +392,7 @@ public final class Json {
      * @param path The path to the list of bytes in the json data.
      * @return A Collection of bytes at the given path, or an empty list if the path does not exist or the value is not a json array of bytes.
      */
-    public Collection<Byte> getByteList(String path) {
+    public @NotNull @Unmodifiable Collection<Byte> getByteList(@NotNull String path) {
         return getIntList(path).stream().map(Integer::byteValue).toList();
     }
 
@@ -400,7 +402,7 @@ public final class Json {
      * @param path The path to the list of integers in the json data.
      * @return A Collection of integers at the given path, or an empty list if the path does not exist or the value is not a json array of integers.
      */
-    public Collection<Integer> getIntList(String path) {
+    public @NotNull @Unmodifiable Collection<Integer> getIntList(@NotNull String path) {
         return getNumberList(path, int.class);
     }
 
@@ -410,7 +412,7 @@ public final class Json {
      * @param path The path to the list of longs in the json data.
      * @return A Collection of longs at the given path, or an empty list if the path does not exist or the value is not a json array of longs.
      */
-    public Collection<Long> getLongList(String path) {
+    public @NotNull @Unmodifiable Collection<Long> getLongList(@NotNull String path) {
         return getNumberList(path, long.class);
     }
 
@@ -420,7 +422,7 @@ public final class Json {
      * @param path The path to the list of doubles in the json data.
      * @return A Collection of doubles at the given path, or an empty list if the path does not exist or the value is not a json array of doubles.
      */
-    public Collection<Double> getDoubleList(String path) {
+    public @NotNull @Unmodifiable Collection<Double> getDoubleList(@NotNull String path) {
         return getNumberList(path, double.class);
     }
 
@@ -430,7 +432,7 @@ public final class Json {
      * @param path The path to the list of floats in the json data.
      * @return A Collection of floats at the given path, or an empty list if the path does not exist or the value is not a json array of floats.
      */
-    public Collection<Float> getFloatList(String path) {
+    public @NotNull @Unmodifiable Collection<Float> getFloatList(@NotNull String path) {
         return getNumberList(path, float.class);
     }
 
@@ -440,7 +442,7 @@ public final class Json {
      * @param path The path to the list of booleans in the json data.
      * @return A Collection of booleans at the given path, or an empty list if the path does not exist or the value is not a json array of booleans.
      */
-    public Collection<Boolean> getBooleanList(String path) {
+    public @NotNull @Unmodifiable Collection<Boolean> getBooleanList(@NotNull String path) {
         return getJsonPrimitiveStream(path).map(JsonElement::getAsBoolean).toList();
     }
 
@@ -454,9 +456,10 @@ public final class Json {
      * @param data The data to be set at the given path.
      * @return The Json object with the updated value at the specified path.
      */
-    public Json set(String path, Object data) {
+    public @NotNull Json set(@NotNull String path, @Nullable Object data) {
         synchronized (this) {
-            if (data instanceof JsonElement) setJson(path, (JsonElement) data);
+            if (data == null) set(path, JsonNull.INSTANCE);
+            else if (data instanceof JsonElement) setJson(path, (JsonElement) data);
             else if (data instanceof Json) setJson(path, ((Json) data).getObject());
             else if (data instanceof String) setString(path, (String) data);
             else if (data instanceof Number) setNumber(path, (Number) data);
@@ -475,7 +478,7 @@ public final class Json {
      * @param target The desired output path (where the object is moved to)
      * @since 3.8.4-SNAPSHOT
      */
-    public Json moveTo(String source, String target) {
+    public @NotNull Json moveTo(@NotNull String source, @NotNull String target) {
         copyTo(source, target);
         return remove(source);
     }
@@ -487,7 +490,7 @@ public final class Json {
      * @param target The desired output path (where the object is copied to)
      * @since 3.8.4-SNAPSHOT
      */
-    public Json copyTo(String source, String target) {
+    public @NotNull Json copyTo(@NotNull String source, @NotNull String target) {
         if (!contains(source)) return this;
         return set(target, get(source));
     }
@@ -498,7 +501,7 @@ public final class Json {
      * @param path The path where the string value should be set in the json data.
      * @param data The string data to be set at the given path.
      */
-    private void setJson(String path, JsonElement data) {
+    private void setJson(@NotNull String path, @NotNull JsonElement data) {
         String[] args = path.split("(?<!\\\\)\\.");
         JsonElement destination = getParentOfPath(path, true);
         if (destination == null) return;
@@ -530,7 +533,7 @@ public final class Json {
      * @param allowNew {@code true} if new creation of new indexes is supported, {@code false} otherwise.
      * @return The converted index.
      */
-    private int argumentToIndex(String arg, JsonArray array, boolean allowNew) {
+    private int argumentToIndex(@NotNull String arg, @NotNull JsonArray array, boolean allowNew) {
         try {
             if (arg.equalsIgnoreCase("$last")) return array.size() - 1;
 
@@ -551,7 +554,7 @@ public final class Json {
      * @param isArray {@code true} if the path should be initialized as a {@link JsonArray}, {@code false} for {@link JsonObject}
      * @return the newly created {@link JsonElement} (either {@link JsonArray} or {@link JsonObject}) at the specified path
      */
-    private JsonElement initPath(String path, boolean isArray) {
+    private @NotNull JsonElement initPath(@NotNull String path, boolean isArray) {
         JsonElement element = isArray ? new JsonArray() : new JsonObject();
         if (getObject().isJsonNull()) this.object = element;
         else setJson(path, element);
@@ -566,7 +569,7 @@ public final class Json {
      * @param isArray  {@code true} if the property should be initialized as a {@link JsonArray}, {@code false} for {@link JsonObject}
      * @return the existing or newly created {@link JsonElement} (either {@link JsonArray} or {@link JsonObject})
      */
-    private JsonElement getOrCreate(JsonObject obj, String property, boolean isArray) {
+    private @NotNull JsonElement getOrCreate(@NotNull JsonObject obj, @NotNull String property, boolean isArray) {
         if (!obj.has(property)) {
             JsonElement newObject = isArray ? new JsonArray() : new JsonObject();
             obj.add(property, newObject);
@@ -584,7 +587,7 @@ public final class Json {
      * @param isArray {@code true} if the element should be initialized as a {@link JsonArray}, {@code false} for {@link JsonObject}
      * @return the existing or newly created {@link JsonElement} (either {@link JsonArray} or {@link JsonObject}) at the specified index
      */
-    private JsonElement getOrCreate(JsonArray array, int index, boolean isArray) {
+    private @NotNull JsonElement getOrCreate(@NotNull JsonArray array, int index, boolean isArray) {
         JsonElement element = index >= array.size() ? JsonNull.INSTANCE : array.get(index);
 
         if (element.isJsonNull()) {
@@ -603,7 +606,7 @@ public final class Json {
      * @param path The path where the string value should be set in the json data.
      * @param data The string data to be set at the given path.
      */
-    private void setString(String path, String data) {
+    private void setString(@NotNull String path, @NotNull String data) {
         setJson(path, new JsonPrimitive(data));
     }
 
@@ -613,7 +616,7 @@ public final class Json {
      * @param path The path where the string value should be set in the json data.
      * @param data The string data to be set at the given path.
      */
-    private void setNumber(String path, Number data) {
+    private void setNumber(@NotNull String path, @NotNull Number data) {
         setJson(path, new JsonPrimitive(data));
     }
 
@@ -623,7 +626,7 @@ public final class Json {
      * @param path The path where the boolean value should be set in the json data.
      * @param data The boolean data to be set at the given path.
      */
-    private void setBoolean(String path, boolean data) {
+    private void setBoolean(@NotNull String path, boolean data) {
         setJson(path, new JsonPrimitive(data));
     }
 
@@ -638,9 +641,12 @@ public final class Json {
      * @param collection The collection of values to be set at the given path.
      */
     @SuppressWarnings("unchecked")
-    private void setList(String path, Collection<?> collection) {
-        assert collection != null;
-        if (collection.isEmpty()) setEmptyList(path);
+    private void setList(@NotNull String path, @Nullable Collection<?> collection) {
+        if (collection == null || collection.isEmpty()) {
+            setEmptyList(path);
+            return;
+        }
+
         for (Object o : collection) {
             if (o instanceof JsonElement) setJsonList(path, (Collection<JsonElement>) collection);
             else if (o instanceof Json) setJsonList(path, ((Collection<Json>) collection).stream().map(Json::getObject).toList());
@@ -658,7 +664,7 @@ public final class Json {
      *
      * @param path The path where the empty json array should be set.
      */
-    private void setEmptyList(String path) {
+    private void setEmptyList(@NotNull String path) {
         setJson(path, new JsonArray());
     }
 
@@ -668,7 +674,7 @@ public final class Json {
      * @param path       The path where the string collection should be set in the json data.
      * @param collection The collection of {@link JsonElement} to be set at the given path.
      */
-    private void setJsonList(String path, Collection<JsonElement> collection) {
+    private void setJsonList(@NotNull String path, @NotNull Collection<JsonElement> collection) {
         JsonArray array = new JsonArray();
         for (JsonElement item : collection) array.add(item);
         setJson(path, array);
@@ -680,7 +686,7 @@ public final class Json {
      * @param path       The path where the string collection should be set in the json data.
      * @param collection The collection of string values to be set at the given path.
      */
-    private void setStringList(String path, Collection<String> collection) {
+    private void setStringList(@NotNull String path, @NotNull Collection<String> collection) {
         JsonArray array = new JsonArray();
         for (String item : collection) array.add(item);
         setJson(path, array);
@@ -693,7 +699,7 @@ public final class Json {
      * @param path       The path where the number collection should be set in the json data.
      * @param collection The collection of number values to be set at the given path.
      */
-    private void setNumberList(String path, Collection<Number> collection) {
+    private void setNumberList(@NotNull String path, @NotNull Collection<Number> collection) {
         JsonArray array = new JsonArray();
         for (Number item : collection) array.add(item);
         setJson(path, array);
@@ -705,7 +711,7 @@ public final class Json {
      * @param path       The path where the boolean collection should be set in the json data.
      * @param collection The collection of boolean values to be set at the given path.
      */
-    private void setBoolList(String path, Collection<Boolean> collection) {
+    private void setBoolList(@NotNull String path, @NotNull Collection<Boolean> collection) {
         JsonArray array = new JsonArray();
         for (boolean item : collection) array.add(item);
         setJson(path, array);
@@ -716,7 +722,7 @@ public final class Json {
      *
      * @return The set containing all the keys.
      */
-    public Set<String> keySet() {
+    public @NotNull Set<String> keySet() {
         return keySet("");
     }
 
@@ -726,9 +732,9 @@ public final class Json {
      * @param path The path for which the keys should be loaded.
      * @return The set containing all the keys.
      */
-    public Set<String> keySet(String path) {
+    public @NotNull Set<String> keySet(@NotNull String path) {
         JsonElement element = get(path);
-        if (element == null) throw new NullPointerException("No such json element under " + path);
+        if (element.isJsonNull()) throw new NullPointerException("No such json element under " + path);
         if (!element.isJsonObject()) throw new IllegalStateException("Can not retrieve the keys of " + element.getClass().getSimpleName());
         return element.getAsJsonObject().keySet();
     }
@@ -738,7 +744,7 @@ public final class Json {
      *
      * @return The set containing all the values.
      */
-    public Set<JsonElement> values() {
+    public @NotNull Set<JsonElement> values() {
         return values("");
     }
 
@@ -748,9 +754,9 @@ public final class Json {
      * @param path The path for which the values should be loaded.
      * @return The set containing all the values.
      */
-    public Set<JsonElement> values(String path) {
+    public @NotNull Set<JsonElement> values(@NotNull String path) {
         JsonElement element = get(path);
-        if (element == null) throw new NullPointerException("No such json element under " + path);
+        if (element.isJsonNull()) throw new NullPointerException("No such json element under " + path);
 
         if (element.isJsonObject())
             return element.getAsJsonObject().entrySet().parallelStream().map(Map.Entry::getValue).collect(Collectors.toSet());
@@ -779,9 +785,9 @@ public final class Json {
      * @throws NullPointerException  if there is no json element at the specified path
      * @throws IllegalStateException if the target element is neither a json object nor a json array
      */
-    public int size(String path) {
+    public int size(@NotNull String path) {
         JsonElement element = get(path);
-        if (element == null) throw new NullPointerException("No such json element under " + path);
+        if (element.isJsonNull()) throw new NullPointerException("No such json element under " + path);
 
         if (element.isJsonObject()) return element.getAsJsonObject().size();
         if (element.isJsonArray()) return element.getAsJsonArray().size();
@@ -795,8 +801,8 @@ public final class Json {
      *
      * @param path The path where the json data should be saved.
      */
-    public void save(Path path) {
-        save(path, false);
+    public void save(@NotNull Path path) {
+        this.save(path, false);
     }
 
     /**
@@ -805,13 +811,24 @@ public final class Json {
      * @param path   The path where the json data should be saved.
      * @param pretty Sets whether the output should be pretty formated or not.
      */
-    public void save(Path path, boolean pretty) {
+    public void save(@NotNull Path path, boolean pretty) {
+        this.save(path, pretty ? PRETTY_GSON : GSON);
+    }
+
+    /**
+     * Saves the json data to the specified path.
+     *
+     * @param path The path where the json data should be saved.
+     * @param gson The {@link Gson} instance which is used to stringify the json.
+     * @since 3.8.10
+     */
+    public void save(@NotNull Path path, @NotNull Gson gson) {
         try {
             synchronized (this) {
-                Files.writeString(path, toString(pretty), StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+                Files.writeString(path, toString(gson), StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not save the json to the file system!", e);
         }
     }
 
@@ -820,7 +837,7 @@ public final class Json {
      *
      * @param file The file where the json data should be saved.
      */
-    public void save(File file) {
+    public void save(@NotNull File file) {
         save(file, false);
     }
 
@@ -830,8 +847,19 @@ public final class Json {
      * @param file   The file where the json data should be saved.
      * @param pretty Sets whether the output should be pretty formated or not.
      */
-    public void save(File file, boolean pretty) {
-        this.save(file.toPath(), pretty);
+    public void save(@NotNull File file, boolean pretty) {
+        this.save(file, pretty ? PRETTY_GSON : GSON);
+    }
+
+    /**
+     * Saves the json data to the specified file.
+     *
+     * @param file The file where the json data should be saved.
+     * @param gson The {@link Gson} instance which is used to stringify the json.
+     * @since 3.8.10
+     */
+    public void save(@NotNull File file, @NotNull Gson gson) {
+        this.save(file.toPath(), gson);
     }
 
     /**
@@ -840,8 +868,8 @@ public final class Json {
      * @return The json data as a json string.
      */
     @Override
-    public String toString() {
-        return toString(false);
+    public @NotNull String toString() {
+        return this.toString(false);
     }
 
     /**
@@ -850,11 +878,22 @@ public final class Json {
      * @param pretty Sets whether the return should be pretty formated or not.
      * @return The json data as a json string.
      */
-    public String toString(boolean pretty) {
+    public @NotNull String toString(boolean pretty) {
+        return this.toString(pretty ? PRETTY_GSON : GSON);
+    }
+
+    /**
+     * Returns the json data as a json string.
+     *
+     * @param gson The {@link Gson} instance which is used to stringify the json.
+     * @return The json data as a json string.
+     * @since 3.8.10
+     */
+    public @NotNull String toString(@NotNull Gson gson) {
         try {
-            return (pretty ? PRETTY_GSON : GSON).toJson(getObject());
+            return gson.toJson(this.getObject());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not stringify the json!", e);
         }
     }
 
@@ -863,7 +902,7 @@ public final class Json {
      *
      * @return The JsonElement representing the json data.
      */
-    public JsonElement getObject() {
+    public @NotNull JsonElement getObject() {
         return object;
     }
 
@@ -872,7 +911,7 @@ public final class Json {
      *
      * @return The new Json class
      */
-    public static Json empty() {
+    public static @NotNull Json empty() {
         return new Json(JsonNull.INSTANCE);
     }
 

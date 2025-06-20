@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.10
+ * @version 2.1.0
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -54,28 +54,22 @@ public final class Json {
      * @return true if the value exists at the path, false otherwise.
      */
     public boolean contains(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        JsonElement temp = getObject();
+        String[] args = path.split("(?<!\\\\)\\.");
+        JsonElement destination = getParentOfPath(path, false);
 
-        for (String arg : args) {
-            String s = arg.replace("&dot;", ".");
+        if (destination == null || destination.isJsonNull()) return false;
 
-            if (temp.isJsonArray()) {
-                if (!s.startsWith("$"))
-                    throw new IllegalStateException("The index of an array must start with an $ char!");
+        String arg = args[args.length - 1].replace("\\.", ".");
+        if (destination.isJsonObject()) return destination.getAsJsonObject().has(arg);
 
-                JsonArray array = temp.getAsJsonArray();
+        if (destination.isJsonArray())
+            try {
+                JsonArray array = destination.getAsJsonArray();
                 int index = argumentToIndex(arg, array, false);
-
-                if (index >= array.size()) return false;
-                temp = temp.getAsJsonArray().get(index);
-            } else if (temp.isJsonObject()) {
-                JsonObject curr = temp.getAsJsonObject();
-                if (curr.has(s)) temp = curr.get(s);
-                else return false;
-            } else throw new IllegalStateException("The value for the key \"" + s + "\" is not a json object or array!");
-        }
+                return array.size() > index;
+            } catch (IllegalStateException e) {
+                return false;
+            }
 
         return true;
     }
@@ -87,38 +81,20 @@ public final class Json {
      * @return The Json object itself after removing the value.
      */
     public Json remove(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        JsonElement temp = getObject();
+        String[] args = path.split("(?<!\\\\)\\.");
+        JsonElement target = getParentOfPath(path, false);
 
-        for (int i = 0; i < args.length - 1; i++) {
-            String arg = args[i].replace("&dot;", ".");
+        if (target == null) return this;
 
-            if (temp.isJsonArray()) {
-                if (!arg.startsWith("$"))
-                    throw new IllegalStateException("The index of an array must start with an $ char!");
-
-                JsonArray array = temp.getAsJsonArray();
-                int index = argumentToIndex(arg, array, false);
-
-                if (index >= array.size()) return this;
-                temp = temp.getAsJsonArray().get(index);
-            } else if (temp.isJsonObject()) {
-                JsonObject curr = temp.getAsJsonObject();
-                if (curr.has(arg)) temp = curr.get(arg);
-                else return this;
-            } else throw new IllegalStateException("The value for the key \"" + arg + "\" is not a json object or array!");
-        }
-
-        String lastArg = args[args.length - 1].replace("&dot;", ".");
-        if (temp.isJsonArray()) {
-            JsonArray array = temp.getAsJsonArray();
+        String lastArg = args[args.length - 1].replace("\\.", ".");
+        if (target.isJsonArray()) {
+            JsonArray array = target.getAsJsonArray();
             int index = argumentToIndex(lastArg, array, false);
 
             if (index >= array.size()) return this;
             array.remove(index);
-        } else if (temp.isJsonObject())
-            temp.getAsJsonObject().remove(lastArg);
+        } else if (target.isJsonObject())
+            target.getAsJsonObject().remove(lastArg);
         return this;
     }
 
@@ -144,10 +120,62 @@ public final class Json {
      */
     public <T> Json serialize(String path, T data) {
         Json json = JsonParser.parse(GSON.toJson(data));
-        if (json == null) return this;
         set(path, json.getObject());
         return this;
     }
+
+    /**
+     * Navigates to the parent element of the given json path.
+     * If the path does not exist and {@code initIfMissing} is {@code true},
+     * it will initialize any missing objects or arrays along the way.
+     *
+     * @param path          The json path string using dot notation, with optional escaped dots and array indicators
+     * @param initIfMissing If {@code true}, missing elements along the path will be initialized
+     * @return The {@link JsonElement} representing the parent of the final path segment, or
+     * {@code null} if it doesn't exist and {@code initIfMissing} is {@code false}
+     * @since 3.8.9
+     */
+    private JsonElement getParentOfPath(String path, boolean initIfMissing) {
+        String[] segments = path.split("(?<!\\\\)\\.");
+        JsonElement current = getObject();
+        StringBuilder processedPath = new StringBuilder();
+
+        for (int i = 0; i < segments.length - 1; i++) {
+            String key = segments[i].replace("\\.", ".");
+            boolean isArray = key.startsWith("$");
+
+            if (current == null || current.isJsonNull())
+                if (initIfMissing)
+                    current = initPath(processedPath.toString(), isArray);
+                else return null;
+
+            String nextSegment = segments[i + 1];
+            boolean nextIsArray = nextSegment.startsWith("$");
+            String processedKey;
+
+            if (isArray) {
+                JsonArray array = current.getAsJsonArray();
+                int index = argumentToIndex(key, array, initIfMissing);
+                current = initIfMissing
+                        ? getOrCreate(array, index, nextIsArray)
+                        : array.get(index);
+                processedKey = "$" + index;
+            } else {
+                JsonObject object = current.getAsJsonObject();
+                current = initIfMissing
+                        ? getOrCreate(object, key, nextIsArray)
+                        : object.get(key);
+                processedKey = key;
+            }
+
+            processedPath.append(processedKey);
+            if (i < segments.length - 2)
+                processedPath.append(".");
+        }
+
+        return current;
+    }
+
 
     /**
      * Retrieves the JsonElement at the specified path in the json data.
@@ -156,30 +184,17 @@ public final class Json {
      * @return The JsonElement at the given path, or null if the path does not exist.
      */
     public JsonElement get(String path) {
-        path = path.replace("\\.", "&dot;");
-        String[] args = path.split("\\.");
-        JsonElement temp = getObject();
+        String[] args = path.split("(?<!\\\\)\\.");
+        if (args.length == 0) return getObject();
 
-        if (!path.isBlank())
-            for (String arg : args) {
-                String s = arg.replace("&dot;", ".");
+        JsonElement destination = getParentOfPath(path, false);
+        if (destination == null || destination.isJsonNull()) return destination;
 
-                if (temp.isJsonArray()) {
-                    if (!s.startsWith("$"))
-                        throw new IllegalStateException("The index of an array must start with an $ char!");
+        String arg = args[args.length - 1].replace("\\.", ".");
+        if (destination.isJsonObject()) return destination.getAsJsonObject().get(arg);
+        if (destination.isJsonArray()) return destination.getAsJsonArray().get(argumentToIndex(arg, destination.getAsJsonArray(), false));
 
-                    JsonArray array = temp.getAsJsonArray();
-                    int index = argumentToIndex(arg, array, false);
-
-                    temp = temp.getAsJsonArray().get(index);
-                } else if (temp.isJsonObject()) {
-                    JsonObject curr = temp.getAsJsonObject();
-                    if (curr.has(s)) temp = curr.get(s);
-                    else return null;
-                } else throw new IllegalStateException("The value for the key \"" + s + "\" is not a json object or array!");
-            }
-
-        return temp;
+        return destination;
     }
 
     /**
@@ -441,7 +456,6 @@ public final class Json {
      */
     public Json set(String path, Object data) {
         synchronized (this) {
-            path = path.replace("\\.", "&dot;");
             if (data instanceof JsonElement) setJson(path, (JsonElement) data);
             else if (data instanceof Json) setJson(path, ((Json) data).getObject());
             else if (data instanceof String) setString(path, (String) data);
@@ -463,9 +477,7 @@ public final class Json {
      */
     public Json moveTo(String source, String target) {
         copyTo(source, target);
-        remove(source);
-
-        return this;
+        return remove(source);
     }
 
     /**
@@ -476,10 +488,8 @@ public final class Json {
      * @since 3.8.4-SNAPSHOT
      */
     public Json copyTo(String source, String target) {
-        if (contains(source))
-            set(target, get(source));
-
-        return this;
+        if (!contains(source)) return this;
+        return set(target, get(source));
     }
 
     /**
@@ -489,32 +499,13 @@ public final class Json {
      * @param data The string data to be set at the given path.
      */
     private void setJson(String path, JsonElement data) {
-        String[] args = path.split("\\.");
-        JsonElement destination = getObject();
-        StringBuilder processedPath = new StringBuilder();
-
-        for (int i = 0; i < args.length - 1; i++) {
-            String arg = args[i].replace("&dot;", ".");
-            boolean array = arg.startsWith("$");
-            if (destination.isJsonNull())
-                destination = initPath(processedPath.toString(), array);
-
-            String nextArg = args[i + 1];
-            if (array) {
-                int index = argumentToIndex(arg, destination.getAsJsonArray(), true);
-                destination = getOrCreate(destination.getAsJsonArray(), index, nextArg.startsWith("$"));
-                processedPath.append("$").append(index);
-            } else {
-                destination = getOrCreate(destination.getAsJsonObject(), arg, nextArg.startsWith("$"));
-                processedPath.append(arg);
-            }
-
-            if (i < args.length - 2) processedPath.append(".");
-        }
+        String[] args = path.split("(?<!\\\\)\\.");
+        JsonElement destination = getParentOfPath(path, true);
+        if (destination == null) return;
 
         // Handling for the last element in the path
         JsonElement last;
-        String lastArg = args[args.length - 1].replace("&dot;", ".");
+        String lastArg = args[args.length - 1].replace("\\.", ".");
         if (lastArg.startsWith("$")) {
             JsonArray array = destination.isJsonNull() ? new JsonArray() : destination.getAsJsonArray();
             int index = argumentToIndex(lastArg, array, true);
@@ -542,7 +533,11 @@ public final class Json {
     private int argumentToIndex(String arg, JsonArray array, boolean allowNew) {
         try {
             if (arg.equalsIgnoreCase("$last")) return array.size() - 1;
-            else if (arg.equalsIgnoreCase("$new") && allowNew) return array.size();
+
+            if (arg.equalsIgnoreCase("$new"))
+                if (allowNew) return array.size();
+                else throw new IllegalStateException("The $new argument is not allowed on this action!");
+
             return Integer.parseInt(arg.replace("$", ""));
         } catch (NumberFormatException e) {
             throw new IllegalStateException("Not a valid array index! (" + arg + ")", e);
@@ -577,6 +572,7 @@ public final class Json {
             obj.add(property, newObject);
             return newObject;
         }
+
         return obj.get(property);
     }
 
@@ -590,12 +586,14 @@ public final class Json {
      */
     private JsonElement getOrCreate(JsonArray array, int index, boolean isArray) {
         JsonElement element = index >= array.size() ? JsonNull.INSTANCE : array.get(index);
+
         if (element.isJsonNull()) {
             element = isArray ? new JsonArray() : new JsonObject();
 
             if (index == array.size()) array.add(element);
             else array.set(index, element);
         }
+
         return element;
     }
 
@@ -767,7 +765,7 @@ public final class Json {
      *
      * @return the size of the root json object or array
      * @throws NullPointerException  if the root json element does not exist
-     * @throws IllegalStateException if the root element is neither a JSON object nor a JSON array
+     * @throws IllegalStateException if the root element is neither a json object nor a json array
      */
     public int size() {
         return size("");
@@ -778,8 +776,8 @@ public final class Json {
      *
      * @param path the path within the json structure to the target element
      * @return the size of the json object or array located at the specified path
-     * @throws NullPointerException  if there is no JSON element at the specified path
-     * @throws IllegalStateException if the target element is neither a JSON object nor a JSON array
+     * @throws NullPointerException  if there is no json element at the specified path
+     * @throws IllegalStateException if the target element is neither a json object nor a json array
      */
     public int size(String path) {
         JsonElement element = get(path);

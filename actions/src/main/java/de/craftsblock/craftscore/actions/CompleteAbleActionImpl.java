@@ -1,5 +1,6 @@
 package de.craftsblock.craftscore.actions;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,24 +14,54 @@ import java.util.function.Consumer;
  * @param <T> the type of the action's result
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.2.0
+ * @version 1.3.0
  * @see CompleteAbleAction
  * @since 3.6#15-SNAPSHOT
  */
 public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
 
-    private static final ExecutorService service = Executors.newCachedThreadPool();
+    private static ExecutorService executor = Executors.newCachedThreadPool();
 
     static {
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                service.shutdown();
-                if (!service.awaitTermination(1, TimeUnit.SECONDS))
-                    service.shutdownNow();
+                executor.shutdown();
+                if (!executor.awaitTermination(5, TimeUnit.SECONDS))
+                    executor.shutdownNow();
             } catch (InterruptedException ignored) {
-                service.shutdownNow();
+                executor.shutdownNow();
             }
         }));
+    }
+
+    /**
+     * Sets the {@link ExecutorService} used for asynchronous execution of actions.
+     * <p>
+     * The previously used executor will be shut down immediately via {@link ExecutorService#shutdownNow()},
+     * and any leftover tasks that were pending on the old executor will be resubmitted
+     * to the new executor to ensure no tasks are lost.
+     *
+     * @param executor the new {@link ExecutorService} to use for execution
+     * @since 3.8.10
+     */
+    public static void setExecutor(ExecutorService executor) {
+        Collection<Runnable> leftoverTasks = CompleteAbleActionImpl.executor.shutdownNow();
+
+        for (Runnable runnable : leftoverTasks)
+            executor.submit(runnable);
+
+        CompleteAbleActionImpl.executor = executor;
+    }
+
+    /**
+     * Returns the current {@link ExecutorService} used for asynchronous execution.
+     *
+     * @return the current {@link ExecutorService}
+     * @since 3.8.10
+     */
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
     private final Action<T> action;
@@ -63,19 +94,18 @@ public class CompleteAbleActionImpl<T> implements CompleteAbleAction<T> {
      */
     @Override
     public CompletableFuture<T> submit(final Consumer<T> consumer) {
-        CompletableFuture<T> future = new CompletableFuture<>();
-        service.submit(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 T result = action.handle();
-                future.complete(result);
                 if (consumer != null) consumer.accept(result);
-                Thread.currentThread().interrupt();
-            } catch (InterruptedException ignore) {
+
+                return result;
             } catch (Exception e) {
                 throw new RuntimeException("Could not complete action!", e);
+            } finally {
+                Thread.currentThread().interrupt();
             }
-        });
-        return future;
+        }, executor);
     }
 
     /**

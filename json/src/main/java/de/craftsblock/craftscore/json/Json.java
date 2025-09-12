@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.1
+ * @version 2.1.2
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -459,13 +459,13 @@ public final class Json {
     public @NotNull Json set(@NotNull String path, @Nullable Object data) {
         synchronized (this) {
             if (data == null) set(path, JsonNull.INSTANCE);
-            else if (data instanceof JsonElement) setJson(path, (JsonElement) data);
-            else if (data instanceof Json) setJson(path, ((Json) data).getObject());
-            else if (data instanceof String) setString(path, (String) data);
-            else if (data instanceof Number) setNumber(path, (Number) data);
-            else if (data instanceof Boolean) setBoolean(path, (boolean) data);
-            else if (data instanceof Collection<?>) setList(path, (Collection<?>) data);
-            else if (data instanceof Object[]) setList(path, Arrays.asList((Object[]) data));
+            else if (data instanceof JsonElement jsonElement) setJson(path, jsonElement);
+            else if (data instanceof Json json) setJson(path, json.getObject());
+            else if (data instanceof String string) setString(path, string);
+            else if (data instanceof Number number) setNumber(path, number);
+            else if (data instanceof Boolean bool) setBoolean(path, bool);
+            else if (data instanceof Collection<?> collection) setList(path, collection);
+            else if (data instanceof Object[] array) setList(path, Arrays.asList(array));
             else setString(path, data.toString());
             return this;
         }

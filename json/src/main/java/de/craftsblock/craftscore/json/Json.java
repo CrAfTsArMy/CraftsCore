@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.2
+ * @version 2.2.0
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -573,15 +573,15 @@ public final class Json {
             if (data == null) set(path, JsonNull.INSTANCE);
             else if (data instanceof JsonElement jsonElement) setJson(path, jsonElement);
             else if (data instanceof Json json) setJson(path, json.getObject());
-            else if (data instanceof String string) setString(path, string);
-            else if (data instanceof Number number) setNumber(path, number);
-            else if (data instanceof Boolean bool) setBoolean(path, bool);
+            else if (data instanceof String string) setJson(path, new JsonPrimitive(string));
+            else if (data instanceof Number number) setJson(path, new JsonPrimitive(number));
+            else if (data instanceof Boolean bool) setJson(path, new JsonPrimitive(bool));
             else if (data instanceof Character character) setJson(path, new JsonPrimitive(character));
 
             else if (data instanceof Collection<?> collection) setList(path, collection);
             else if (data instanceof Object[] array) setList(path, Arrays.asList(array));
-            else setString(path, data.toString());
 
+            else setJson(path, new JsonPrimitive(data.toString()));
             return this;
         }
     }
@@ -716,36 +716,6 @@ public final class Json {
     }
 
     /**
-     * Sets a string value at the specified path in the json data.
-     *
-     * @param path The path where the string value should be set in the json data.
-     * @param data The string data to be set at the given path.
-     */
-    private void setString(@NotNull String path, @NotNull String data) {
-        setJson(path, new JsonPrimitive(data));
-    }
-
-    /**
-     * Sets a number value at the specified path in the json data.
-     *
-     * @param path The path where the string value should be set in the json data.
-     * @param data The string data to be set at the given path.
-     */
-    private void setNumber(@NotNull String path, @NotNull Number data) {
-        setJson(path, new JsonPrimitive(data));
-    }
-
-    /**
-     * Sets a boolean value at the specified path in the json data.
-     *
-     * @param path The path where the boolean value should be set in the json data.
-     * @param data The boolean data to be set at the given path.
-     */
-    private void setBoolean(@NotNull String path, boolean data) {
-        setJson(path, new JsonPrimitive(data));
-    }
-
-    /**
      * Sets a collection of values at the specified path in the json data.
      * If the collection is empty, an empty json array will be set at the path.
      * For each element in the collection, the appropriate setter method will be called based on its type.
@@ -765,12 +735,11 @@ public final class Json {
         for (Object o : collection) {
             if (o instanceof JsonElement) setJsonList(path, (Collection<JsonElement>) collection);
             else if (o instanceof Json) setJsonList(path, ((Collection<Json>) collection).stream().map(Json::getObject).toList());
-            else if (o instanceof String) setStringList(path, (Collection<String>) collection);
-            else if (o instanceof Number) setNumberList(path, (Collection<Number>) collection);
-            else if (o instanceof Boolean) setBoolList(path, (Collection<Boolean>) collection);
-            else setStringList(path, collection.stream().map(Object::toString).toList());
+            else if (o instanceof String) setPrimitiveList(path, ((Collection<String>) collection).stream().map(JsonPrimitive::new).toList());
+            else if (o instanceof Number) setPrimitiveList(path, ((Collection<Number>) collection).stream().map(JsonPrimitive::new).toList());
             else if (o instanceof Boolean) setPrimitiveList(path, ((Collection<Boolean>) collection).stream().map(JsonPrimitive::new).toList());
             else if (o instanceof Character) setPrimitiveList(path, ((Collection<Character>) collection).stream().map(JsonPrimitive::new).toList());
+            else setPrimitiveList(path, collection.stream().map(Object::toString).map(JsonPrimitive::new).toList());
 
             break;
         }
@@ -794,31 +763,6 @@ public final class Json {
     private void setJsonList(@NotNull String path, @NotNull Collection<JsonElement> collection) {
         JsonArray array = new JsonArray();
         for (JsonElement item : collection) array.add(item);
-        setJson(path, array);
-    }
-
-    /**
-     * Sets a collection of string values at the specified path in the json data.
-     *
-     * @param path       The path where the string collection should be set in the json data.
-     * @param collection The collection of string values to be set at the given path.
-     */
-    private void setStringList(@NotNull String path, @NotNull Collection<String> collection) {
-        JsonArray array = new JsonArray();
-        for (String item : collection) array.add(item);
-        setJson(path, array);
-    }
-
-
-    /**
-     * Sets a collection of number values at the specified path in the json data.
-     *
-     * @param path       The path where the number collection should be set in the json data.
-     * @param collection The collection of number values to be set at the given path.
-     */
-    private void setNumberList(@NotNull String path, @NotNull Collection<Number> collection) {
-        JsonArray array = new JsonArray();
-        for (Number item : collection) array.add(item);
         setJson(path, array);
     }
 

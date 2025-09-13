@@ -1,6 +1,7 @@
 package de.craftsblock.craftscore.json;
 
 import com.google.gson.*;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -207,7 +208,8 @@ public final class Json {
      * @param fallback The fallback data to return if no data is associated with the path
      * @return The JsonElement at the given path, or null if the path does not exist.
      */
-    public @NotNull JsonElement getOrDefault(@NotNull String path, @NotNull JsonElement fallback) {
+    @Contract(value = "_, !null -> !null", pure = true)
+    public @Nullable JsonElement getOrDefault(@NotNull String path, @Nullable JsonElement fallback) {
         JsonElement element = get(path);
         return !element.isJsonNull() ? element : fallback;
     }
@@ -230,6 +232,7 @@ public final class Json {
      * @param fallback The fallback data to return if no data is associated with the path
      * @return The {@link Json} at the given path, or the fallback value if the path does not exist.
      */
+    @Contract(value = "_, !null -> !null", pure = true)
     public @Nullable Json getJson(@NotNull String path, @Nullable Json fallback) {
         JsonElement element = get(path);
         return !element.isJsonNull() ? JsonParser.parse(element) : fallback;
@@ -241,10 +244,52 @@ public final class Json {
      * @param path The path to the String value in the json data.
      * @return The String value at the given path, or an empty string if the path does not exist or the value is not a string.
      */
+    public @Nullable Character getCharacter(@NotNull String path) {
+        return getCharacter(path, null);
+    }
+
+    /**
+     * Retrieves the {@link String} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link String} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link String} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    @SuppressWarnings("deprecation")
+    @Contract(value = "_, !null -> !null", pure = true)
+    public @Nullable Character getCharacter(@NotNull String path, @Nullable Character orElse) {
+        try {
+            JsonElement element = get(path);
+            return element.isJsonPrimitive() ? Character.valueOf(element.getAsCharacter()) : orElse;
+        } catch (UnsupportedOperationException e) {
+            return orElse;
+        }
+    }
+
+    /**
+     * Retrieves the String value at the specified path in the json data.
+     *
+     * @param path The path to the String value in the json data.
+     * @return The String value at the given path, or an empty string if the path does not exist or the value is not a string.
+     */
     public @NotNull String getString(@NotNull String path) {
+        return getString(path, "");
+    }
+
+    /**
+     * Retrieves the {@link String} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link String} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link String} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    @Contract(value = "_, !null -> !null", pure = true)
+    public @Nullable String getString(@NotNull String path, @Nullable String orElse) {
         JsonElement element = get(path);
-        if (!element.isJsonNull() && element.isJsonPrimitive()) return element.getAsString();
-        return "";
+        return element.isJsonPrimitive() ? element.getAsString() : orElse;
+    }
     }
 
     /**
@@ -464,9 +509,12 @@ public final class Json {
             else if (data instanceof String string) setString(path, string);
             else if (data instanceof Number number) setNumber(path, number);
             else if (data instanceof Boolean bool) setBoolean(path, bool);
+            else if (data instanceof Character character) setJson(path, new JsonPrimitive(character));
+
             else if (data instanceof Collection<?> collection) setList(path, collection);
             else if (data instanceof Object[] array) setList(path, Arrays.asList(array));
             else setString(path, data.toString());
+
             return this;
         }
     }
@@ -654,6 +702,8 @@ public final class Json {
             else if (o instanceof Number) setNumberList(path, (Collection<Number>) collection);
             else if (o instanceof Boolean) setBoolList(path, (Collection<Boolean>) collection);
             else setStringList(path, collection.stream().map(Object::toString).toList());
+            else if (o instanceof Boolean) setPrimitiveList(path, ((Collection<Boolean>) collection).stream().map(JsonPrimitive::new).toList());
+            else if (o instanceof Character) setPrimitiveList(path, ((Collection<Character>) collection).stream().map(JsonPrimitive::new).toList());
 
             break;
         }
@@ -671,7 +721,7 @@ public final class Json {
     /**
      * Sets a collection of {@link JsonElement} at the specified path in the json data.
      *
-     * @param path       The path where the string collection should be set in the json data.
+     * @param path       The path where the {@link JsonElement} collection should be set in the json data.
      * @param collection The collection of {@link JsonElement} to be set at the given path.
      */
     private void setJsonList(@NotNull String path, @NotNull Collection<JsonElement> collection) {
@@ -706,14 +756,15 @@ public final class Json {
     }
 
     /**
-     * Sets a collection of boolean values at the specified path in the json data.
+     * Sets a collection of {@link JsonPrimitive} at the specified path in the json data.
      *
-     * @param path       The path where the boolean collection should be set in the json data.
-     * @param collection The collection of boolean values to be set at the given path.
+     * @param path       The path where the {@link JsonPrimitive} collection should be set in the json data.
+     * @param collection The collection of {@link JsonPrimitive} to be set at the given path.
+     * @since 3.8.11
      */
-    private void setBoolList(@NotNull String path, @NotNull Collection<Boolean> collection) {
+    private void setPrimitiveList(@NotNull String path, @NotNull Collection<JsonPrimitive> collection) {
         JsonArray array = new JsonArray();
-        for (boolean item : collection) array.add(item);
+        collection.forEach(array::add);
         setJson(path, array);
     }
 

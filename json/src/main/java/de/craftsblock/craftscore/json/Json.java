@@ -290,6 +290,28 @@ public final class Json {
         JsonElement element = get(path);
         return element.isJsonPrimitive() ? element.getAsString() : orElse;
     }
+
+    /**
+     * Retrieves the boolean value at the specified path in the json data.
+     *
+     * @param path The path to the boolean value in the json data.
+     * @return The boolean value at the given path, or false if the path does not exist or the value is not a boolean.
+     */
+    public boolean getBoolean(@NotNull String path) {
+        return getBoolean(path, false);
+    }
+
+    /**
+     * Retrieves the {@link Boolean} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link Boolean} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link Boolean} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    public boolean getBoolean(@NotNull String path, boolean orElse) {
+        JsonElement element = get(path);
+        return element.isJsonPrimitive() ? element.getAsBoolean() : orElse;
     }
 
     /**
@@ -299,9 +321,20 @@ public final class Json {
      * @return The byte value at the given path, or -1 if the path does not exist or the value is not a byte.
      */
     public byte getByte(@NotNull String path) {
+        return getByte(path, (byte) -1);
+    }
+
+    /**
+     * Retrieves the {@link Byte} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link Byte} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link Byte} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    public byte getByte(@NotNull String path, byte orElse) {
         JsonElement element = get(path);
-        if (!element.isJsonNull() && element.isJsonPrimitive()) return element.getAsByte();
-        return -1;
+        return element.isJsonPrimitive() ? element.getAsByte() : orElse;
     }
 
     /**
@@ -317,27 +350,39 @@ public final class Json {
     }
 
     /**
+     * Retrieves the {@link Integer} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link Integer} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link Integer} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    public int getInt(@NotNull String path, int orElse) {
+        JsonElement element = get(path);
+        return element.isJsonPrimitive() ? element.getAsInt() : orElse;
+    }
+
+    /**
      * Retrieves the long value at the specified path in the json data.
      *
      * @param path The path to the long value in the json data.
      * @return The long value at the given path, or -1 if the path does not exist or the value is not a long.
      */
     public long getLong(@NotNull String path) {
-        JsonElement element = get(path);
-        if (element.isJsonPrimitive()) return element.getAsLong();
-        return -1;
+        return getLong(path, -1);
     }
 
     /**
-     * Retrieves the boolean value at the specified path in the json data.
+     * Retrieves the {@link Long} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
      *
-     * @param path The path to the boolean value in the json data.
-     * @return The boolean value at the given path, or false if the path does not exist or the value is not a boolean.
+     * @param path   The path to the {@link Long} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link Long} at the given path, or the {@code orElse} value if the path does not exist.
      */
-    public boolean getBoolean(@NotNull String path) {
+    public long getLong(@NotNull String path, long orElse) {
         JsonElement element = get(path);
-        if (element.isJsonPrimitive()) return element.getAsBoolean();
-        return false;
+        return element.isJsonPrimitive() ? element.getAsLong() : orElse;
     }
 
     /**
@@ -347,9 +392,20 @@ public final class Json {
      * @return The double value at the given path, or -1 if the path does not exist or the value is not a double.
      */
     public double getDouble(@NotNull String path) {
+        return getDouble(path, -1);
+    }
+
+    /**
+     * Retrieves the {@link Double} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link Double} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link Double} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    public double getDouble(@NotNull String path, double orElse) {
         JsonElement element = get(path);
-        if (element.isJsonPrimitive()) return element.getAsDouble();
-        return -1;
+        return element.isJsonPrimitive() ? element.getAsDouble() : orElse;
     }
 
     /**
@@ -359,9 +415,20 @@ public final class Json {
      * @return The float value at the given path, or -1 if the path does not exist or the value is not a float.
      */
     public float getFloat(@NotNull String path) {
+        return getFloat(path, -1);
+    }
+
+    /**
+     * Retrieves the {@link Float} at the specified path in the json data.
+     * If no data is associated with the path, a fallback data value is returned.
+     *
+     * @param path   The path to the {@link Float} in the json data.
+     * @param orElse The fallback data to return if no data is associated with the path.
+     * @return The {@link Float} at the given path, or the {@code orElse} value if the path does not exist.
+     */
+    public float getFloat(@NotNull String path, float orElse) {
         JsonElement element = get(path);
-        if (element.isJsonPrimitive()) return element.getAsFloat();
-        return -1;
+        return element.isJsonPrimitive() ? element.getAsFloat() : orElse;
     }
 
     /**

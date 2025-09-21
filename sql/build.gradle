@@ -16,5 +16,5 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
-    implementation 'com.mysql:mysql-connector-j:9.3.0'
+    implementation 'com.mysql:mysql-connector-j:9.4.0'
 }

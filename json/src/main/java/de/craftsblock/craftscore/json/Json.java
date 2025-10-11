@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.2.0
+ * @version 2.2.1
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -88,7 +88,7 @@ public final class Json {
         String[] args = path.split("(?<!\\\\)\\.");
         JsonElement target = getParentOfPath(path, false);
 
-        if (target == null) return this;
+        if (target == null || target.isJsonNull()) return this;
 
         String lastArg = args[args.length - 1].replace("\\.", ".");
         if (target.isJsonArray()) {
@@ -120,6 +120,7 @@ public final class Json {
      *
      * @param path The path to set the serialized data in the json data.
      * @param data The data to be serialized and set at the path.
+     * @param <T>  The type of the object that should be serialized.
      * @return The Json object itself after setting the data at the path.
      */
     public <T> @NotNull Json serialize(@NotNull String path, @NotNull T data) {
@@ -151,7 +152,7 @@ public final class Json {
             if (current == null || current.isJsonNull())
                 if (initIfMissing)
                     current = initPath(processedPath.toString(), isArray);
-                else return null;
+                else return JsonNull.INSTANCE;
 
             String nextSegment = segments[i + 1];
             boolean nextIsArray = nextSegment.startsWith("$");
@@ -194,10 +195,16 @@ public final class Json {
         if (destination == null || destination.isJsonNull()) return JsonNull.INSTANCE;
 
         String arg = args[args.length - 1].replace("\\.", ".");
-        if (destination.isJsonObject()) return destination.getAsJsonObject().get(arg);
-        if (destination.isJsonArray()) return destination.getAsJsonArray().get(argumentToIndex(arg, destination.getAsJsonArray(), false));
 
-        return destination;
+        JsonElement element;
+        if (destination.isJsonObject())
+            element = destination.getAsJsonObject().get(arg);
+        else if (destination.isJsonArray())
+            element = destination.getAsJsonArray()
+                    .get(argumentToIndex(arg, destination.getAsJsonArray(), false));
+        else element = destination;
+
+        return element != null && !element.isJsonNull() ? element : JsonNull.INSTANCE;
     }
 
     /**
@@ -288,7 +295,7 @@ public final class Json {
     @Contract(value = "_, !null -> !null", pure = true)
     public @Nullable String getString(@NotNull String path, @Nullable String orElse) {
         JsonElement element = get(path);
-        return element.isJsonPrimitive() ? element.getAsString() : orElse;
+        return element != null && element.isJsonPrimitive() ? element.getAsString() : orElse;
     }
 
     /**
@@ -589,8 +596,9 @@ public final class Json {
     /**
      * Moves a json object if it exists to a desired output path.
      *
-     * @param source The path from witch is copied from and afterward deleted
-     * @param target The desired output path (where the object is moved to)
+     * @param source The path from witch is copied from and afterward deleted.
+     * @param target The desired output path (where the object is moved to).
+     * @return The updated json object.
      * @since 3.8.4-SNAPSHOT
      */
     public @NotNull Json moveTo(@NotNull String source, @NotNull String target) {
@@ -601,8 +609,9 @@ public final class Json {
     /**
      * Copys a json object if it exists to a desired output path.
      *
-     * @param source The path from witch is copied from
-     * @param target The desired output path (where the object is copied to)
+     * @param source The path from witch is copied from.
+     * @param target The desired output path (where the object is copied to).
+     * @return The updated json object.
      * @since 3.8.4-SNAPSHOT
      */
     public @NotNull Json copyTo(@NotNull String source, @NotNull String target) {

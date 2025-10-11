@@ -1,5 +1,7 @@
 package de.craftsblock.craftscore.cache;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * @version 2.0.1
  * @since 3.6#4
  */
-public class Cache<K, V> {
+public class Cache<K, V> implements Map<K, V> {
 
     private final int capacity;
     private final ConcurrentHashMap<K, V> hashmap;
@@ -41,8 +43,9 @@ public class Cache<K, V> {
      * @param key The key whose associated value is to be retrieved from the cache.
      * @return The value associated with the given key, or null if the key is not in the cache.
      */
-    public V get(final K key) {
-        moveToFront(key);
+    @Override
+    public V get(final Object key) {
+        if (!containsKey(key)) return null;
         return hashmap.get(key);
     }
 
@@ -52,9 +55,19 @@ public class Cache<K, V> {
      * @param key The key whose presence in the cache is to be checked.
      * @return true if the cache contains the key, otherwise false.
      */
-    public boolean containsKey(final K key) {
-        moveToFront(key);
-        return hashmap.containsKey(key);
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean containsKey(final Object key) {
+        if (!hashmap.containsKey(key))
+            return false;
+
+        moveToFront((K) key);
+        return true;
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return hashmap.containsValue(value);
     }
 
     /**
@@ -64,9 +77,11 @@ public class Cache<K, V> {
      *
      * @param key   The key to be added to the cache.
      * @param value The value associated with the key to be added.
+     * @return
      */
-    public void put(final K key, final V value) {
-        hashmap.put(key, value);
+    public V put(final K key, final V value) {
+        V prev = hashmap.put(key, value);
+
         // Move the key to the front of the queue to represent its recent use.
         // If the key was not already present in the queue and the cache size exceeds capacity,
         // remove the least recently used key-value pair from the cache.
@@ -74,6 +89,13 @@ public class Cache<K, V> {
             K last = internalQueue.removeLast();
             remove(last);
         }
+
+        return prev;
+    }
+
+    @Override
+    public void putAll(@NotNull Map<? extends K, ? extends V> m) {
+        m.forEach(this::put);
     }
 
     /**
@@ -94,32 +116,43 @@ public class Cache<K, V> {
      *
      * @param key The key whose associated key-value pair is to be removed from the cache.
      */
-    public void remove(final K key) {
-        hashmap.remove(key);
+    @Override
+    public V remove(final Object key) {
         internalQueue.remove(key);
+        return hashmap.remove(key);
     }
 
     /**
      * Clears the cache, removing all key-value pairs from it.
      */
+    @Override
     public void clear() {
         internalQueue.forEach(this::remove);
     }
 
-    public Set<Map.Entry<K, V>> entrySet() {
+    @Override
+    public @NotNull Set<Map.Entry<K, V>> entrySet() {
         return hashmap.entrySet();
     }
 
-    public Set<K> keySet() {
+    @Override
+    public @NotNull Set<K> keySet() {
         return hashmap.keySet();
     }
 
-    public Collection<V> values() {
+    @Override
+    public @NotNull Collection<V> values() {
         return hashmap.values();
     }
 
+    @Override
     public int size() {
         return hashmap.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return hashmap.isEmpty();
     }
 
     /**

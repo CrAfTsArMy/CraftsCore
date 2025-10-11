@@ -26,13 +26,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.5
+ * @version 2.1.6
  * @since 3.6.16-SNAPSHOT
  */
 public class ListenerRegistry {
 
-    private final ConcurrentHashMap<Class<? extends Event>, EnumMap<EventPriority, List<Listener>>> data = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Short, ConcurrentLinkedQueue<Event>> channelQueues = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Event>, Map<EventPriority, Queue<Listener>>> data = new ConcurrentHashMap<>();
+    private final Map<Short, Queue<Event>> channelQueues = new ConcurrentHashMap<>();
 
     /**
      * Registers an event listener. All methods in the provided {@code ListenerAdapter}
@@ -46,7 +46,7 @@ public class ListenerRegistry {
                 Class<? extends Event> event = getEventTypeOrThrow(method);
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 data.computeIfAbsent(event, p -> new EnumMap<>(EventPriority.class))
-                        .computeIfAbsent(eventHandler.priority(), e -> new ArrayList<>())
+                        .computeIfAbsent(eventHandler.priority(), e -> new ConcurrentLinkedQueue<>())
                         .add(new Listener(method, adapter, eventHandler.priority(), eventHandler.ignoreWhenCancelled()));
             } catch (Exception e) {
                 throw new RuntimeException("Could not register handler %s#%s(%s)!".formatted(
@@ -69,7 +69,7 @@ public class ListenerRegistry {
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 if (!data.containsKey(event)) continue;
 
-                EnumMap<EventPriority, List<Listener>> listeners = data.get(event);
+                Map<EventPriority, Queue<Listener>> listeners = data.get(event);
                 if (!listeners.containsKey(eventHandler.priority())) continue;
                 listeners.get(eventHandler.priority()).removeIf(listener -> listener.method().equals(method));
 
@@ -136,7 +136,7 @@ public class ListenerRegistry {
                 .filter(map -> !map.isEmpty())
                 .flatMap(map -> map.values().stream())
                 .filter(list -> !list.isEmpty())
-                .flatMap(List::stream)
+                .flatMap(Queue::stream)
                 .map(Listener::self)
                 .anyMatch(type::isInstance);
     }
@@ -146,10 +146,8 @@ public class ListenerRegistry {
      * in order of their {@link EventPriority}.
      *
      * @param event The event to be dispatched.
-     * @throws InvocationTargetException If the listener method cannot be invoked.
-     * @throws IllegalAccessException    If the listener method is inaccessible.
      */
-    public void call(Event event) throws InvocationTargetException, IllegalAccessException {
+    public void call(Event event) {
         call(event, event.getClass());
     }
 
@@ -159,10 +157,8 @@ public class ListenerRegistry {
      *
      * @param event The event to be dispatched.
      * @param type  The type of the event listener to call.
-     * @throws InvocationTargetException If the listener method cannot be invoked.
-     * @throws IllegalAccessException    If the listener method is inaccessible.
      */
-    private void call(Event event, Class<? extends Event> type) throws InvocationTargetException, IllegalAccessException {
+    private void call(Event event, Class<? extends Event> type) {
         @SuppressWarnings("unchecked")
         Class<? extends Event> superClass = (Class<? extends Event>) type.getSuperclass();
         if (superClass != null && Event.class.isAssignableFrom(superClass))
@@ -171,11 +167,11 @@ public class ListenerRegistry {
         if (!this.data.containsKey(type))
             return;
 
-        EnumMap<EventPriority, List<Listener>> data = this.data.get(type);
+        Map<EventPriority, Queue<Listener>> data = this.data.get(type);
         if (data.isEmpty()) return;
 
         for (EventPriority priority : data.keySet()) {
-            List<Listener> listeners = data.get(priority);
+            Queue<Listener> listeners = data.get(priority);
             if (listeners.isEmpty()) continue;
 
             for (Listener tile : listeners) {
@@ -186,8 +182,12 @@ public class ListenerRegistry {
                 try {
                     method.setAccessible(true);
                     method.invoke(tile.self, event);
-                } finally {
-                    method.setAccessible(false);
+                } catch (InvocationTargetException | IllegalAccessException e) {
+                    throw new RuntimeException("Could not invoke listener callback %s".formatted(method.toGenericString()), e);
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Could not invoke listener callback %s with arguments (%s)".formatted(
+                            method.toGenericString(), event.getClass().getSimpleName()
+                    ));
                 }
             }
         }
@@ -214,21 +214,15 @@ public class ListenerRegistry {
 
     /**
      * Processes and dispatches all queued events in the default channel (channel 0).
-     *
-     * @throws InvocationTargetException If a listener method cannot be invoked.
-     * @throws IllegalAccessException    If a listener method is inaccessible.
      */
-    public void callQueued() throws InvocationTargetException, IllegalAccessException {
+    public void callQueued() {
         callQueued((short) 0);
     }
 
     /**
      * Processes and dispatches all queued events across all channels.
-     *
-     * @throws InvocationTargetException If a listener method cannot be invoked.
-     * @throws IllegalAccessException    If a listener method is inaccessible.
      */
-    public void callAllQueued() throws InvocationTargetException, IllegalAccessException {
+    public void callAllQueued() {
         for (Short channel : channelQueues.keySet())
             callQueued(channel);
     }
@@ -237,13 +231,11 @@ public class ListenerRegistry {
      * Processes and dispatches all queued events in a specific channel.
      *
      * @param channel The channel ID to process queued events from.
-     * @throws InvocationTargetException If a listener method cannot be invoked.
-     * @throws IllegalAccessException    If a listener method is inaccessible.
      */
-    public void callQueued(Short channel) throws InvocationTargetException, IllegalAccessException {
+    public void callQueued(Short channel) {
         if (!channelQueues.containsKey(channel)) return;
 
-        ConcurrentLinkedQueue<Event> queue = channelQueues.get(channel);
+        Queue<Event> queue = channelQueues.get(channel);
         for (Event event : queue) {
             call(event);
             queue.remove(event);
@@ -255,9 +247,9 @@ public class ListenerRegistry {
     /**
      * Internal record representing a registered listener.
      *
-     * @param method          The method to be invoked for the event.
-     * @param self            The instance of the listener object.
-     * @param priority        The priority of the event handler.
+     * @param method              The method to be invoked for the event.
+     * @param self                The instance of the listener object.
+     * @param priority            The priority of the event handler.
      * @param ignoreWhenCancelled Whether the handler is skipped, when the event is cancelled.
      */
     @ApiStatus.Internal

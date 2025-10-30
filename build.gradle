@@ -1,5 +1,5 @@
-group 'de.craftsblock'
-version '3.8.9'
+group = "de.craftsblock"
+version = "3.8.11"
 
 subprojects {
     apply from: "$rootDir/gradle/publications.gradle"

@@ -1,17 +1,17 @@
 afterEvaluate {
-    def component = project.components.findByName('java')
-            ?: project.components.findByName('javaPlatform')
+    def component = project.components.findByName("java")
+            ?: project.components.findByName("javaPlatform")
 
     if (component != null && component.name.equalsIgnoreCase("java"))
         dependencies {
             // https://mvnrepository.com/artifact/org.jetbrains/annotations
-            implementation 'org.jetbrains:annotations:26.0.2'
+            implementation "org.jetbrains:annotations:26.0.2"
         }
 
     if (project.ext.has("shouldPublish") && !project.ext["shouldPublish"])
         return
 
-    apply plugin: 'maven-publish'
+    apply plugin: "maven-publish"
 
     def env = new Properties()
     file("$rootDir/.env").withInputStream {
@@ -21,7 +21,7 @@ afterEvaluate {
     publishing {
         publications {
             normal(MavenPublication) {
-                artifactId project.name.toLowerCase()
+                artifactId = project.name.toLowerCase()
 
                 if (component == null) {
                     logger.warn("${project.name} does not contain a component that is publishable!")
@@ -33,23 +33,23 @@ afterEvaluate {
                 pom {
                     name = project.description
                     description = project.description
-                    url = 'https://github.com/CrAfTsArMy/CraftsCore'
+                    url = "https://github.com/CrAfTsArMy/CraftsCore"
 
                     scm {
-                        url = 'https://github.com/CrAfTsArMy/CraftsCore'
-                        connection = 'scm:git:git://github.com/CrAfTsArMy/CraftsCore.git'
-                        developerConnection = 'scm:git:git@github.com:CrAfTsArMy/CraftsCore.git'
+                        url = "https://github.com/CrAfTsArMy/CraftsCore"
+                        connection = "scm:git:git://github.com/CrAfTsArMy/CraftsCore.git"
+                        developerConnection = "scm:git:git@github.com:CrAfTsArMy/CraftsCore.git"
                     }
 
                     issueManagement {
-                        system = 'github'
-                        url = 'https://github.com/CrAfTsArMy/CraftsCore/issues'
+                        system = "github"
+                        url = "https://github.com/CrAfTsArMy/CraftsCore/issues"
                     }
 
                     licenses {
                         license {
-                            name = 'Apache License 2.0'
-                            url = 'https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE'
+                            name = "Apache License 2.0"
+                            url = "https://github.com/CrAfTsArMy/CraftsCore/blob/master/LICENSE"
                         }
                     }
                 }
@@ -57,7 +57,7 @@ afterEvaluate {
         }
         repositories {
             maven {
-                url('https://repo.craftsblock.de/releases')
+                url = "https://repo.craftsblock.de/releases"
                 authentication {
                     basic(BasicAuthentication) {
                     }

@@ -8,6 +8,8 @@
 
 ![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/actions?color=40c14a&name=actions&prefix=v)
 ![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/all?color=40c14a&name=all&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/bom?color=40c14a&name=bom&prefix=v)
+![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/buffer?color=40c14a&name=buffer&prefix=v)
 ![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/cache?color=40c14a&name=cache&prefix=v)
 ![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/encryption?color=40c14a&name=encryption&prefix=v)
 ![Latest Release on Maven](https://repo.craftsblock.de/api/badge/latest/releases/de/craftsblock/craftscore/event?color=40c14a&name=event&prefix=v)

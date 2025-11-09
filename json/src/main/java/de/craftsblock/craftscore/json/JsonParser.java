@@ -2,19 +2,13 @@ package de.craftsblock.craftscore.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import de.craftsblock.craftscore.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 
 /**
  * The JsonParser class provides methods for parsing JSON data from a file or a String.
@@ -64,53 +58,56 @@ public final class JsonParser {
     }
 
     /**
-     * Parses the content of an InputStream into a {@link Json} object.
-     * <p>
-     * This method reads all bytes from the provided InputStream and converts them into a json string.
-     * </p>
+     * Parses a byte array into a {@link Json} object.
      *
-     * @param stream The InputStream to be parsed
-     * @return A {@link Json} object representing the content of the InputStream
+     * @param data The byte array containing JSON data
+     * @return A {@link Json} object representing the content of the sub-array
+     */
+    public static @NotNull Json parse(byte @NotNull [] data) {
+        return parse(data, 0, data.length);
+    }
+
+    /**
+     * Parses a specific portion of a byte array into a {@link Json} object.
+     *
+     * @param data   The byte array containing JSON data
+     * @param pos    The starting position of the sub-array
+     * @param length The length of the sub-array
+     * @return A {@link Json} object representing the content of the sub-array
+     */
+    public static @NotNull Json parse(byte @NotNull [] data, int pos, int length) {
+        try (ByteArrayInputStream reader = new ByteArrayInputStream(data, pos, length)) {
+            return parse(reader);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not parse the byte array to json!", e);
+        }
+    }
+
+    /**
+     * Parses the content of an {@link InputStream} into a {@link Json} object.
+     *
+     * @param stream The {@link InputStream} to be parsed
+     * @return A {@link Json} object representing the content of the {@link InputStream}
      * @throws RuntimeException If an I/O error occurs during reading from the stream
      */
     public static @NotNull Json parse(@NotNull InputStream stream) {
-        try (ByteArrayOutputStream data = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[2048];
-
-            int read;
-            while ((read = stream.read(buffer)) != -1)
-                data.write(buffer, 0, read);
-
-            Arrays.fill(buffer, (byte) 0);
-            return parse(data.toByteArray(), 0, data.size());
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            return parse(reader);
         } catch (IOException e) {
             throw new RuntimeException("Could not parse the input stream to json!", e);
         }
     }
 
     /**
-     * Parses a specific portion of a byte array into a {@link Json} object.
-     * <p>
-     * This method extracts a sub-array from the provided byte array starting at a specified position
-     * and with a specified length. It then converts this sub-array into a JSON string and returns
-     * the corresponding {@link Json} object. The method ensures that the sub-array contains only valid UTF-8 bytes.
-     * </p>
+     * Parses the content of an {@link Reader} into a {@link Json} object.
      *
-     * @param data   The byte array containing JSON data
-     * @param pos    The starting position of the sub-array
-     * @param length The length of the sub-array
-     * @return A {@link Json} object representing the content of the sub-array
-     * @throws IllegalArgumentException If the sub-array contains non-positive bytes
+     * @param reader The {@link Reader} to be parsed
+     * @return A {@link Json} object representing the content of the {@link Reader}
+     * @throws RuntimeException If an I/O error occurs during reading from the stream
      */
-    public static @NotNull Json parse(byte @NotNull [] data, int pos, int length) {
-        assert pos >= 0;
-        assert length <= data.length;
-        byte[] specific = Arrays.copyOfRange(data, pos, length);
-
-        if (!Utils.isEncodingValid(specific, StandardCharsets.UTF_8))
-            throw new IllegalArgumentException("The sub-array is not encoded as a utf8 string!");
-
-        return parse(new String(specific, StandardCharsets.UTF_8));
+    public static @NotNull Json parse(@NotNull Reader reader) {
+        JsonElement element = com.google.gson.JsonParser.parseReader(reader);
+        return parse(element);
     }
 
     /**
@@ -121,14 +118,11 @@ public final class JsonParser {
      * @throws RuntimeException If an I/O error occurs during parsing
      */
     public static @NotNull Json parse(@Nullable String json) {
-        try {
-            if (json != null && JsonValidator.isValid(json))
-                return new Json(com.google.gson.JsonParser.parseString(json));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not parse %s to json!".formatted(Utils.abbreviate(json, 50)), e);
-        }
+        if (json == null)
+            return Json.empty();
 
-        return Json.empty();
+        JsonElement element = com.google.gson.JsonParser.parseString(json);
+        return parse(element);
     }
 
     /**
@@ -142,13 +136,13 @@ public final class JsonParser {
      * @param element The {@link JsonElement} to be parsed
      * @return A {@link Json} object representing the content of the {@link JsonElement}
      */
-    public static @Nullable Json parse(@NotNull JsonElement element) {
-        if (element.isJsonPrimitive()) {
+    public static @NotNull Json parse(@NotNull JsonElement element) {
+        if (!JsonValidator.isParsable(element)) {
             JsonPrimitive primitive = element.getAsJsonPrimitive();
-            return primitive.isString() ? parse(primitive.getAsString()) : null;
+            return primitive.isString() ? parse(primitive.getAsString()) : Json.empty();
         }
 
-        return new Json(element);
+        return Json.empty();
     }
 
 }

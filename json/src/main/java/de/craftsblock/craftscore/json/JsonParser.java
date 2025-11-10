@@ -16,7 +16,7 @@ import java.nio.file.StandardOpenOption;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.0
+ * @version 2.1.1
  * @see Json
  * @see JsonValidator
  * @since 3.6#16-SNAPSHOT
@@ -142,7 +142,7 @@ public final class JsonParser {
             return primitive.isString() ? parse(primitive.getAsString()) : Json.empty();
         }
 
-        return Json.empty();
+        return new Json(element);
     }
 
 }

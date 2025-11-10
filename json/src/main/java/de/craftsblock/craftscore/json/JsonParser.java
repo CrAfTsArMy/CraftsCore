@@ -16,7 +16,7 @@ import java.nio.file.StandardOpenOption;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.0.5
+ * @version 2.1.0
  * @see Json
  * @see JsonValidator
  * @since 3.6#16-SNAPSHOT
@@ -62,6 +62,7 @@ public final class JsonParser {
      *
      * @param data The byte array containing JSON data
      * @return A {@link Json} object representing the content of the sub-array
+     * @since 3.8.12
      */
     public static @NotNull Json parse(byte @NotNull [] data) {
         return parse(data, 0, data.length);
@@ -104,10 +105,10 @@ public final class JsonParser {
      * @param reader The {@link Reader} to be parsed
      * @return A {@link Json} object representing the content of the {@link Reader}
      * @throws RuntimeException If an I/O error occurs during reading from the stream
+     * @since 3.8.12
      */
     public static @NotNull Json parse(@NotNull Reader reader) {
-        JsonElement element = com.google.gson.JsonParser.parseReader(reader);
-        return parse(element);
+        return parse(JsonValidator.safeParse(() -> com.google.gson.JsonParser.parseReader(reader)));
     }
 
     /**
@@ -121,8 +122,7 @@ public final class JsonParser {
         if (json == null)
             return Json.empty();
 
-        JsonElement element = com.google.gson.JsonParser.parseString(json);
-        return parse(element);
+        return parse(JsonValidator.safeParse(() -> com.google.gson.JsonParser.parseString(json)));
     }
 
     /**

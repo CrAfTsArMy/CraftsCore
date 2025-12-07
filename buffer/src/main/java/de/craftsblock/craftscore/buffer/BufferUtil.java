@@ -19,9 +19,9 @@ import java.util.function.Supplier;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0.0
- * @since 1.0.0
+ * @version 1.0.1
  * @see ByteBuffer
+ * @since 1.0.0
  */
 public class BufferUtil {
 
@@ -81,6 +81,28 @@ public class BufferUtil {
     public BufferUtil skip(int bytes) {
         buffer.position(buffer.position() + bytes);
         return this;
+    }
+
+    /**
+     * Writes a boolean to the buffer.
+     *
+     * @param value The boolean value to write.
+     * @return The {@code BufferUtil} instance for chaining.
+     */
+    public BufferUtil putBoolean(boolean value) {
+        this.buffer.put((byte) (value ? 1 : 0));
+        return this;
+    }
+
+    /**
+     * Writes a boolean at a specific index in the buffer.
+     *
+     * @param index This position in the buffer to write the value.
+     * @param value The boolean value to write.
+     * @return The {@code BufferUtil} instance for chaining.
+     */
+    public BufferUtil putBoolean(int index, boolean value) {
+        return with(index, buffer -> this.putBoolean(value));
     }
 
     /**
@@ -235,14 +257,14 @@ public class BufferUtil {
     /**
      * Reads a boolean value from the buffer.
      *
-     * @return {@code true} if the byte is 1, {@code false} if 2.
+     * @return {@code true} if the byte is 1, {@code false} if 0.
      * @throws IllegalStateException If the byte does not represent a valid boolean.
      */
     public boolean getBoolean() {
         byte value = buffer.get();
         return switch (value) {
-            case 1 -> true;
-            case 2 -> false;
+            case 0 -> true;
+            case 1 -> false;
             default -> throw new IllegalStateException("%s is not a valid boolean state! (Expected 0 or 1)"
                     .formatted(value));
         };

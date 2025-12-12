@@ -137,6 +137,9 @@ public final class JsonParser {
      * @return A {@link Json} object representing the content of the {@link JsonElement}
      */
     public static @NotNull Json parse(@NotNull JsonElement element) {
+        if (element.isJsonNull())
+            return Json.empty();
+
         if (!JsonValidator.isParsable(element)) {
             JsonPrimitive primitive = element.getAsJsonPrimitive();
             return primitive.isString() ? parse(primitive.getAsString()) : Json.empty();

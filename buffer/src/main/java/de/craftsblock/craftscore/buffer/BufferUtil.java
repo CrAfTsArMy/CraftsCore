@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.1.0
+ * @version 1.1.1
  * @see ByteBuffer
  * @since 3.8.11
  */
@@ -32,7 +32,7 @@ public class BufferUtil {
      *
      * @param buffer The {@link ByteBuffer} to wrap.
      */
-    private BufferUtil(ByteBuffer buffer) {
+    public BufferUtil(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 

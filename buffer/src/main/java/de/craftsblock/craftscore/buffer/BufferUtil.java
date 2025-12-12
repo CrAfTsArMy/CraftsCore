@@ -19,9 +19,9 @@ import java.util.function.Supplier;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0.1
+ * @version 1.1.0
  * @see ByteBuffer
- * @since 1.0.0
+ * @since 3.8.11
  */
 public class BufferUtil {
 
@@ -34,53 +34,6 @@ public class BufferUtil {
      */
     private BufferUtil(ByteBuffer buffer) {
         this.buffer = buffer;
-    }
-
-    /**
-     * Ensures that the buffer has enough remaining space to store the specified number of bytes.
-     * If not, a larger buffer is allocated and the contents are copied.
-     *
-     * @param needed The number of bytes required.
-     * @return This {@code BufferUtil} instance for chaining.
-     */
-    public BufferUtil ensure(int needed) {
-        if (buffer.remaining() >= needed)
-            return this;
-
-        int newCapacity = Math.max(buffer.capacity() * 2, buffer.position() + needed);
-        ByteBuffer expanded = ByteBuffer.allocate(newCapacity);
-        buffer.flip();
-        expanded.put(buffer);
-
-        this.buffer = expanded;
-        return this;
-    }
-
-    /**
-     * Trims the buffer to its current position, creating a new buffer containing only
-     * the written data.
-     *
-     * @return This {@code BufferUtil} instance for chaining.
-     */
-    public BufferUtil trim() {
-        buffer.flip();
-
-        byte[] trimmed = new byte[buffer.remaining()];
-        buffer.get(trimmed);
-
-        this.buffer = ByteBuffer.wrap(trimmed);
-        return this;
-    }
-
-    /**
-     * Skips a number of bytes by advancing the buffer position.
-     *
-     * @param bytes The number of bytes to skip.
-     * @return This {@code BufferUtil} instance for chaining.
-     */
-    public BufferUtil skip(int bytes) {
-        buffer.position(buffer.position() + bytes);
-        return this;
     }
 
     /**
@@ -259,6 +212,7 @@ public class BufferUtil {
      *
      * @return {@code true} if the byte is 1, {@code false} if 0.
      * @throws IllegalStateException If the byte does not represent a valid boolean.
+     * @since 3.8.13
      */
     public boolean getBoolean() {
         byte value = buffer.get();
@@ -275,6 +229,8 @@ public class BufferUtil {
      *
      * @param index The position in the buffer.
      * @return The boolean value.
+     * @throws IllegalStateException If the byte does not represent a valid boolean.
+     * @since 3.8.13
      */
     public boolean getBoolean(int index) {
         return map(index, () -> getBoolean());
@@ -447,22 +403,98 @@ public class BufferUtil {
     }
 
     /**
-     * Sets the buffer byte order to little-endian.
+     * Reads the remaining bytes in the buffer.
      *
+     * @return An array containing the remaining bytes.
+     * @since 3.8.13
+     */
+    public byte[] getRemaining() {
+        int remaining = buffer.remaining();
+
+        byte[] data = new byte[remaining];
+        buffer.get(data);
+
+        return data;
+    }
+
+    /**
+     * Reads the remaining bytes in the buffer starting at a specific index.
+     *
+     * @param index The index to start reading from.
+     * @return An array containing the remaining bytes.
+     * @since 3.8.13
+     */
+    public byte[] getRemaining(int index) {
+        return this.map(index, () -> getRemaining());
+    }
+
+    /**
+     * Checks whether the underlying {@link ByteBuffer} has at least the specified
+     * number of bytes remaining between its current position and its limit.
+     *
+     * @param bytes The minimum number of bytes required to be available for reading or writing
+     * @return {@code true} if {@code buffer.remaining() >= bytes}, otherwise {@code false}
+     * @since 3.8.13
+     */
+    public boolean hasRemaining(int bytes) {
+        return buffer.remaining() >= bytes;
+    }
+
+    /**
+     * Checks whether the underlying {@link ByteBuffer} has any bytes remaining
+     * between its current position and its limit.
+     *
+     * @return {@code true} if at least one byte is available, otherwise {@code false}
+     * @since 3.8.13
+     */
+    public boolean hasRemaining() {
+        return buffer.hasRemaining();
+    }
+
+    /**
+     * Ensures that the buffer has enough remaining space to store the specified number of bytes.
+     * If not, a larger buffer is allocated and the contents are copied.
+     *
+     * @param needed The number of bytes required.
      * @return This {@code BufferUtil} instance for chaining.
      */
-    public BufferUtil toLittleEndian() {
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
+    public BufferUtil ensure(int needed) {
+        if (buffer.remaining() >= needed)
+            return this;
+
+        int newCapacity = Math.max(buffer.capacity() * 2, buffer.position() + needed);
+        ByteBuffer expanded = ByteBuffer.allocate(newCapacity);
+        buffer.flip();
+        expanded.put(buffer);
+
+        this.buffer = expanded;
         return this;
     }
 
     /**
-     * Sets the buffer byte order to big-endian.
+     * Trims the buffer to its current position, creating a new buffer containing only
+     * the written data.
      *
      * @return This {@code BufferUtil} instance for chaining.
      */
-    public BufferUtil toBigEndian() {
-        buffer.order(ByteOrder.BIG_ENDIAN);
+    public BufferUtil trim() {
+        buffer.flip();
+
+        byte[] trimmed = new byte[buffer.remaining()];
+        buffer.get(trimmed);
+
+        this.buffer = ByteBuffer.wrap(trimmed);
+        return this;
+    }
+
+    /**
+     * Skips a number of bytes by advancing the buffer position.
+     *
+     * @param bytes The number of bytes to skip.
+     * @return This {@code BufferUtil} instance for chaining.
+     */
+    public BufferUtil skip(int bytes) {
+        buffer.position(buffer.position() + bytes);
         return this;
     }
 
@@ -554,12 +586,23 @@ public class BufferUtil {
     }
 
     /**
-     * Returns the raw wrapped {@link ByteBuffer}.
+     * Sets the buffer byte order to little-endian.
      *
-     * @return The wrapped buffer.
+     * @return This {@code BufferUtil} instance for chaining.
      */
-    public ByteBuffer getRaw() {
-        return buffer;
+    public BufferUtil toLittleEndian() {
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        return this;
+    }
+
+    /**
+     * Sets the buffer byte order to big-endian.
+     *
+     * @return This {@code BufferUtil} instance for chaining.
+     */
+    public BufferUtil toBigEndian() {
+        buffer.order(ByteOrder.BIG_ENDIAN);
+        return this;
     }
 
     /**
@@ -600,6 +643,15 @@ public class BufferUtil {
         byte[] data = new byte[dup.remaining()];
         dup.get(data);
         return data;
+    }
+
+    /**
+     * Returns the raw wrapped {@link ByteBuffer}.
+     *
+     * @return The wrapped buffer.
+     */
+    public ByteBuffer getRaw() {
+        return buffer;
     }
 
     /**

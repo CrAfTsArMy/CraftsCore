@@ -18,6 +18,7 @@ afterEvaluate {
         env.load(it)
     }
 
+    def repoToDeploy = version.toString().toLowerCase().contains("pre") ? "experimental" : "releases"
     publishing {
         publications {
             normal(MavenPublication) {
@@ -57,14 +58,14 @@ afterEvaluate {
         }
         repositories {
             maven {
-                url = "https://repo.craftsblock.de/releases"
+                url = "https://repo.craftsblock.de/${repoToDeploy}"
                 authentication {
                     basic(BasicAuthentication) {
                     }
                 }
                 credentials {
-                    username = env["username"]
-                    password = env["password"]
+                    username = env["repo.${repoToDeploy}.username"]
+                    password = env["repo.${repoToDeploy}.password"]
                 }
             }
         }

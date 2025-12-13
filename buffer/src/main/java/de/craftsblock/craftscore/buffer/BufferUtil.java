@@ -483,18 +483,56 @@ public class BufferUtil {
     }
 
     /**
-     * Ensures that the buffer has enough remaining space to store the specified number of bytes.
-     * If not, a larger buffer is allocated and the contents are copied.
+     * Ensures that the underlying {@link ByteBuffer} has at least the specified
+     * number of remaining bytes available. If the current buffer does not have
+     * enough space, it will be expanded automatically.
      *
-     * @param needed The number of bytes required.
+     * <p>This version uses a default step size of 4096 bytes for rounding
+     * the new buffer capacity.</p>
+     *
+     * @param needed The minimum number of bytes that should be available.
      * @return This {@code BufferUtil} instance for chaining.
+     * @throws OutOfMemoryError if the buffer would need to exceed {@link Integer#MAX_VALUE}.
      */
-    public BufferUtil ensure(int needed) {
+    public BufferUtil ensure(@Range(from = 0, to = Integer.MAX_VALUE) int needed) {
+        return ensure(needed, 4096);
+    }
+
+    /**
+     * Ensures that the underlying {@link ByteBuffer} has at least the specified
+     * number of remaining bytes available. If the current buffer does not have
+     * enough space, it will be expanded automatically. The new buffer capacity
+     * is rounded up to a multiple of {@code steps} for predictable allocation sizes.
+     *
+     * <p>The buffer's byte order is preserved when expanding.</p>
+     *
+     * @param needed The minimum number of bytes that should be available.
+     * @param steps  The step size used to round up the new buffer capacity; must be >= 1.
+     * @return This {@code BufferUtil} instance for chaining.
+     * @throws OutOfMemoryError if the buffer would need to exceed {@link Integer#MAX_VALUE}.
+     * @since 3.8.13
+     */
+    public BufferUtil ensure(@Range(from = 0, to = Integer.MAX_VALUE) int needed,
+                             @Range(from = 1, to = Integer.MAX_VALUE) int steps) {
         if (buffer.remaining() >= needed)
             return this;
 
-        int newCapacity = Math.max(buffer.capacity() * 2, buffer.position() + needed);
-        ByteBuffer expanded = ByteBuffer.allocate(newCapacity);
+        int position = buffer.position();
+        int required = position + needed;
+
+        int capacity = buffer.capacity();
+        while (capacity < required) {
+            capacity <<= 1;
+
+            if (capacity < 0)
+                throw new OutOfMemoryError("Buffer too large");
+        }
+
+        int remainder = capacity % steps;
+        if (capacity > steps && remainder != 0)
+            capacity += steps - remainder;
+
+        ByteBuffer expanded = ByteBuffer.allocate(capacity).order(buffer.order());
         buffer.flip();
         expanded.put(buffer);
 

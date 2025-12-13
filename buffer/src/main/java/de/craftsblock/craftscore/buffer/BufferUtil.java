@@ -619,9 +619,11 @@ public class BufferUtil {
      * @return This {@code BufferUtil} instance for chaining.
      */
     public BufferUtil with(int index, Consumer<ByteBuffer> consumer) {
-        buffer.mark().position(index);
+        int position = this.buffer.position();
+
+        this.buffer.position(index);
         consumer.accept(buffer);
-        buffer.reset();
+        buffer.position(position);
 
         return this;
     }
@@ -658,9 +660,11 @@ public class BufferUtil {
      * @return The mapping result.
      */
     public <R> R map(int index, Function<ByteBuffer, R> mapper) {
-        buffer.mark().position(index);
+        int position = this.buffer.position();
+
+        this.buffer.position(index);
         R mapped = mapper.apply(buffer);
-        buffer.reset();
+        buffer.position(position);
 
         return mapped;
     }

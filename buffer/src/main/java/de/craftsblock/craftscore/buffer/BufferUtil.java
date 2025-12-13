@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.1.1
+ * @version 1.2.0
  * @see ByteBuffer
  * @since 3.8.11
  */
@@ -748,6 +748,67 @@ public class BufferUtil {
      */
     public ByteBuffer getRaw() {
         return buffer;
+    }
+
+    /**
+     * Allocates a new {@link BufferUtil} instance with an underlying
+     * {@link ByteBuffer} of the specified capacity.
+     *
+     * <p>This method creates a heap-based {@code ByteBuffer} using
+     * {@link ByteBuffer#allocate(int)} and wraps it in a {@link BufferUtil}
+     * for further processing.</p>
+     *
+     * @param capacity The size, in bytes, of the buffer to allocate.
+     * @return A new {@link BufferUtil} instance backed by the allocated {@link ByteBuffer}.
+     * @since 3.8.13
+     */
+    public static BufferUtil allocate(int capacity) {
+        return of(ByteBuffer.allocate(capacity));
+    }
+
+    /**
+     * Allocates a new {@link BufferUtil} instance backed by a direct
+     * {@link ByteBuffer} with the specified capacity.
+     *
+     * <p>Direct buffers are allocated outside the Java heap and may provide
+     * better performance for I/O operations.</p>
+     *
+     * @param capacity The size, in bytes, of the direct buffer to allocate.
+     * @return A new {@link BufferUtil} instance backed by the allocated direct buffer.
+     * @since 3.8.13
+     */
+    public static BufferUtil allocateDirect(int capacity) {
+        return of(ByteBuffer.allocateDirect(capacity));
+    }
+
+    /**
+     * Wraps a portion of the given byte array in a {@link BufferUtil}.
+     *
+     * <p>The resulting buffer will reference the specified range of the array
+     * without copying its contents.</p>
+     *
+     * @param array  The byte array to wrap.
+     * @param offset The starting position in the array.
+     * @param length The number of bytes to include in the buffer.
+     * @return A {@link BufferUtil} instance wrapping the specified range of the array.
+     * @since 3.8.13
+     */
+    public static BufferUtil wrap(byte[] array, int offset, int length) {
+        return of(ByteBuffer.wrap(array, offset, length));
+    }
+
+    /**
+     * Wraps the entire given byte array in a {@link BufferUtil}.
+     *
+     * <p>The resulting buffer will reference the original array directly
+     * without copying its contents.</p>
+     *
+     * @param array The byte array to wrap.
+     * @return A {@link BufferUtil} instance wrapping the full array.
+     * @since 3.8.13
+     */
+    public static BufferUtil wrap(byte[] array) {
+        return of(ByteBuffer.wrap(array));
     }
 
     /**

@@ -18,7 +18,7 @@ afterEvaluate {
         env.load(it)
     }
 
-    def repoToDeploy = version.toString().toLowerCase().contains("pre") ? "experimental" : "releases"
+    def repoToDeploy = version.toString().matches(/^\d+(?:\.\d+)*$/) ? "releases" : "experimental"
     publishing {
         publications {
             normal(MavenPublication) {

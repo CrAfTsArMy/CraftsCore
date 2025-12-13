@@ -1,7 +1,10 @@
 package de.craftsblock.craftscore.buffer;
 
+import org.jetbrains.annotations.Range;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.InvalidMarkException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -547,12 +550,32 @@ public class BufferUtil {
      * @return This {@code BufferUtil} instance for chaining.
      */
     public BufferUtil trim() {
-        buffer.flip();
+        ByteBuffer dup = buffer.asReadOnlyBuffer();
+        dup.flip();
 
-        byte[] trimmed = new byte[buffer.remaining()];
-        buffer.get(trimmed);
+        byte[] data = new byte[dup.remaining()];
+        dup.get(data);
 
-        this.buffer = ByteBuffer.wrap(trimmed);
+        ByteBuffer trimmed = ByteBuffer.wrap(data).order(buffer.order());
+
+        int position = Math.min(buffer.position(), trimmed.limit());
+        trimmed.position(position);
+        trimmed.limit(Math.min(buffer.limit(), trimmed.limit()));
+
+        try {
+            buffer.reset();
+
+            int mark = buffer.position();
+            if (mark <= trimmed.limit()) {
+                trimmed.mark();
+                trimmed.position(mark);
+                trimmed.mark();
+                trimmed.position(position);
+            }
+        } catch (InvalidMarkException ignore) {
+        }
+
+        this.buffer = trimmed;
         return this;
     }
 

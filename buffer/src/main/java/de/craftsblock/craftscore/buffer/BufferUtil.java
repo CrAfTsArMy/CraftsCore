@@ -733,11 +733,11 @@ public class BufferUtil {
      * @return A byte array containing the current buffer content.
      */
     public byte[] toByteArray() {
-        ByteBuffer dup = buffer.duplicate();
-        dup.flip();
+        ByteBuffer readOnly = buffer.asReadOnlyBuffer();
+        readOnly.rewind();
 
-        byte[] data = new byte[dup.remaining()];
-        dup.get(data);
+        byte[] data = new byte[readOnly.remaining()];
+        readOnly.get(data);
         return data;
     }
 

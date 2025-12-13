@@ -439,7 +439,7 @@ public class BufferUtil {
      * @return An array containing the remaining bytes.
      * @since 3.8.13
      */
-    public byte[] getRemaining() {
+    public byte[] getRemainingBytes() {
         int remaining = buffer.remaining();
 
         byte[] data = new byte[remaining];
@@ -455,8 +455,8 @@ public class BufferUtil {
      * @return An array containing the remaining bytes.
      * @since 3.8.13
      */
-    public byte[] getRemaining(int index) {
-        return this.map(index, () -> getRemaining());
+    public byte[] getRemainingBytes(int index) {
+        return this.map(index, () -> getRemainingBytes());
     }
 
     /**
@@ -467,7 +467,7 @@ public class BufferUtil {
      * @return {@code true} if {@code buffer.remaining() >= bytes}, otherwise {@code false}
      * @since 3.8.13
      */
-    public boolean hasRemaining(int bytes) {
+    public boolean hasRemainingBytes(int bytes) {
         return buffer.remaining() >= bytes;
     }
 
@@ -478,7 +478,7 @@ public class BufferUtil {
      * @return {@code true} if at least one byte is available, otherwise {@code false}
      * @since 3.8.13
      */
-    public boolean hasRemaining() {
+    public boolean hasRemainingBytes() {
         return buffer.hasRemaining();
     }
 

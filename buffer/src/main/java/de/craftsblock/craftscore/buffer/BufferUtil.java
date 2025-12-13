@@ -185,6 +185,37 @@ public class BufferUtil {
     }
 
     /**
+     * Writes the given {@link UUID} into the underlying buffer.
+     * <p>
+     * The {@link UUID} is encoded as two consecutive {@code long} values.
+     * First the most significant bits, then the least significant bits.
+     *
+     * @param uuid the UUID to write into the buffer
+     * @return this {@code BufferUtil} instance for method chaining
+     * @since 3.8.13
+     */
+    public BufferUtil putUuid(UUID uuid) {
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+        return this;
+    }
+
+    /**
+     * Writes the given {@link UUID} into the underlying buffer at the specified index.
+     * <p>
+     * The {@link UUID} is encoded as two consecutive {@code long} values.
+     * First the most significant bits, then the least significant bits.
+     *
+     * @param index the position at which the UUID should be written
+     * @param uuid  the UUID to write into the buffer
+     * @return this {@code BufferUtil} instance for method chaining
+     * @since 3.8.13
+     */
+    public BufferUtil putUuid(int index, UUID uuid) {
+        return with(index, () -> this.putUuid(uuid));
+    }
+
+    /**
      * Reads a specific number of bytes from the buffer.
      *
      * @param n The number of bytes to read.
@@ -388,7 +419,7 @@ public class BufferUtil {
      *
      * @return The decoded {@link UUID}.
      */
-    public UUID getUUID() {
+    public UUID getUuid() {
         return new UUID(buffer.getLong(), buffer.getLong());
     }
 
@@ -398,8 +429,8 @@ public class BufferUtil {
      * @param index The buffer index.
      * @return The decoded {@link UUID}.
      */
-    public UUID getUUID(int index) {
-        return this.map(index, () -> getUUID());
+    public UUID getUuid(int index) {
+        return this.map(index, () -> getUuid());
     }
 
     /**

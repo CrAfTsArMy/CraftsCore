@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.2.0
+ * @version 1.2.1
  * @see ByteBuffer
  * @since 3.8.11
  */
@@ -733,12 +733,30 @@ public class BufferUtil {
      * @return A byte array containing the current buffer content.
      */
     public byte[] toByteArray() {
+        if (!isSliced()) {
+            return buffer.array();
+        }
+
         ByteBuffer readOnly = buffer.asReadOnlyBuffer();
         readOnly.rewind();
 
         byte[] data = new byte[readOnly.remaining()];
         readOnly.get(data);
         return data;
+    }
+
+    /**
+     * Indicates whether this buffer represents a sliced view of another buffer.
+     * <p>
+     * A buffer is considered sliced if it has a backing array and its
+     * {@link java.nio.Buffer#arrayOffset()} is not zero, meaning it does not start
+     * at the beginning of the underlying array.
+     *
+     * @return {@code true} if the buffer is sliced; {@code false} otherwise
+     * @since 3.8.13
+     */
+    public boolean isSliced() {
+        return buffer.hasArray() && buffer.arrayOffset() != 0;
     }
 
     /**

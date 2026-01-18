@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  * @see BufferUtil
  * @see ObjectOutputStream
  * @see ObjectInputStream
- * @since 3.7.0
+ * @since 3.8.13
  */
 public final class ObjectSerializer {
 

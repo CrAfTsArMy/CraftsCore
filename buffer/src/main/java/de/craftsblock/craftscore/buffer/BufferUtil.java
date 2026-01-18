@@ -7,6 +7,7 @@ import java.nio.ByteOrder;
 import java.nio.InvalidMarkException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -31,7 +32,7 @@ public class BufferUtil {
     private ByteBuffer buffer;
 
     /**
-     * Constructs a new {@code BufferUtil} instance wrapping the given {@link ByteBuffer}.
+     * Constructs a new {@link BufferUtil} instance wrapping the given {@link ByteBuffer}.
      *
      * @param buffer The {@link ByteBuffer} to wrap.
      */
@@ -43,7 +44,7 @@ public class BufferUtil {
      * Writes a boolean to the buffer.
      *
      * @param value The boolean value to write.
-     * @return The {@code BufferUtil} instance for chaining.
+     * @return The {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putBoolean(boolean value) {
         this.buffer.put((byte) (value ? 1 : 0));
@@ -55,7 +56,7 @@ public class BufferUtil {
      *
      * @param index This position in the buffer to write the value.
      * @param value The boolean value to write.
-     * @return The {@code BufferUtil} instance for chaining.
+     * @return The {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putBoolean(int index, boolean value) {
         return with(index, buffer -> this.putBoolean(value));
@@ -65,7 +66,7 @@ public class BufferUtil {
      * Writes a variable-length integer to the buffer using VarInt encoding.
      *
      * @param value The integer value to write.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putVarInt(int value) {
         while ((value & -128) != 0) {
@@ -82,7 +83,7 @@ public class BufferUtil {
      *
      * @param index The position in the buffer to write the value.
      * @param value The integer value to write.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putVarInt(int index, int value) {
         return with(index, buffer -> this.putVarInt(value));
@@ -92,7 +93,7 @@ public class BufferUtil {
      * Writes a variable-length long to the buffer using VarLong encoding.
      *
      * @param value The long value to write.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putVarLong(long value) {
         while ((value & -128) != 0) {
@@ -109,7 +110,7 @@ public class BufferUtil {
      *
      * @param index The position in the buffer to write the value.
      * @param value The long value to write.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putVarLong(int index, long value) {
         return with(index, buffer -> this.putVarLong(value));
@@ -119,7 +120,7 @@ public class BufferUtil {
      * Writes a UTF-8 encoded string to the buffer, prefixed with its length as a VarInt.
      *
      * @param value The string value to write.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putUtf(String value) {
         this.putVarInt(value.getBytes(StandardCharsets.UTF_8).length);
@@ -133,7 +134,7 @@ public class BufferUtil {
      *
      * @param index The buffer index to write at.
      * @param value The string value to write.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putUtf(int index, String value) {
         return this.with(index, () -> this.putUtf(value));
@@ -144,7 +145,7 @@ public class BufferUtil {
      *
      * @param value   The character sequence to write.
      * @param charset The charset to use for encoding.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putCharSequence(CharSequence value, Charset charset) {
         buffer.put(value.toString().getBytes(charset));
@@ -157,7 +158,7 @@ public class BufferUtil {
      * @param index   The buffer index to write at.
      * @param value   The character sequence to write.
      * @param charset The charset to use for encoding.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil putCharSequence(int index, CharSequence value, Charset charset) {
         return this.with(index, () -> this.putCharSequence(value, charset));
@@ -168,7 +169,7 @@ public class BufferUtil {
      *
      * @param t   The enum value to write.
      * @param <T> The enum type.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public <T extends Enum<?>> BufferUtil putEnum(T t) {
         buffer.putInt(t.ordinal());
@@ -181,7 +182,7 @@ public class BufferUtil {
      * @param index The buffer index to write at.
      * @param t     The enum value to write.
      * @param <T>   The enum type.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public <T extends Enum<?>> BufferUtil putEnum(int index, T t) {
         return this.with(index, () -> this.putEnum(t));
@@ -194,7 +195,7 @@ public class BufferUtil {
      * First the most significant bits, then the least significant bits.
      *
      * @param uuid the UUID to write into the buffer
-     * @return this {@code BufferUtil} instance for method chaining
+     * @return this {@link BufferUtil} instance for method chaining
      * @since 3.8.13
      */
     public BufferUtil putUuid(UUID uuid) {
@@ -211,7 +212,7 @@ public class BufferUtil {
      *
      * @param index the position at which the UUID should be written
      * @param uuid  the UUID to write into the buffer
-     * @return this {@code BufferUtil} instance for method chaining
+     * @return this {@link BufferUtil} instance for method chaining
      * @since 3.8.13
      */
     public BufferUtil putUuid(int index, UUID uuid) {
@@ -494,7 +495,7 @@ public class BufferUtil {
      * the new buffer capacity.</p>
      *
      * @param needed The minimum number of bytes that should be available.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      * @throws OutOfMemoryError if the buffer would need to exceed {@link Integer#MAX_VALUE}.
      */
     public BufferUtil ensure(@Range(from = 0, to = Integer.MAX_VALUE) int needed) {
@@ -511,7 +512,7 @@ public class BufferUtil {
      *
      * @param needed The minimum number of bytes that should be available.
      * @param steps  The step size used to round up the new buffer capacity; must be >= 1.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      * @throws OutOfMemoryError if the buffer would need to exceed {@link Integer#MAX_VALUE}.
      * @since 3.8.13
      */
@@ -547,7 +548,7 @@ public class BufferUtil {
      * Trims the buffer to its current position, creating a new buffer containing only
      * the written data.
      *
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil trim() {
         ByteBuffer dup = buffer.asReadOnlyBuffer();
@@ -583,7 +584,7 @@ public class BufferUtil {
      * Skips a number of bytes by advancing the buffer position.
      *
      * @param bytes The number of bytes to skip.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil skip(int bytes) {
         buffer.position(buffer.position() + bytes);
@@ -591,9 +592,9 @@ public class BufferUtil {
     }
 
     /**
-     * Creates a duplicate copy of this {@code BufferUtil} with a duplicated buffer.
+     * Creates a duplicate copy of this {@link BufferUtil} with a duplicated buffer.
      *
-     * @return A new {@code BufferUtil} instance wrapping the duplicate buffer.
+     * @return A new {@link BufferUtil} instance wrapping the duplicate buffer.
      */
     public BufferUtil copy() {
         return of(buffer.duplicate());
@@ -603,7 +604,7 @@ public class BufferUtil {
      * Executes a {@link Consumer} operation on the wrapped buffer.
      *
      * @param consumer The consumer to execute.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil with(Consumer<ByteBuffer> consumer) {
         consumer.accept(buffer);
@@ -616,7 +617,7 @@ public class BufferUtil {
      *
      * @param index    The index to temporarily set.
      * @param consumer The consumer to execute.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil with(int index, Consumer<ByteBuffer> consumer) {
         int position = this.buffer.position();
@@ -633,7 +634,7 @@ public class BufferUtil {
      *
      * @param index    The index to temporarily set.
      * @param runnable The runnable to execute.
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     private BufferUtil with(int index, Runnable runnable) {
         return this.with(index, buffer -> runnable.run());
@@ -682,9 +683,38 @@ public class BufferUtil {
     }
 
     /**
+     * Overwrites the underlying buffer contents with zeros and resets
+     * the buffer state for reuse.
+     * <p>
+     * This method guarantees that sensitive data is removed from memory
+     * whenever possible. For heap backed, non sliced buffers the backing
+     * array is cleared directly for performance reasons. Otherwise, the
+     * buffer is cleared byte by byte.
+     * </p>
+     *
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.13
+     */
+    public BufferUtil purge() {
+        if (!isSliced()) {
+            Arrays.fill(buffer.array(), (byte) 0);
+            buffer.clear();
+            return this;
+        }
+
+        buffer.clear();
+        while (buffer.hasRemaining()) {
+            buffer.put((byte) 0);
+        }
+        buffer.clear();
+
+        return this;
+    }
+
+    /**
      * Sets the buffer byte order to little-endian.
      *
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil toLittleEndian() {
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -694,7 +724,7 @@ public class BufferUtil {
     /**
      * Sets the buffer byte order to big-endian.
      *
-     * @return This {@code BufferUtil} instance for chaining.
+     * @return This {@link BufferUtil} instance for chaining.
      */
     public BufferUtil toBigEndian() {
         buffer.order(ByteOrder.BIG_ENDIAN);
@@ -830,40 +860,40 @@ public class BufferUtil {
     }
 
     /**
-     * Creates a new {@code BufferUtil} instance from an existing {@link ByteBuffer}.
+     * Creates a new {@link BufferUtil} instance from an existing {@link ByteBuffer}.
      *
      * @param buffer The buffer to wrap.
-     * @return A new {@code BufferUtil} instance.
+     * @return A new {@link BufferUtil} instance.
      */
     public static BufferUtil of(ByteBuffer buffer) {
         return new BufferUtil(buffer);
     }
 
     /**
-     * Creates a new {@code BufferUtil} instance from a {@link Supplier} of {@link ByteBuffer}.
+     * Creates a new {@link BufferUtil} instance from a {@link Supplier} of {@link ByteBuffer}.
      *
      * @param bufSupplier The supplier providing the buffer.
-     * @return A new {@code BufferUtil} instance.
+     * @return A new {@link BufferUtil} instance.
      */
     public static BufferUtil of(Supplier<ByteBuffer> bufSupplier) {
         return of(bufSupplier.get());
     }
 
     /**
-     * Creates a new {@code BufferUtil} instance using a function that generates a {@link ByteBuffer}
+     * Creates a new {@link BufferUtil} instance using a function that generates a {@link ByteBuffer}
      * based on an input parameter.
      *
      * @param bufFunction The function generating the buffer.
      * @param t           The input value.
      * @param <T>         The input type.
-     * @return A new {@code BufferUtil} instance.
+     * @return A new {@link BufferUtil} instance.
      */
     public static <T> BufferUtil of(Function<T, ByteBuffer> bufFunction, T t) {
         return of(bufFunction.apply(t));
     }
 
     /**
-     * Creates a new {@code BufferUtil} instance using a bi-function that generates a {@link ByteBuffer}
+     * Creates a new {@link BufferUtil} instance using a bi-function that generates a {@link ByteBuffer}
      * based on two input parameters.
      *
      * @param bufFunction The bi-function generating the buffer.
@@ -871,7 +901,7 @@ public class BufferUtil {
      * @param u           The second input value.
      * @param <T>         The first input type.
      * @param <U>         The second input type.
-     * @return A new {@code BufferUtil} instance.
+     * @return A new {@link BufferUtil} instance.
      */
     public static <T, U> BufferUtil of(BiFunction<T, U, ByteBuffer> bufFunction, T t, U u) {
         return of(bufFunction.apply(t, u));

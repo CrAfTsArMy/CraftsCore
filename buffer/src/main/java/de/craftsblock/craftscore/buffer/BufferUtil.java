@@ -523,7 +523,7 @@ public class BufferUtil {
         int position = buffer.position();
         int required = position + needed;
 
-        int capacity = buffer.capacity();
+        int capacity = buffer.capacity() == 0 ? 1 : buffer.capacity();
         while (capacity < required) {
             capacity <<= 1;
 

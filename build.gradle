@@ -1,5 +1,5 @@
 group = "de.craftsblock"
-version = "3.8.13-pre5"
+version = "3.8.13-pre7"
 
 subprojects {
     apply from: "$rootDir/gradle/publications.gradle"

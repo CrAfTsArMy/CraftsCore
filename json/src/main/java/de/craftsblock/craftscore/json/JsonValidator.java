@@ -22,8 +22,8 @@ import java.util.function.Supplier;
  */
 public final class JsonValidator {
 
+    // Private constructor to disallow instantiation.
     private JsonValidator() {
-        // Private constructor to disallow instantiation.
     }
 
     /**

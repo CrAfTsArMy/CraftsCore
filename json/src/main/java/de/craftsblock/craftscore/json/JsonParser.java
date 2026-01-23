@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,15 +17,15 @@ import java.nio.file.StandardOpenOption;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.1
+ * @version 2.1.2
  * @see Json
  * @see JsonValidator
  * @since 3.6#16-SNAPSHOT
  */
 public final class JsonParser {
 
+    // Private constructor to disallow instantiation.
     private JsonParser() {
-        // Private constructor to disallow instantiation.
     }
 
     /**
@@ -108,7 +109,7 @@ public final class JsonParser {
      * @since 3.8.12
      */
     public static @NotNull Json parse(@NotNull Reader reader) {
-        return parse(JsonValidator.safeParse(() -> com.google.gson.JsonParser.parseReader(reader)));
+        return parseElement(JsonValidator.safeParse(() -> com.google.gson.JsonParser.parseReader(reader)), false);
     }
 
     /**
@@ -122,27 +123,44 @@ public final class JsonParser {
         if (json == null)
             return Json.empty();
 
-        return parse(JsonValidator.safeParse(() -> com.google.gson.JsonParser.parseString(json)));
+        return parseElement(JsonValidator.safeParse(() -> com.google.gson.JsonParser.parseString(json)), false);
     }
 
     /**
      * Parses a {@link JsonElement} into a {@link Json} object.
-     * <p>
-     * This method checks if the provided JsonElement is a {@link com.google.gson.JsonPrimitive}. If it is a string,
-     * it parses the string and returns the corresponding {@link Json} object. Otherwise, it returns
-     * a new {@link Json} object representing the {@link JsonElement}.
-     * </p>
      *
      * @param element The {@link JsonElement} to be parsed
      * @return A {@link Json} object representing the content of the {@link JsonElement}
      */
     public static @NotNull Json parse(@NotNull JsonElement element) {
+        return parseElement(element, true);
+    }
+
+    /**
+     * Parses a {@link JsonElement} into a {@link Json} object.
+     * <p>
+     * This method checks if the provided JsonElement is a {@link JsonPrimitive}.
+     * If it is a string and {@code breakDownStrings} is set to {@code true}, it parses the
+     * string and returns the corresponding {@link Json} object. Otherwise, it returns a new
+     * {@link Json} object representing the {@link JsonElement}.
+     * </p>
+     *
+     * @param element The {@link JsonElement} to be parsed
+     * @param breakDownStrings Whether {@link JsonPrimitive} are deep parsed if it is a string
+     * @return A {@link Json} object representing the content of the {@link JsonElement}
+     * @since 3.8.13
+     */
+    private static @NotNull Json parseElement(@NotNull JsonElement element, boolean breakDownStrings) {
         if (element.isJsonNull())
             return Json.empty();
 
         if (!JsonValidator.isParsable(element)) {
             JsonPrimitive primitive = element.getAsJsonPrimitive();
-            return primitive.isString() ? parse(primitive.getAsString()) : Json.empty();
+            if (breakDownStrings && primitive.isString()) {
+                return parse(primitive.getAsString());
+            }
+
+            throw new JsonSyntaxException("Not parsable: " + primitive);
         }
 
         return new Json(element);

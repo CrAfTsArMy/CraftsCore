@@ -67,21 +67,26 @@ public class ListenerRegistry {
             try {
                 Class<? extends Event> event = getEventTypeOrThrow(method);
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
-                if (!data.containsKey(event)) continue;
+                if (!data.containsKey(event)) {
+                    continue;
+                }
 
                 Map<EventPriority, Queue<Listener>> listeners = data.get(event);
-                if (!listeners.containsKey(eventHandler.priority())) continue;
+                if (!listeners.containsKey(eventHandler.priority())) {
+                    continue;
+                }
+
                 listeners.get(eventHandler.priority()).removeIf(listener -> listener.method().equals(method));
 
-                // Remove the event priority if there are no left listeners
-                if (listeners.get(eventHandler.priority()).isEmpty())
+                if (listeners.get(eventHandler.priority()).isEmpty()) {
                     listeners.remove(eventHandler.priority());
-                else
-                    // Continue as there are more listeners remaining
+                } else {
                     continue;
+                }
 
-                // Remove the event type if no listeners are left
-                if (listeners.isEmpty()) data.remove(event);
+                if (listeners.isEmpty()) {
+                    data.remove(event);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("Could not unregister handler %s#%s(%s)!".formatted(
                         method.getDeclaringClass().getSimpleName(),
@@ -102,12 +107,14 @@ public class ListenerRegistry {
                 method.getName(), EventHandler.class.getName(), Event.class.getName()
         );
 
-        if (method.getParameterCount() <= 0)
+        if (method.getParameterCount() <= 0) {
             throw new IllegalStateException(exception);
+        }
 
         Class<?> parameter = method.getParameters()[0].getType();
-        if (!Event.class.isAssignableFrom(parameter))
+        if (!Event.class.isAssignableFrom(parameter)) {
             throw new IllegalStateException(exception);
+        }
 
         return parameter.asSubclass(Event.class);
     }
@@ -130,7 +137,9 @@ public class ListenerRegistry {
      * @return {@code true} when the {@link ListenerAdapter} was registered, {@code false} otherwise.
      */
     public boolean isRegistered(Class<? extends ListenerAdapter> type) {
-        if (data.isEmpty()) return false;
+        if (data.isEmpty()) {
+            return false;
+        }
 
         return data.values().stream()
                 .filter(map -> !map.isEmpty())
@@ -161,22 +170,29 @@ public class ListenerRegistry {
     private void call(Event event, Class<? extends Event> type) {
         @SuppressWarnings("unchecked")
         Class<? extends Event> superClass = (Class<? extends Event>) type.getSuperclass();
-        if (superClass != null && Event.class.isAssignableFrom(superClass))
+        if (superClass != null && Event.class.isAssignableFrom(superClass)) {
             call(event, superClass);
+        }
 
-        if (!this.data.containsKey(type))
+        if (!this.data.containsKey(type)) {
             return;
+        }
 
         Map<EventPriority, Queue<Listener>> data = this.data.get(type);
-        if (data.isEmpty()) return;
+        if (data.isEmpty()) {
+            return;
+        }
 
         for (EventPriority priority : data.keySet()) {
             Queue<Listener> listeners = data.get(priority);
-            if (listeners.isEmpty()) continue;
+            if (listeners.isEmpty()) {
+                continue;
+            }
 
             for (Listener tile : listeners) {
-                if (event instanceof Cancellable cancellable && cancellable.isCancelled() && tile.ignoreWhenCancelled())
+                if (event instanceof Cancellable cancellable && cancellable.isCancelled() && tile.ignoreWhenCancelled()) {
                     continue;
+                }
 
                 Method method = tile.method();
                 try {
@@ -223,8 +239,9 @@ public class ListenerRegistry {
      * Processes and dispatches all queued events across all channels.
      */
     public void callAllQueued() {
-        for (Short channel : channelQueues.keySet())
+        for (Short channel : channelQueues.keySet()) {
             callQueued(channel);
+        }
     }
 
     /**
@@ -233,15 +250,19 @@ public class ListenerRegistry {
      * @param channel The channel ID to process queued events from.
      */
     public void callQueued(Short channel) {
-        if (!channelQueues.containsKey(channel)) return;
-
-        Queue<Event> queue = channelQueues.get(channel);
-        for (Event event : queue) {
-            call(event);
-            queue.remove(event);
+        if (!channelQueues.containsKey(channel)) {
+            return;
         }
 
-        if (queue.isEmpty()) channelQueues.remove(channel);
+        Queue<Event> queue = channelQueues.get(channel);
+        Event event;
+        while ((event = queue.poll()) != null) {
+            call(event);
+        }
+
+        if (queue.isEmpty()) {
+            channelQueues.remove(channel);
+        }
     }
 
     /**

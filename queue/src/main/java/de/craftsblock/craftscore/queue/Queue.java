@@ -1,7 +1,11 @@
 package de.craftsblock.craftscore.queue;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class Queue {
 
     private final ConcurrentLinkedQueue<Runnable> tasks = new ConcurrentLinkedQueue<>();

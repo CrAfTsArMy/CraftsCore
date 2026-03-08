@@ -1,10 +1,14 @@
 package de.craftsblock.craftscore.queue;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class PrioritizedTimedQueue extends PrioritizedQueue {
 
     private final long time;

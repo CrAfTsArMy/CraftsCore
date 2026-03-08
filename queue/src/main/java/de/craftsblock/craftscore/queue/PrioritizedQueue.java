@@ -1,10 +1,13 @@
 package de.craftsblock.craftscore.queue;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class PrioritizedQueue extends Queue {
 
     private final EnumMap<Priority, ConcurrentLinkedQueue<Runnable>> tasks = new EnumMap<>(Priority.class);

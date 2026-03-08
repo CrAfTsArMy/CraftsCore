@@ -1,6 +1,7 @@
 package de.craftsblock.craftscore.encryption.methods;
 
 import de.craftsblock.craftscore.encryption.api.Encryptor;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -11,6 +12,8 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public class AES extends Encryptor {
 
     public String encrypt(String plaintext, String password) throws Exception {

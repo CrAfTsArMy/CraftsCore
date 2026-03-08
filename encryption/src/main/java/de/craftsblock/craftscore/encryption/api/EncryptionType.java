@@ -1,9 +1,12 @@
 package de.craftsblock.craftscore.encryption.api;
 
 import de.craftsblock.craftscore.encryption.methods.AES;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.InvocationTargetException;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public enum EncryptionType {
 
     AES(AES.class);

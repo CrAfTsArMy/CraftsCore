@@ -758,6 +758,25 @@ public class BufferUtil {
     }
 
     /**
+     * Converts the buffer content into a binary string representation.
+     *
+     * @return A string containing the buffer’s bytes in binary format.
+     */
+    public String toBinaryString() {
+        ByteBuffer dup = buffer.duplicate();
+        dup.rewind();
+
+        StringBuilder sb = new StringBuilder();
+        while (dup.hasRemaining()) {
+            sb.append(String.format("%8s", Integer.toBinaryString(dup.get() & 0xFF))
+                            .replace(' ', '0'))
+                    .append(" ");
+        }
+
+        return sb.toString().trim();
+    }
+
+    /**
      * Converts the buffer content into a byte array.
      *
      * @return A byte array containing the current buffer content.

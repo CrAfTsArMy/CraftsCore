@@ -54,24 +54,12 @@ public final class DirectListener<T extends Event> implements Listener {
      * {@inheritDoc}
      *
      * @param event {@inheritDoc}
+     * @since 3.8.14
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void accept(Event event) {
-        this.accept0((T) event);
-    }
-
-    /**
-     * Internal type-safe event handling method.
-     * <p>
-     * Executes the underlying {@link Consumer} and then forwards execution
-     * to the next listener in the chain.
-     *
-     * @param event The event instance to handle.
-     */
-    public void accept0(T event) {
-        getConsumer().accept(event);
-        Listener.super.callNext(event);
+    public void call(Event event) {
+        this.consumer.accept((T) event);
     }
 
     /**

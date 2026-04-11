@@ -32,8 +32,17 @@ public sealed interface Listener extends Consumer<Event>
      */
     @Override
     default void accept(Event event) {
+        call(event);
         callNext(event);
     }
+
+    /**
+     * Performs the logic of this listener with a given event.
+     *
+     * @param event The event to perform on.
+     * @since 3.8.14
+     */
+    void call(Event event);
 
     /**
      * Passes the event to the next listener in the chain, if present.

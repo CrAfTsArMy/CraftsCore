@@ -84,9 +84,10 @@ public final class ReflectionListener implements Listener {
      * {@inheritDoc}
      *
      * @param event {@inheritDoc}
+     * @since 3.8.14
      */
     @Override
-    public void accept(Event event) {
+    public void call(Event event) {
         try {
             handle.invokeExact(event);
         } catch (Throwable e) {
@@ -95,8 +96,6 @@ public final class ReflectionListener implements Listener {
                     e
             );
         }
-
-        Listener.super.callNext(event);
     }
 
     /**

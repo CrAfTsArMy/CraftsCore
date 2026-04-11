@@ -6,6 +6,7 @@ import de.craftsblock.craftscore.event.listener.ReflectionListener;
 import de.craftsblock.craftscore.event.queue.CallQueue;
 import de.craftsblock.craftscore.utils.Utils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -34,11 +35,14 @@ public class ListenerRegistry {
 
     private static final ListenerRegistry GLOBAL = new ListenerRegistry();
     private static final EventPriority[] PRIORITIES;
+    private static final EventPriority[] REVERSED_PRIORITIES;
 
     static {
         List<EventPriority> priorities = Arrays.asList(EventPriority.values());
-        Collections.reverse(priorities);
         PRIORITIES = priorities.toArray(EventPriority[]::new);
+
+        Collections.reverse(priorities);
+        REVERSED_PRIORITIES = priorities.toArray(EventPriority[]::new);
     }
 
     private final @NotNull ExecutorService executorService;
@@ -279,7 +283,7 @@ public class ListenerRegistry {
                 continue;
             }
 
-            for (EventPriority priority : PRIORITIES) {
+            for (EventPriority priority : REVERSED_PRIORITIES) {
                 List<Listener> list = map.get(priority);
                 if (list != null) {
                     ordered.addAll(list);
@@ -339,10 +343,10 @@ public class ListenerRegistry {
     }
 
     /**
-     * Dispatches the given event asynchronously using the default executor service.
+     * Dispatches the given event asynchronously using the default internal executor service.
      *
-     * @param event The event to dispatch asynchronously.
-     * @return A {@link CompletableFuture} that completes with the processed event.
+     * @param event The event to be dispatched asynchronously
+     * @return A {@link CompletableFuture} that completes once all listeners have finished processing the event
      * @since 3.8.13
      */
     public CompletableFuture<Event> callAsync(@NotNull Event event) {
@@ -350,21 +354,70 @@ public class ListenerRegistry {
     }
 
     /**
-     * Dispatches the given event asynchronously using the specified executor.
+     * Dispatches an event asynchronously using the provided executor while respecting
+     * listener priorities.
+     * <p>
+     * The execution is split into sequential priority stages (from lowest to highest),
+     * while listeners within the same priority are executed concurrently using the
+     * supplied {@link Executor}.
      *
-     * @param event    The event to dispatch asynchronously.
-     * @param executor The executor responsible for running the event.
-     * @return A {@link CompletableFuture} that completes with the processed event.
+     * @param event    The event to dispatch
+     * @param executor The executor used for asynchronous listener execution
+     * @return A {@link CompletableFuture} completing once all listener stages have finished
      * @since 3.8.13
      */
     public CompletableFuture<Event> callAsync(@NotNull Event event, @NotNull Executor executor) {
         event.markAsync();
         event.ensureAsyncAllowed();
 
-        return CompletableFuture.supplyAsync(() -> {
-            call(event);
-            return event;
-        }, executor);
+        Listener listener = bakedListeners.get(event.getClass());
+        if (listener == null) {
+            return CompletableFuture.completedFuture(event);
+        }
+
+        EnumMap<EventPriority, List<Listener>> priorities = new EnumMap<>(EventPriority.class);
+        for (Listener current = listener; current != null; current = current.getNext()) {
+            priorities.computeIfAbsent(current.getPriority(), __ -> new ArrayList<>())
+                    .add(current);
+        }
+
+        return callAsync(event, executor, priorities.get(EventPriority.LOWEST))
+                .thenCompose(v -> callAsync(event, executor, priorities.get(EventPriority.LOW)))
+                .thenCompose(v -> callAsync(event, executor, priorities.get(EventPriority.NORMAL)))
+                .thenCompose(v -> callAsync(event, executor, priorities.get(EventPriority.HIGH)))
+                .thenCompose(v -> callAsync(event, executor, priorities.get(EventPriority.HIGHEST)))
+                .thenCompose(v -> callAsync(event, executor, priorities.get(EventPriority.MONITOR)))
+                .thenApply(v -> event);
+    }
+
+    /**
+     * Executes a collection of listeners asynchronously using the provided executor.
+     * <p>
+     * All listeners in the collection are executed in parallel, and the returned
+     * future completes when all listener executions have finished.
+     *
+     * @param event     The event to pass to each listener
+     * @param executor  The executor used for asynchronous execution
+     * @param listeners The collection of listeners to execute; may be {@code null}
+     * @return A {@link CompletableFuture} that completes when all listeners have finished execution
+     * @since 3.8.14
+     */
+    private CompletableFuture<Void> callAsync(@NotNull Event event, @NotNull Executor executor,
+                                              @Nullable Collection<Listener> listeners) {
+        if (listeners == null || listeners.isEmpty()) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>(listeners.size());
+        for (Listener listener : listeners) {
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> listener.call(event),
+                    executor
+            );
+            futures.add(future);
+        }
+
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
     /**

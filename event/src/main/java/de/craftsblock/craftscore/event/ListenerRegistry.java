@@ -41,6 +41,7 @@ public class ListenerRegistry {
     }
 
     private final @NotNull ExecutorService executorService;
+    private final @NotNull CallQueue callQueue;
 
     private final Set<ListenerAdapter> listenerIndex = ConcurrentHashMap.newKeySet();
 
@@ -70,6 +71,7 @@ public class ListenerRegistry {
      */
     public ListenerRegistry(@NotNull ExecutorService executorService) {
         this.executorService = executorService;
+        this.callQueue = new CallQueue(this);
     }
 
     /**
@@ -298,6 +300,17 @@ public class ListenerRegistry {
             call(event);
             return event;
         }, executor);
+    }
+
+    /**
+     * Returns the internal {@link CallQueue} responsible for managing
+     * deferred and asynchronous event dispatching.
+     *
+     * @return The {@link CallQueue} instance associated with this registry.
+     * @since 3.8.13
+     */
+    public @NotNull CallQueue getCallQueue() {
+        return callQueue;
     }
 
     /**

@@ -15,7 +15,6 @@ import java.util.function.Supplier;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.0
  * @see Json
  * @see de.craftsblock.craftscore.json.JsonParser
  * @since 2.4-SNAPSHOT

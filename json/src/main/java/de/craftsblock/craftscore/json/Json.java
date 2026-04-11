@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,7 +23,6 @@ import java.util.stream.Stream;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.2.1
  * @see JsonParser
  * @since 3.6#16-SNAPSHOT
  */
@@ -566,6 +566,38 @@ public final class Json {
     }
 
     /**
+     * Sets the value at the specified path in the json data if the check return {@code false}.
+     *
+     * @param path  The path where the value should be set in the json data.
+     * @param data  The data to be set at the given path.
+     * @param check The check that must not pass.
+     * @return The {@link Json} instance for chaining.
+     * @since 3.8.13
+     */
+    public @NotNull Json setIfNot(@NotNull String path, @Nullable Object data,
+                                  @NotNull Supplier<Boolean> check) {
+        return this.setIf(path, data, () -> !check.get());
+    }
+
+    /**
+     * Sets the value at the specified path in the json data if the check return {@code true}.
+     *
+     * @param path  The path where the value should be set in the json data.
+     * @param data  The data to be set at the given path.
+     * @param check The check that must pass.
+     * @return The {@link Json} instance for chaining.
+     * @since 3.8.13
+     */
+    public @NotNull Json setIf(@NotNull String path, @Nullable Object data,
+                               @NotNull Supplier<Boolean> check) {
+        if (!check.get()) {
+            return this;
+        }
+
+        return this.set(path, data);
+    }
+
+    /**
      * Sets the value at the specified path in the json data.
      * If the path does not exist, it will be created.
      * If the given data is of a supported type (String, Integer, Long, Boolean, Double, Collection or Object[]),
@@ -573,7 +605,7 @@ public final class Json {
      *
      * @param path The path where the value should be set in the json data.
      * @param data The data to be set at the given path.
-     * @return The Json object with the updated value at the specified path.
+     * @return The {@link Json} instance for chaining.
      */
     public @NotNull Json set(@NotNull String path, @Nullable Object data) {
         synchronized (this) {

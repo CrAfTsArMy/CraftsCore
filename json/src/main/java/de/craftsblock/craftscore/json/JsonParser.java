@@ -17,7 +17,6 @@ import java.nio.file.StandardOpenOption;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 2.1.2
  * @see Json
  * @see JsonValidator
  * @since 3.6#16-SNAPSHOT

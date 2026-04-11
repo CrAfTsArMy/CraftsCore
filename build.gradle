@@ -13,10 +13,10 @@ subprojects {
     description = "${rootProject.name} (${suffix})"
 
     afterEvaluate {
-        def component = project.components.findByName("java")
+        def softwareComponent = project.components.findByName("java")
                 ?: project.components.findByName("javaPlatform")
 
-        if (component != null && component.name.equalsIgnoreCase("java")) {
+        if (softwareComponent != null && softwareComponent.name.equalsIgnoreCase("java")) {
             dependencies {
                 // https://mvnrepository.com/artifact/org.jetbrains/annotations
                 implementation "org.jetbrains:annotations:26.0.2"
@@ -34,7 +34,7 @@ subprojects {
             artifactId = project.name
             name = "craftscore ${project.name}"
 
-            component
+            component = softwareComponent
 
             pom {
                 name = project.name

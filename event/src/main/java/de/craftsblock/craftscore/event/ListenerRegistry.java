@@ -32,6 +32,7 @@ import java.util.function.Consumer;
  */
 public class ListenerRegistry {
 
+    private static final ListenerRegistry GLOBAL = new ListenerRegistry();
     private static final EventPriority[] PRIORITIES;
 
     static {
@@ -399,6 +400,16 @@ public class ListenerRegistry {
         }
 
         return parameter.asSubclass(Event.class);
+    }
+
+    /**
+     * Returns the global singleton instance of the {@code ListenerRegistry}.
+     *
+     * @return The globally shared {@code ListenerRegistry} instance.
+     * @since 3.8.13
+     */
+    public static ListenerRegistry global() {
+        return GLOBAL;
     }
 
 }

@@ -18,4 +18,64 @@ package de.craftsblock.craftscore.event;
  */
 public abstract class Event {
 
+    private boolean async = false;
+
+    /**
+     * Determines whether this event type is allowed to be executed asynchronously.
+     * <p>
+     * Subclasses may override this method to restrict an event to synchronous
+     * execution only. If overridden to return {@code false}, the event system
+     * will prevent dispatching this event on asynchronous threads.
+     *
+     * @return {@code true} if the event may be executed asynchronously,
+     * otherwise {@code false}
+     * @since 3.8.13
+     */
+    protected boolean isAsyncAllowed() {
+        return true;
+    }
+
+    /**
+     * Ensures that this event is allowed to be executed asynchronously.
+     * <p>
+     * This method is used by the event dispatcher to validate whether the event
+     * supports asynchronous execution before it is fired. If asynchronous execution
+     * is not permitted, an exception is thrown.
+     *
+     * @throws IllegalStateException if this event does not allow async execution
+     * @since 3.8.13
+     */
+    void ensureAsyncAllowed() {
+        if (isAsyncAllowed()) {
+            return;
+        }
+
+        throw new IllegalStateException(getClass().getName() + " can not be thrown async!");
+    }
+
+    /**
+     * Marks this event as being executed in an asynchronous context.
+     * <p>
+     * This method is typically called by the event dispatcher when an event
+     * is being fired from a non-main thread or asynchronous execution pipeline.
+     *
+     * @since 3.8.13
+     */
+    void markAsync() {
+        this.async = true;
+    }
+
+    /**
+     * Returns whether this event is currently being executed asynchronously.
+     * <p>
+     * This can be used by listeners to adjust their behavior depending on
+     * threading context requirements.
+     *
+     * @return {@code true} if the event is executed asynchronously, otherwise {@code false}
+     * @since 3.8.13
+     */
+    public final boolean isAsync() {
+        return async;
+    }
+
 }

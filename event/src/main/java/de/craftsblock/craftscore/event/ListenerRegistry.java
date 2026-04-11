@@ -272,6 +272,35 @@ public class ListenerRegistry {
     }
 
     /**
+     * Dispatches the given event asynchronously using the default executor service.
+     *
+     * @param event The event to dispatch asynchronously.
+     * @return A {@link CompletableFuture} that completes with the processed event.
+     * @since 3.8.13
+     */
+    public CompletableFuture<Event> callAsync(@NotNull Event event) {
+        return this.callAsync(event, this.executorService);
+    }
+
+    /**
+     * Dispatches the given event asynchronously using the specified executor.
+     *
+     * @param event    The event to dispatch asynchronously.
+     * @param executor The executor responsible for running the event.
+     * @return A {@link CompletableFuture} that completes with the processed event.
+     * @since 3.8.13
+     */
+    public CompletableFuture<Event> callAsync(@NotNull Event event, @NotNull Executor executor) {
+        event.markAsync();
+        event.ensureAsyncAllowed();
+
+        return CompletableFuture.supplyAsync(() -> {
+            call(event);
+            return event;
+        }, executor);
+    }
+
+    /**
      * Retrieves the event type for which the handler is listening.
      *
      * @param method The method which handles a given event type.

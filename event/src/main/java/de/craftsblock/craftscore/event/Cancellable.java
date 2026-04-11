@@ -18,7 +18,6 @@ package de.craftsblock.craftscore.event;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0.0
  * @since 3.6.16-SNAPSHOT
  */
 public interface Cancellable {

@@ -11,7 +11,6 @@ package de.craftsblock.craftscore.event;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.0.0
  * @see Event
  * @see Cancellable
  * @since 3.7.62-SNAPSHOT

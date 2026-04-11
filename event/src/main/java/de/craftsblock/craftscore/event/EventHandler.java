@@ -28,7 +28,6 @@ import java.lang.annotation.Target;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.1.0
  * @see EventPriority
  * @since 3.6.16-SNAPSHOT
  */

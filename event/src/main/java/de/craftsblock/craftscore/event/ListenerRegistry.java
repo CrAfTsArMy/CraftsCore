@@ -113,6 +113,70 @@ public class ListenerRegistry {
     }
 
     /**
+     * Registers a functional event listener for the given event type using
+     * default priority {@link EventPriority#NORMAL} and without ignoring cancelled events.
+     *
+     * @param eventType The class type of the event to listen for.
+     * @param consumer  The consumer that will handle the event.
+     * @param <T>       The type of the event.
+     * @since 3.8.13
+     */
+    public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Consumer<T> consumer) {
+        this.register(eventType, consumer, EventPriority.NORMAL, false);
+    }
+
+    /**
+     * Registers a functional event listener for the given event type using
+     * default priority {@link EventPriority#NORMAL}.
+     *
+     * @param eventType           The class type of the event to listen for.
+     * @param consumer            The consumer that will handle the event.
+     * @param ignoreWhenCancelled Whether the listener should ignore cancelled events.
+     * @param <T>                 The type of the event.
+     * @since 3.8.13
+     */
+    public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Consumer<T> consumer,
+                                           boolean ignoreWhenCancelled) {
+        this.register(eventType, consumer, EventPriority.NORMAL, ignoreWhenCancelled);
+    }
+
+    /**
+     * Registers a functional event listener for the given event type without
+     * specifying cancellation behavior.
+     *
+     * @param eventType The class type of the event to listen for.
+     * @param consumer  The consumer that will handle the event.
+     * @param priority  The priority at which the listener should be executed.
+     * @param <T>       The type of the event.
+     * @since 3.8.13
+     */
+    public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Consumer<T> consumer,
+                                           @NotNull EventPriority priority) {
+        this.register(eventType, consumer, priority, false);
+    }
+
+    /**
+     * Registers a functional event listener for the given event type.
+     *
+     * @param eventType           The class type of the event to listen for.
+     * @param consumer            The consumer that will handle the event.
+     * @param priority            The priority at which the listener should be executed.
+     * @param ignoreWhenCancelled Whether the listener should ignore cancelled events.
+     * @param <T>                 The type of the event.
+     * @since 3.8.13
+     */
+    public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Consumer<T> consumer,
+                                           @NotNull EventPriority priority, boolean ignoreWhenCancelled) {
+        Listener listener = new DirectListener<>(eventType, consumer, priority, ignoreWhenCancelled);
+        registeredListeners
+                .computeIfAbsent(eventType, p -> new EnumMap<>(EventPriority.class))
+                .computeIfAbsent(priority, e -> new CopyOnWriteArrayList<>())
+                .add(listener);
+
+        bakeAll(Collections.singleton(eventType));
+    }
+
+    /**
      * Unregisters an event listener, removing all of its registered event handler methods
      * from the registry.
      *

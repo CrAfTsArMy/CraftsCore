@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -42,11 +41,11 @@ public final class ReflectionListener implements Listener {
     /**
      * Creates a new reflection-based listener for the given event handler method.
      *
-     * @param eventType            The class of the event handled by this listener.
-     * @param method               The reflective method to invoke when the event is fired.
-     * @param owner                The instance owning the method (ignored for static methods).
-     * @param priority             The execution priority of this listener.
-     * @param ignoreWhenCancelled  Whether this listener should ignore cancelled events.
+     * @param eventType           The class of the event handled by this listener.
+     * @param method              The reflective method to invoke when the event is fired.
+     * @param owner               The instance owning the method (ignored for static methods).
+     * @param priority            The execution priority of this listener.
+     * @param ignoreWhenCancelled Whether this listener should ignore cancelled events.
      */
     public ReflectionListener(
             Class<? extends Event> eventType,
@@ -70,7 +69,7 @@ public final class ReflectionListener implements Listener {
                 handle = handle.bindTo(owner);
             }
 
-            MethodType targetType = MethodType.methodType(void.class, eventType);
+            MethodType targetType = MethodType.methodType(void.class, Event.class);
             this.handle = handle.asType(targetType);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Failed to create MethodHandle for " + method, e);

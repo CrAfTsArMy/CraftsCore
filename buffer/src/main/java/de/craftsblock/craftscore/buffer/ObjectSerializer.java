@@ -87,9 +87,14 @@ public final class ObjectSerializer {
     public static final byte CLASS_ID = 10;
 
     /**
-     * Type identifier for {@link Enum} values
+     * Type identifier for {@link Enum} values by its ordinal value
      */
-    public static final byte ENUM_ID = 11;
+    public static final byte ENUM_ID_ORDINAL = 11;
+
+    /**
+     * Type identifier for {@link Enum} values by its constant name value
+     */
+    public static final byte ENUM_ID = 12;
 
     /**
      * Type identifier for objects serialized using java object serialization.
@@ -133,6 +138,7 @@ public final class ObjectSerializer {
             case CHARACTER_ID -> buffer.getRaw().getChar();
             case BOOLEAN_ID -> buffer.getBoolean();
             case UUID_ID -> buffer.getUuid();
+
             case CLASS_ID -> {
                 try {
                     yield Class.forName(buffer.getUtf());
@@ -140,6 +146,16 @@ public final class ObjectSerializer {
                     throw new RuntimeException("Deserialization failed: %s".formatted(e.getMessage()), e);
                 }
             }
+
+            case ENUM_ID_ORDINAL -> {
+                try {
+                    Class<?> type = Class.forName(buffer.getUtf());
+                    yield buffer.getEnumOrdinal(type.asSubclass(Enum.class));
+                } catch (ClassCastException | ClassNotFoundException e) {
+                    throw new RuntimeException("Deserialization failed: %s".formatted(e.getMessage()), e);
+                }
+            }
+
             case ENUM_ID -> {
                 try {
                     Class<?> type = Class.forName(buffer.getUtf());

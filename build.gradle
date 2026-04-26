@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "de.craftsblock"
-version = "3.8.15"
+version = "3.8.16"
 
 subprojects {
     group = "${rootProject.group}.${rootProject.name.toLowerCase()}"

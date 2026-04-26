@@ -165,13 +165,36 @@ public class BufferUtil {
     }
 
     /**
-     * Writes an enum value by its ordinal index.
+     * Writes an enum value by its constant name.
      *
      * @param t   The enum value to write.
      * @param <T> The enum type.
      * @return This {@link BufferUtil} instance for chaining.
      */
     public <T extends Enum<?>> BufferUtil putEnum(T t) {
+        return putUtf(t.name());
+    }
+
+    /**
+     * Writes an enum value at a specific index by its constant name.
+     *
+     * @param index The buffer index to write at.
+     * @param t     The enum value to write.
+     * @param <T>   The enum type.
+     * @return This {@link BufferUtil} instance for chaining.
+     */
+    public <T extends Enum<?>> BufferUtil putEnum(int index, T t) {
+        return this.with(index, () -> this.putEnum(t));
+    }
+
+    /**
+     * Writes an enum value by its ordinal index.
+     *
+     * @param t   The enum value to write.
+     * @param <T> The enum type.
+     * @return This {@link BufferUtil} instance for chaining.
+     */
+    public <T extends Enum<?>> BufferUtil putEnumOrdinal(T t) {
         buffer.putInt(t.ordinal());
         return this;
     }
@@ -184,8 +207,8 @@ public class BufferUtil {
      * @param <T>   The enum type.
      * @return This {@link BufferUtil} instance for chaining.
      */
-    public <T extends Enum<?>> BufferUtil putEnum(int index, T t) {
-        return this.with(index, () -> this.putEnum(t));
+    public <T extends Enum<?>> BufferUtil putEnumOrdinal(int index, T t) {
+        return this.with(index, () -> this.putEnumOrdinal(t));
     }
 
     /**
@@ -396,13 +419,36 @@ public class BufferUtil {
     }
 
     /**
+     * Reads an enum constant from the buffer by constant name.
+     *
+     * @param type The enum class.
+     * @param <T>  The enum type.
+     * @return The corresponding enum constant.
+     */
+    public <T extends Enum<T>> T getEnum(Class<T> type) {
+        return Enum.valueOf(type, getUtf());
+    }
+
+    /**
+     * Reads an enum constant from a specific buffer index by constant name.
+     *
+     * @param index The buffer index.
+     * @param type  The enum class.
+     * @param <T>   The enum type.
+     * @return The corresponding enum constant.
+     */
+    public <T extends Enum<T>> T getEnum(int index, Class<T> type) {
+        return this.map(index, () -> getEnum(type));
+    }
+
+    /**
      * Reads an enum constant from the buffer by ordinal index.
      *
      * @param type The enum class.
      * @param <T>  The enum type.
      * @return The corresponding enum constant.
      */
-    public <T extends Enum<?>> T getEnum(Class<T> type) {
+    public <T extends Enum<T>> T getEnumOrdinal(Class<T> type) {
         return type.getEnumConstants()[buffer.getInt()];
     }
 
@@ -414,8 +460,8 @@ public class BufferUtil {
      * @param <T>   The enum type.
      * @return The corresponding enum constant.
      */
-    public <T extends Enum<?>> T getEnum(int index, Class<T> type) {
-        return this.map(index, () -> getEnum(type));
+    public <T extends Enum<T>> T getEnumOrdinal(int index, Class<T> type) {
+        return this.map(index, () -> getEnumOrdinal(type));
     }
 
     /**

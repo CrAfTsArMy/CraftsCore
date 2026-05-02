@@ -41,6 +41,31 @@ public class BufferUtil {
     }
 
     /**
+     * Writes a byte array prefixed with its length encoded as a VarInt.
+     *
+     * @param value The byte array to write.
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.17
+     */
+    public BufferUtil putSized(byte[] value) {
+        this.putVarInt(value.length);
+        this.getRaw().put(value);
+        return this;
+    }
+
+    /**
+     * Writes a byte array with length prefix at a specific buffer index.
+     *
+     * @param index The position in the buffer.
+     * @param value The byte array to write.
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.17
+     */
+    public BufferUtil putSized(int index, byte[] value) {
+        return with(index, buffer -> this.putSized(value));
+    }
+
+    /**
      * Writes a boolean to the buffer.
      *
      * @param value The boolean value to write.
@@ -263,6 +288,27 @@ public class BufferUtil {
      */
     public byte[] getNBytes(int index, int n) {
         return map(index, () -> getNBytes(n));
+    }
+
+    /**
+     * Reads a length-prefixed byte array from the buffer.
+     *
+     * @return The decoded byte array.
+     * @since 3.8.17
+     */
+    public byte[] getSized() {
+        return this.getNBytes(this.getRaw().getInt());
+    }
+
+    /**
+     * Reads a length-prefixed byte array from a specific index.
+     *
+     * @param index The buffer index.
+     * @return The decoded byte array.
+     * @since 3.8.17
+     */
+    public byte[] getSized(int index) {
+        return map(index, () -> this.getSized(index));
     }
 
     /**

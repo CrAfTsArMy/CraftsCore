@@ -66,6 +66,29 @@ public class BufferUtil {
     }
 
     /**
+     * Serializes an object and writes it as a length-prefixed byte array.
+     *
+     * @param value The object to serialize and write.
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.17
+     */
+    public BufferUtil putSerialized(Object value) {
+        return this.putSized(ObjectSerializer.serialize(value));
+    }
+
+    /**
+     * Serializes an object and writes it at a specific index.
+     *
+     * @param index The buffer index.
+     * @param value The object to serialize and write.
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.17
+     */
+    public BufferUtil putSerialized(int index, Object value) {
+        return with(index, () -> this.putSerialized(value));
+    }
+
+    /**
      * Writes a boolean to the buffer.
      *
      * @param value The boolean value to write.
@@ -309,6 +332,30 @@ public class BufferUtil {
      */
     public byte[] getSized(int index) {
         return map(index, () -> this.getSized(index));
+    }
+
+    /**
+     * Deserializes an object from the buffer.
+     *
+     * @param <T> The expected object type.
+     * @return The deserialized object.
+     * @since 3.8.17
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getSerialized() {
+        return (T) ObjectSerializer.deserialize(getSized());
+    }
+
+    /**
+     * Deserializes an object from a specific index.
+     *
+     * @param index The buffer index.
+     * @param <T>   The expected object type.
+     * @return The deserialized object.
+     * @since 3.8.17
+     */
+    public <T> T getSerialized(int index) {
+        return map(index, () -> this.getSerialized());
     }
 
     /**

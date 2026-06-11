@@ -368,8 +368,8 @@ public class BufferUtil {
     public boolean getBoolean() {
         byte value = buffer.get();
         return switch (value) {
-            case 0 -> true;
-            case 1 -> false;
+            case 0 -> false;
+            case 1 -> true;
             default -> throw new IllegalStateException("%s is not a valid boolean state! (Expected 0 or 1)"
                     .formatted(value));
         };

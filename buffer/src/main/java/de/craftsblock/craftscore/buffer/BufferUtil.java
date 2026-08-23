@@ -320,7 +320,7 @@ public class BufferUtil {
      * @since 3.8.17
      */
     public byte[] getSized() {
-        return this.getNBytes(this.getRaw().getInt());
+        return this.getNBytes(this.getVarInt());
     }
 
     /**
@@ -331,7 +331,7 @@ public class BufferUtil {
      * @since 3.8.17
      */
     public byte[] getSized(int index) {
-        return map(index, () -> this.getSized(index));
+        return map(index, () -> this.getSized());
     }
 
     /**

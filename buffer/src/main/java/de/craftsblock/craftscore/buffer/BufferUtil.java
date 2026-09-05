@@ -1,18 +1,15 @@
 package de.craftsblock.craftscore.buffer;
 
 import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.InvalidMarkException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * A utility wrapper around {@link ByteBuffer} providing extended functionality.
@@ -291,6 +288,63 @@ public class BufferUtil {
     }
 
     /**
+     * Writes a collection of objects using {@link #putCollection(Collection, BiConsumer)}.
+     * Each element is serialized using {@link ObjectSerializer}.
+     *
+     * @param values the values to write
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.19
+     */
+    public BufferUtil putCollection(Collection<?> values) {
+        return this.putCollection(values, BufferUtil::putSerialized);
+    }
+
+    /**
+     * Writes a collection of objects using a caller-provided element writer.
+     * The collection size is prefixed using {@link #putVarInt(int)}.
+     *
+     * @param values the values to write
+     * @param writer the function used to write each element
+     * @param <T>    the element type
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.19
+     */
+    public <T> BufferUtil putCollection(Collection<T> values, BiConsumer<BufferUtil, T> writer) {
+        this.putVarInt(values.size());
+        for (T value : values) {
+            writer.accept(this, value);
+        }
+
+        return this;
+    }
+
+    /**
+     * Writes a collection of objects at a specific buffer index.
+     *
+     * @param index  the position in the buffer
+     * @param values the values to write
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.19
+     */
+    public BufferUtil putCollection(int index, Collection<?> values) {
+        return with(index, () -> this.putCollection(values));
+    }
+
+    /**
+     * Writes a typed collection of objects at a specific buffer index.
+     *
+     * @param index  the position in the buffer
+     * @param values the values to write
+     * @param writer the function used to write each element
+     * @param <T>    the element type
+     * @return This {@link BufferUtil} instance for chaining.
+     * @since 3.8.19
+     */
+    public <T> BufferUtil putCollection(int index, Collection<T> values, BiConsumer<BufferUtil, T> writer) {
+        return with(index, () -> this.putCollection(values, writer));
+    }
+
+    /**
      * Reads a specific number of bytes from the buffer.
      *
      * @param n The number of bytes to read.
@@ -441,8 +495,9 @@ public class BufferUtil {
             long value = (read & 127);
             result |= (value << (7 * numRead));
 
-            if (++numRead > maxSize)
+            if (++numRead > maxSize) {
                 throw new RuntimeException("VarLong is too large");
+            }
         } while ((read & 128) != 0);
 
         return result;
@@ -577,6 +632,66 @@ public class BufferUtil {
     }
 
     /**
+     * Reads a collection of objects serialized using {@link ObjectSerializer}.
+     *
+     * @param <T> the element type
+     * @return the decoded list
+     * @throws IllegalStateException if the encoded list size is negative
+     * @since 3.8.19
+     */
+    public <T> @UnmodifiableView Collection<T> getCollection() {
+        return this.getCollection(BufferUtil::getSerialized);
+    }
+
+    /**
+     * Reads a typed collection using a caller-provided element reader.
+     *
+     * @param reader the function used to read each element
+     * @param <T>    the element type
+     * @return the decoded list
+     * @throws IllegalStateException if the encoded list size is negative
+     * @since 3.8.19
+     */
+    public <T> @UnmodifiableView Collection<T> getCollection(Function<BufferUtil, T> reader) {
+        int size = this.getVarInt();
+        if (size < 0) {
+            throw new IllegalStateException("List size must not be negative: " + size);
+        }
+
+        Collection<T> collection = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            collection.add(reader.apply(this));
+        }
+
+        return Collections.unmodifiableCollection(collection);
+    }
+
+    /**
+     * Reads a collection of serialized objects from a specific buffer index.
+     *
+     * @param index the position in the buffer
+     * @param <T>   the element type
+     * @return the decoded list
+     * @since 3.8.19
+     */
+    public <T> @UnmodifiableView Collection<T> getCollection(int index) {
+        return map(index, () -> this.getCollection());
+    }
+
+    /**
+     * Reads a typed collection from a specific buffer index.
+     *
+     * @param index  the position in the buffer
+     * @param reader the function used to read each element
+     * @param <T>    the element type
+     * @return the decoded list
+     * @since 3.8.19
+     */
+    public <T> @UnmodifiableView Collection<T> getCollection(int index, Function<BufferUtil, T> reader) {
+        return map(index, () -> this.getCollection(reader));
+    }
+
+    /**
      * Reads the remaining bytes in the buffer.
      *
      * @return An array containing the remaining bytes.
@@ -657,8 +772,9 @@ public class BufferUtil {
      */
     public BufferUtil ensure(@Range(from = 0, to = Integer.MAX_VALUE) int needed,
                              @Range(from = 1, to = Integer.MAX_VALUE) int steps) {
-        if (buffer.remaining() >= needed)
+        if (buffer.remaining() >= needed) {
             return this;
+        }
 
         int position = buffer.position();
         int required = position + needed;
@@ -667,13 +783,15 @@ public class BufferUtil {
         while (capacity < required) {
             capacity <<= 1;
 
-            if (capacity < 0)
+            if (capacity < 0) {
                 throw new OutOfMemoryError("Buffer too large");
+            }
         }
 
         int remainder = capacity % steps;
-        if (capacity > steps && remainder != 0)
+        if (capacity > steps && remainder != 0) {
             capacity += steps - remainder;
+        }
 
         ByteBuffer expanded = ByteBuffer.allocate(capacity).order(buffer.order());
         buffer.flip();
@@ -890,8 +1008,9 @@ public class BufferUtil {
         dup.rewind();
 
         StringBuilder sb = new StringBuilder();
-        while (dup.hasRemaining())
+        while (dup.hasRemaining()) {
             sb.append(String.format("%02X ", dup.get()));
+        }
 
         return sb.toString().trim();
     }

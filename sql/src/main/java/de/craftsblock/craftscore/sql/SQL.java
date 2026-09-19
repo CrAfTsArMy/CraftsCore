@@ -1,6 +1,9 @@
 package de.craftsblock.craftscore.sql;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.sql.*;
 
@@ -11,7 +14,6 @@ import java.sql.*;
  *
  * @author Philipp Maywald
  * @author CraftsBlock
- * @version 1.3.2
  * @see de.craftsblock.craftscore.sql.SQL.Callback
  * @since 3.6#15-SNAPSHOT
  */
@@ -19,8 +21,9 @@ public class SQL {
 
     private final Callback callback;
 
+    private @NotNull JdbcSubprotocol subprotocol = JdbcSubprotocol.MYSQL;
     private String host, database;
-    private Integer port;
+    private int port = 3306;
     private Connection connection;
 
     /**
@@ -54,16 +57,18 @@ public class SQL {
      * @param callback  The callback to be notified when the connection is established or closed.
      * @param autoclose If true, the connection will be closed automatically on program shutdown.
      */
-    public SQL(Callback callback, boolean autoclose) {
+    public SQL(@Nullable Callback callback, boolean autoclose) {
+
         this.callback = callback;
-        if (autoclose)
+        if (autoclose) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     disconnect();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException("Failed to close the sql connection on shutdown", e);
                 }
             }));
+        }
     }
 
     /**
@@ -71,7 +76,10 @@ public class SQL {
      *
      * @param host     The MySQL server host.
      * @param database The MySQL database name.
+     * @deprecated Use {@link #setHost(String)} and {@link #setDatabase(String)} instead
      */
+    @Deprecated(since = "3.8.19", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.9.0")
     public void bind(String host, String database) {
         bind(host, 3306, database);
     }
@@ -82,11 +90,58 @@ public class SQL {
      * @param host     The MySQL server host.
      * @param port     The MySQL server port.
      * @param database The MySQL database name.
+     * @deprecated Use {@link #setHost(String)}, {@link #setPort(int)} and {@link #setDatabase(String)} instead
      */
-    public void bind(String host, Integer port, String database) {
+    @Deprecated(since = "3.8.19", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.9.0")
+    public void bind(String host, int port, String database) {
+        setHost(host);
+        setPort(port);
+        setDatabase(database);
+    }
+
+    /**
+     * Sets the host to connect to.
+     *
+     * @param host The host to connect to.
+     * @return The instance of {@link SQL} for chaining.
+     */
+    public SQL setHost(@NotNull String host) {
         this.host = host;
+        return this;
+    }
+
+    /**
+     * Sets the port to connect to.
+     *
+     * @param port The port to connect to.
+     * @return The instance of {@link SQL} for chaining.
+     */
+    public SQL setPort(@Range(from = 0, to = Short.MAX_VALUE * 2) int port) {
         this.port = port;
+        return this;
+    }
+
+    /**
+     * Sets the database to connect to.
+     *
+     * @param database The database to connect to.
+     * @return The instance of {@link SQL} for chaining.
+     */
+    public SQL setDatabase(@NotNull String database) {
         this.database = database;
+        return this;
+    }
+
+    /**
+     * Sets the subprotocol to use in the jdbc connect url.
+     *
+     * @param subprotocol The subprotocol.
+     * @return The instance of {@link SQL} for chaining.
+     */
+    public SQL setSubprotocol(@NotNull JdbcSubprotocol subprotocol) {
+        this.subprotocol = subprotocol;
+        return this;
     }
 
     /**
@@ -96,7 +151,7 @@ public class SQL {
      * @param password The MySQL database password.
      * @throws SQLException if there is an error while connecting to the database.
      */
-    public void connect(String user, String password) throws SQLException {
+    public void connect(@NotNull String user, @NotNull String password) throws SQLException {
         connect(user, password, true);
     }
 
@@ -108,15 +163,27 @@ public class SQL {
      * @param autoReconnect Whether the connection should be automatically reconnected when the connection was lost.
      * @throws SQLException if there is an error while connecting to the database.
      */
-    public void connect(String user, String password, boolean autoReconnect) throws SQLException {
-        if (host == null || port == null || database == null)
-            throw new IllegalStateException("You have to bind your MySQL Connection! (Use \"bind(String, String)\" before connecting.)");
-        if (isConnected())
+    public void connect(@NotNull String user, @NotNull String password, boolean autoReconnect) throws SQLException {
+        if (host == null) {
+            throw new IllegalStateException("The host of the database is missing!");
+        }
+
+        if (database == null) {
+            throw new IllegalStateException("The database name to connect to is missing!");
+        }
+
+        if (isConnected()) {
             return;
+        }
+
         connection = DriverManager.getConnection(
-                "jdbc:mysql://" + host + ":" + port + "/" + database + (autoReconnect ? "?autoReconnect=true" : "")
-                , user, password);
-        if (callback != null) callback.connect(this);
+                "jdbc:" + subprotocol + "://" + host + ":" + port + "/" + database + (autoReconnect ? "?autoReconnect=true" : "")
+                , user, password
+        );
+
+        if (callback != null) {
+            callback.connect(this);
+        }
     }
 
     /**
@@ -125,13 +192,18 @@ public class SQL {
      * @throws SQLException if there is an error while disconnecting from the database.
      */
     public void disconnect() throws SQLException {
-        if (!isConnected())
+        if (!isConnected()) {
             return;
+        }
+
         if (connection != null) {
             connection.close();
             connection = null;
         }
-        if (callback != null) callback.disconnect(this);
+
+        if (callback != null) {
+            callback.disconnect(this);
+        }
     }
 
     /**
@@ -146,7 +218,10 @@ public class SQL {
      */
     public void assertConnectedOrThrow() {
         try {
-            if (isConnected()) return;
+            if (isConnected()) {
+                return;
+            }
+
             throw new IllegalStateException("Not connected to the bound database!");
         } catch (SQLException e) {
             throw new RuntimeException("Could not check the sql connection status!", e);
@@ -173,7 +248,7 @@ public class SQL {
      * @throws SQLException if a database access error occurs
      *                      or this method is called on a closed connection
      */
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
+    public PreparedStatement prepareStatement(@NotNull String sql) throws SQLException {
         return this.prepareStatement(sql, false);
     }
 
@@ -187,7 +262,7 @@ public class SQL {
      * @throws SQLException if a database access error occurs
      *                      or this method is called on a closed connection
      */
-    public PreparedStatement prepareStatement(String sql, boolean returnKeys) throws SQLException {
+    public PreparedStatement prepareStatement(@NotNull String sql, boolean returnKeys) throws SQLException {
         return connection.prepareStatement(sql, returnKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
     }
 
@@ -200,7 +275,7 @@ public class SQL {
      * @throws SQLException if a database access error occurs; this method is called on a closed PreparedStatement
      *                      or the SQL statement returns a ResultSet object
      */
-    public int update(String sql) throws SQLException {
+    public int update(@NotNull String sql) throws SQLException {
         return this.update(this.prepareStatement(sql));
     }
 
@@ -213,10 +288,12 @@ public class SQL {
      * @throws SQLException if a database access error occurs; this method is called on a closed PreparedStatement
      *                      or the SQL statement returns a ResultSet object
      */
-    public int update(PreparedStatement statement) throws SQLException {
+    public int update(@NotNull PreparedStatement statement) throws SQLException {
         try (statement) {
-            if (statement.isClosed())
-                throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+            if (statement.isClosed()) {
+                throw new IllegalStateException("The statement is already closed!");
+            }
+
             return statement.executeUpdate();
         }
     }
@@ -232,7 +309,7 @@ public class SQL {
      *                      statement does not return a {@code ResultSet} object
      */
     @NotNull
-    public ResultSet query(String query) throws SQLException {
+    public ResultSet query(@NotNull String query) throws SQLException {
         return this.query(this.prepareStatement(query));
     }
 
@@ -247,9 +324,11 @@ public class SQL {
      *                      statement does not return a {@code ResultSet} object
      */
     @NotNull
-    public ResultSet query(PreparedStatement statement) throws SQLException {
-        if (statement.isClosed())
-            throw new IllegalStateException("Is the statement already closed? If you are using a try-with-resources statement it is not necessary, because the statement is automatically closed after execution.");
+    public ResultSet query(@NotNull PreparedStatement statement) throws SQLException {
+        if (statement.isClosed()) {
+            throw new IllegalStateException("The statement is already closed!");
+        }
+
         return statement.executeQuery();
     }
 
@@ -282,14 +361,14 @@ public class SQL {
          *
          * @param sql The SQL instance that was connected.
          */
-        void connect(SQL sql);
+        void connect(@NotNull SQL sql);
 
         /**
          * Invoked when the SQL connection is disconnected.
          *
          * @param sql The SQL instance that was disconnected.
          */
-        void disconnect(SQL sql);
+        void disconnect(@NotNull SQL sql);
 
     }
 

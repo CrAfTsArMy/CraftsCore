@@ -103,9 +103,9 @@ public sealed interface Listener extends Consumer<Event>
     boolean isIgnoreWhenCancelled();
 
     /**
+     * Clones this listener without cloning the next listener.
      *
-     *
-     * @return
+     * @return The cloned listener.
      */
     @ApiStatus.Internal
     Listener cloneWithoutChain();

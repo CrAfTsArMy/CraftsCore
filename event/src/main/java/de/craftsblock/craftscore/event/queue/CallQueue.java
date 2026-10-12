@@ -44,6 +44,7 @@ public class CallQueue {
      * Queues an event for deferred processing in the default channel (channel 0).
      *
      * @param event The event to be queued.
+     * @return A {@link CompletableFuture<Event>} that will resolve when the event has been called.
      */
     public CompletableFuture<Event> queue(@NotNull Event event) {
         return this.queue((short) 0, event);
@@ -54,6 +55,7 @@ public class CallQueue {
      *
      * @param channel The channel ID to queue the event in.
      * @param event   The event to be queued.
+     * @return A {@link CompletableFuture<Event>} that will resolve when the event has been called.
      */
     public CompletableFuture<Event> queue(short channel, @NotNull Event event) {
         return this.queue(channel, event, false, null);

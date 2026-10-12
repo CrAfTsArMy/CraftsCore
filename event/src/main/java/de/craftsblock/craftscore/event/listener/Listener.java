@@ -3,6 +3,7 @@ package de.craftsblock.craftscore.event.listener;
 import de.craftsblock.craftscore.event.Cancellable;
 import de.craftsblock.craftscore.event.Event;
 import de.craftsblock.craftscore.event.EventPriority;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,5 +101,13 @@ public sealed interface Listener extends Consumer<Event>
      * @return {@code true} if cancelled events should be ignored, otherwise {@code false}.
      */
     boolean isIgnoreWhenCancelled();
+
+    /**
+     *
+     *
+     * @return
+     */
+    @ApiStatus.Internal
+    Listener cloneWithoutChain();
 
 }

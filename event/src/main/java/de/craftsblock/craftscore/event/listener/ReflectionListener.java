@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.event.listener;
 
 import de.craftsblock.craftscore.event.Event;
 import de.craftsblock.craftscore.event.EventPriority;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.sql.Ref;
 
 /**
  * A {@link Listener} implementation that invokes event handler methods via reflection.
@@ -166,6 +168,16 @@ public final class ReflectionListener implements Listener {
     @Override
     public boolean isIgnoreWhenCancelled() {
         return ignoreWhenCancelled;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @ApiStatus.Internal
+    public ReflectionListener cloneWithoutChain() {
+        return new ReflectionListener(this.eventType, this.method, this.owner, this.priority, this.ignoreWhenCancelled);
     }
 
 }

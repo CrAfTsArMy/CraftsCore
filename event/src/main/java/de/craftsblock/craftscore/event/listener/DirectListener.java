@@ -2,6 +2,7 @@ package de.craftsblock.craftscore.event.listener;
 
 import de.craftsblock.craftscore.event.Event;
 import de.craftsblock.craftscore.event.EventPriority;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,6 +120,16 @@ public final class DirectListener<T extends Event> implements Listener {
     @Override
     public boolean isIgnoreWhenCancelled() {
         return ignoreWhenCancelled;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @ApiStatus.Internal
+    public DirectListener<T> cloneWithoutChain() {
+        return new DirectListener<>(this.eventType, this.consumer, this.priority, this.ignoreWhenCancelled);
     }
 
 }

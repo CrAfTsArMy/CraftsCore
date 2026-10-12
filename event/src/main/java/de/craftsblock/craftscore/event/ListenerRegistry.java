@@ -114,7 +114,7 @@ public class ListenerRegistry {
         }
 
         listenerIndex.add(adapter);
-        bakeAll(changedEvents);
+        clearBakedListeners(changedEvents);
     }
 
     /**
@@ -178,7 +178,7 @@ public class ListenerRegistry {
                 .computeIfAbsent(priority, e -> new CopyOnWriteArrayList<>())
                 .add(listener);
 
-        bakeAll(Collections.singleton(eventType));
+        clearBakedListeners(Collections.singleton(eventType));
     }
 
     /**
@@ -229,11 +229,11 @@ public class ListenerRegistry {
         }
 
         listenerIndex.remove(adapter);
-        bakeAll(changedEvents);
+        clearBakedListeners(changedEvents);
     }
 
     /**
-     * Invalidates and rebakes all cached listener chains for the given event types.
+     * Invalidates all cached listener chains for the given event types.
      * <p>
      * This ensures that any structural changes in the listener registry are properly
      * reflected in the internal execution order cache, including inherited event types.
@@ -242,19 +242,14 @@ public class ListenerRegistry {
      * @since 3.8.13
      */
     @SuppressWarnings("unchecked")
-    private void bakeAll(Collection<Class<? extends Event>> targetEvents) {
-        Set<Class<? extends Event>> rebakeTypes = new HashSet<>();
+    private void clearBakedListeners(Collection<Class<? extends Event>> targetEvents) {
         for (Class<? extends Event> type : targetEvents) {
             for (Class<?> current = type;
                  current != null && Event.class.isAssignableFrom(current);
                  current = current.getSuperclass()) {
 
-                rebakeTypes.add((Class<? extends Event>) current);
+                bakedListeners.remove(type);
             }
-        }
-
-        for (Class<? extends Event> type : rebakeTypes) {
-            bakedListeners.remove(type);
         }
     }
 
@@ -295,10 +290,12 @@ public class ListenerRegistry {
             return null;
         }
 
-        return ordered.stream().reduce((current, next) -> {
-            next.setNext(current);
-            return next;
-        }).orElseThrow();
+        return ordered.stream()
+                .map(Listener::cloneWithoutChain)
+                .reduce((current, next) -> {
+                    next.setNext(current);
+                    return next;
+                }).orElseThrow();
     }
 
     /**
@@ -367,8 +364,8 @@ public class ListenerRegistry {
      * @since 3.8.13
      */
     public CompletableFuture<Event> callAsync(@NotNull Event event, @NotNull Executor executor) {
-        event.markAsync();
         event.ensureAsyncAllowed();
+        event.markAsync();
 
         Listener listener = bakedListeners.get(event.getClass());
         if (listener == null) {

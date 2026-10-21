@@ -1,7 +1,5 @@
 package de.craftsblock.craftscore.utils;
 
-import java.util.Objects;
-
 /**
  * A simple immutable key-value container representing a pair of two related objects.
  *
@@ -11,10 +9,7 @@ import java.util.Objects;
  * @author CraftsBlock
  * @since 3.8.13
  */
-public class Pair<K, V> {
-
-    private final K key;
-    private final V value;
+public record Pair<K, V>(K key, V value) {
 
     /**
      * Creates a new {@link Pair} with the given key and value.
@@ -22,9 +17,7 @@ public class Pair<K, V> {
      * @param key   The key element of the pair
      * @param value The value element of the pair
      */
-    public Pair(K key, V value) {
-        this.key = key;
-        this.value = value;
+    public Pair {
     }
 
     /**
@@ -32,7 +25,8 @@ public class Pair<K, V> {
      *
      * @return The key
      */
-    public K getKey() {
+    @Override
+    public K key() {
         return key;
     }
 
@@ -41,42 +35,9 @@ public class Pair<K, V> {
      *
      * @return The value
      */
-    public V getValue() {
+    @Override
+    public V value() {
         return value;
-    }
-
-    /**
-     * Compares this pair to another object for equality.
-     * <p>
-     * Two pairs are considered equal if both their key and value are equal.
-     *
-     * @param obj The object to compare with this pair
-     * @return {@code true} if the given object is equal to this pair, otherwise {@code false}
-     */
-    @Override
-    @SuppressWarnings("rawtypes")
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-
-        Pair that = (Pair) obj;
-        return Objects.equals(this.key, that.key) &&
-                Objects.equals(this.value, that.value);
-    }
-
-    /**
-     * Returns a hash code value for this pair based on its key and value.
-     *
-     * @return The hash code of this pair
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(key, value);
     }
 
 
